@@ -22,4 +22,6 @@ public interface TournamentInterface {
 
     ResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
 
+    ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime);
+
 }

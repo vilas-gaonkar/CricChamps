@@ -205,8 +205,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         jdbcTemplate.update("update tournaments set tournamentStartDate = ? , tournamentEndDate = ? where " +
-                "tournamentId = ? and isDeleted = 'false'",startDate,endDate,tournamentId);
-        return new ResultModel("date added successfully");
+                "tournamentId = ? and isDeleted = 'false'", startDate, endDate, tournamentId);
+        return new ResultModel("date updated successfully");
     }
 
     @Override
@@ -214,8 +214,17 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? where " +
-                "tournamentId = ? and isDeleted = 'false'",startTime,endTime,tournamentId);
-        return new ResultModel("Time added successfully");
+                "tournamentId = ? and isDeleted = 'false'", startTime, endTime, tournamentId);
+        return new ResultModel("Time updated successfully");
+    }
+
+    @Override
+    public ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
+                "tournamentEndDate = ? where tournamentId = ? and isDeleted = 'false'", startTime, endTime, startDate, endDate, tournamentId);
+        return new ResultModel("Date and Time updated successfully");
     }
 
     /**

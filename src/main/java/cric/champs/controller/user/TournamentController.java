@@ -6,6 +6,7 @@ import cric.champs.entity.Tournaments;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.TournamentInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,16 +67,25 @@ public class TournamentController {
 
     @PatchMapping("/set/date")
     public ResponseEntity<ResultModel> setTournamentDate(@RequestPart long tournamentId,
-                                                         @RequestPart LocalDate startDate,
-                                                         @RequestPart LocalDate endDate){
+                                                         @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                         @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDate(tournamentId, startDate, endDate)));
     }
 
     @PatchMapping("/set/time")
     public ResponseEntity<ResultModel> setTournamentTime(@RequestPart long tournamentId,
-                                                         @RequestPart LocalTime startTime,
-                                                         @RequestPart LocalTime endTime){
+                                                         @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                                         @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
+    }
+
+    @PatchMapping("/set/date/time")
+    public ResponseEntity<ResultModel> setTournamentDateTime(@RequestPart long tournamentId,
+                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTime(tournamentId, startDate, endDate, startTime, endTime)));
     }
 
 }
