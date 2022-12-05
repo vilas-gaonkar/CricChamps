@@ -200,8 +200,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public ResultModel deleteGrounds(long groundId) {
-        if (systemInterface.verifyGroundId(groundId).isEmpty())
+    public ResultModel deleteGrounds(long groundId, long tournamentId) {
+        if (systemInterface.verifyGroundId(groundId, tournamentId).isEmpty())
             throw new NullPointerException("Ground is not found");
         jdbcTemplate.update("update grounds set isDeleted = 'true' where groundId = ?", groundId);
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId in" +
@@ -211,7 +211,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public ResultModel editGround(Grounds ground) {
-        if (systemInterface.verifyGroundId(ground.getGroundId()).isEmpty())
+        if (systemInterface.verifyGroundId(ground.getGroundId(), ground.getTournamentId()).isEmpty())
             return new ResultModel("Invalid ground");
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             return new ResultModel("latitude and longitude already added");

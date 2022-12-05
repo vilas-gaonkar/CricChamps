@@ -9,7 +9,7 @@ public interface GroundInterface {
 
     ResultModel registerGrounds(Grounds grounds , List<String> groundPhoto);
 
-    ResultModel deleteGrounds(long groundId);
+    ResultModel deleteGrounds(long groundId,long tournamentId);
 
     ResultModel editGround(Grounds ground);
 
