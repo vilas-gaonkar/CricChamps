@@ -80,11 +80,6 @@ public class LoginController {
         return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword,email)));
     }
 
-    @PatchMapping("/user/change/password")
-    public ResponseEntity<ResultModel> changePassword(@RequestHeader String newPassword, @RequestHeader String confirmPassword) throws UpdateFailedException {
-        return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
-    }
-
     @PatchMapping("/forgot/password")
     public ResponseEntity<ResultModel> forgotPassword(@RequestHeader String email) throws UsernameNotFoundException, OTPGenerateException {
         return ResponseEntity.of(Optional.of(loginInterface.forgotPassword(email)));
@@ -123,6 +118,11 @@ public class LoginController {
             result = uploadImageTOCloud.uploadImage(profilePhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
 
         return ResponseEntity.of(Optional.of(loginInterface.changeProfilePhoto(result.get("url").toString())));
+    }
+
+    @PatchMapping("/user/change/password")
+    public ResponseEntity<ResultModel> changePassword(@RequestHeader String newPassword, @RequestHeader String confirmPassword) throws UpdateFailedException {
+        return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
     }
 
     @DeleteMapping("/user/remove")
