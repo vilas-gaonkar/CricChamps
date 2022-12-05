@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/ground")
 public class GroundController {
 
     @Autowired
@@ -24,7 +25,7 @@ public class GroundController {
     private GroundInterface groundInterface;
 
     @SuppressWarnings("rawtypes")
-    @PostMapping("/register/ground")
+    @PostMapping("/register")
     public ResponseEntity<ResultModel> register(@ModelAttribute Grounds ground, @RequestPart MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
@@ -44,7 +45,7 @@ public class GroundController {
         }
     }
 
-    @PutMapping("/edit/ground")
+    @PutMapping("/edit")
     public ResponseEntity<ResultModel> edit(@ModelAttribute Grounds ground, @RequestPart MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
@@ -64,7 +65,7 @@ public class GroundController {
         }
     }
 
-    @DeleteMapping("/remove/ground")
+    @DeleteMapping("/remove")
     public ResponseEntity<ResultModel> delete(@RequestPart long groundId, @RequestPart long tournamentId){
         return ResponseEntity.of(Optional.of(groundInterface.deleteGrounds(groundId,tournamentId)));
     }

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/tournament")
 public class TournamentController {
 
     @Autowired
@@ -25,7 +26,7 @@ public class TournamentController {
     private UploadImageTOCloud uploadImageTOCloud;
 
     @SuppressWarnings("rawtypes")
-    @PostMapping("/register/tournament")
+    @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@ModelAttribute Tournaments tournament, @RequestPart MultipartFile logo) throws IOException {
         Map result = null;
         if (logo == null)
@@ -45,7 +46,7 @@ public class TournamentController {
         }
     }
 
-    @PutMapping("/edit/tournament")
+    @PutMapping("/edit")
     public ResponseEntity<ResultModel> edit(@RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.cancelTournament(tournamentId)));
     }
