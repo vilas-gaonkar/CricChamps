@@ -53,9 +53,7 @@ public class LoginController {
         try {
             return ResponseEntity.of(Optional.of(loginInterface.signUp(user)));
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
-
         }
     }
 
