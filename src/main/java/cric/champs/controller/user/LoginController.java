@@ -74,7 +74,7 @@ public class LoginController {
         return new HttpEntity<>(Collections.singletonMap("message", "Token generated successfully"), headers);
     }
 
-    @PatchMapping("/change/password")
+    @PatchMapping("/reset/password")
     public ResponseEntity<ResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
                                                      @RequestHeader String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword,email)));
