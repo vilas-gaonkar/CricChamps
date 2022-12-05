@@ -1,2 +1,5 @@
-package cric.champs.service.user;public enum MatchStatus {
+package cric.champs.service;
+
+public enum MatchStatus {
+    ABANDONED,PAST,LIVE,UPCOMING
 }
