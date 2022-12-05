@@ -77,4 +77,8 @@ public class UmpiresController {
         return ResponseEntity.of(Optional.of(umpiresInterface.deleteUmpires(umpireId, tournamentId)));
     }
 
+    @GetMapping("/view/umpire")
+    public ResponseEntity<Umpires> getUmpire(@RequestPart long umpireId, @RequestPart long tournamentId){
+        return ResponseEntity.of(Optional.of(umpiresInterface.getUmpire(umpireId, tournamentId)));
+    }
 }
