@@ -63,7 +63,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 return null;
             List<Users> user = systemInterface.getUserDetails(email, AccountStatus.VERIFIED.toString());
             if (user.isEmpty())
-                throw new NotVerifiedException("verify your account before login");
+                throw new NotVerifiedException("Please verify your account before logging in");
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
             final UserDetails userDetail = jwtUserDetailsService.loadUserByUsername(email);
             return "Bearer " + jwtUtility.generateToken(userDetail);
@@ -84,14 +84,14 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel signUp(Users user) throws SignupException {
         try {
             if (!systemInterface.verifyEmail(user.getEmail()))
-                return new ResultModel("Email already registered in Cric Champs");
+                return new ResultModel("This Email is already registered with Cric Champs");
             jdbcTemplate.update("insert into users values(?,?,?,?,?,?,?,?,?,?,?)", null, user.getUsername(), user.getGender(),
                     user.getEmail(), user.getPhoneNumber(), user.getCity(), user.getProfilePicture(), user.getAge(),
                     passwordEncoder.encode(user.getPassword()), AccountStatus.NOTVERIFIED.toString(), "false");
-            return new ResultModel("Cric Champs account created Successfully");
+            return new ResultModel("Your Cric Champs account has been created successfully");
         } catch (Exception exception) {
             exception.printStackTrace();
-            throw new SignupException("Failed to register.Please provide valid details");
+            throw new SignupException("Failed to register. Please provide valid details");
         }
     }
 
@@ -99,7 +99,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel forgotPassword(String email) throws UsernameNotFoundException, OTPGenerateException {
         if (!systemInterface.verifyEmail(email)) {
             systemInterface.forgetOtp(email);
-            return new ResultModel("OTP sent successfully");
+            return new ResultModel("OTP has been sent to your email");
         }
         throw new UsernameNotFoundException("Invalid email");
     }
@@ -114,9 +114,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (newPassword.equals(confirmPassword)) {
             jdbcTemplate.update("update users set password = ? where userId = ? and isDeleted = 'false'",
                     passwordEncoder.encode(newPassword), systemInterface.getUserId());
-            return new ResultModel("Password updated successfully");
+            return new ResultModel("Your password has been changed successfully");
         }
-        throw new UpdateFailedException("password miss matched");
+        throw new UpdateFailedException("Please re-check your password");
     }
 
     @Override
@@ -124,9 +124,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (newPassword.equals(confirmPassword)) {
             jdbcTemplate.update("update users set password = ? where email = ? and isDeleted = 'false'",
                     passwordEncoder.encode(newPassword), email);
-            return new ResultModel("Password updated successfully");
+            return new ResultModel("Your password has been reset successfully");
         }
-        throw new UpdateFailedException("password miss matched");
+        throw new UpdateFailedException("Please re-check your password");
     }
 
     @Override
@@ -134,9 +134,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (profilePhoto != null) {
             jdbcTemplate.update("update users set profilePicture = ? where userId = ? and isDeleted = 'false'",
                     profilePhoto, systemInterface.getUserId());
-            return new ResultModel("Profile photo uploaded successfully");
+            return new ResultModel("Your profile photo has been changed successfully");
         }
-        throw new UpdateFailedException("Photo not selected");
+        throw new UpdateFailedException("Please select a photo");
     }
 
     @Override
@@ -145,9 +145,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (user.getProfilePicture() != null) {
             jdbcTemplate.update("update users set profilePicture = ? where userId = ? and isDeleted = 'false'",
                     null, systemInterface.getUserId());
-            return new ResultModel("photo deleted successfully");
+            return new ResultModel("Your Profile Photo has been deleted");
         }
-        throw new NullPointerException("Photo not uploaded");
+        throw new NullPointerException("Please select a photo");
     }
 
     /**
@@ -175,12 +175,12 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     @Override
     public ResultModel cancelTournament(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament is not found");
+            throw new NullPointerException("Tournament not found");
 
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentCode = ?",
                 TournamentStatus.CANCELLED, tournamentId);
         systemInterface.deleteMatches(tournamentId);
-        return new ResultModel("tournament cancelled successfully");
+        return new ResultModel("Tournament has been cancelled");
     }
 
     /**
@@ -190,23 +190,23 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     @Override
     public ResultModel registerGrounds(Grounds ground, List<String> groundPhoto) {
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("ground already added in given longitude and longitude");
+            throw new NullPointerException("A ground already exists in the given co-ordinates. Please enter different co-ordinates");
         jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
                 ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getGroundPhoto(),
                 ground.getLatitude(), ground.getLongitude(), "false");
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
                 ground.getTournamentId());
-        return new ResultModel("Grounds added successfully");
+        return new ResultModel("Ground(s) added successfully");
     }
 
     @Override
     public ResultModel deleteGrounds(long groundId, long tournamentId) {
         if (systemInterface.verifyGroundId(groundId, tournamentId).isEmpty())
-            throw new NullPointerException("Ground is not found");
+            throw new NullPointerException("Ground not found");
         jdbcTemplate.update("update grounds set isDeleted = 'true' where groundId = ?", groundId);
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId in" +
                 "(select tournamentId from grounds where groundId = ?)", groundId);
-        return new ResultModel("Ground deleted successfully.");
+        return new ResultModel("Ground has been deleted");
     }
 
     @Override
@@ -228,7 +228,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     @Override
     public ResultModel registerUmpires(Umpires umpires) {
         if (systemInterface.verifyTournamentId(umpires.getTournamentId()).isEmpty())
-            throw new NullPointerException("tournament not found");
+            throw new NullPointerException("Tournament not found");
         jdbcTemplate.update("insert into umpires values(?,?,?,?,?,?,?)", null, umpires.getTournamentId(),
                 umpires.getUmpireName(), umpires.getCity(), umpires.getPhoneNumber(), umpires.getUmpirePhoto(), "false");
         jdbcTemplate.update("update tournaments set numberOfUmpires = numberOfUmpires + 1 where tournamentId = ?",
@@ -246,7 +246,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         jdbcTemplate.update("update umpires set isDeleted = 'true' where umpireId = ?", umpireId);
         jdbcTemplate.update("update tournaments set numberOfUmpires = numberOfUmpires - 1 where tournamentId = ?",
                 tournamentId);
-        return new ResultModel("umpire removed successfully");
+        return new ResultModel("Umpire has been removed");
     }
 
     @Override
@@ -255,7 +255,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             return new ResultModel("Invalid umpire details");
         jdbcTemplate.update("update umpires set umpireName = ? ,city = ? ,phoneNumber = ? , umpirePhoto = ? where umpireId = ? ",
                 umpire.getUmpireName(), umpire.getCity(), umpire.getPhoneNumber(), umpire.getUmpirePhoto(), umpire.getUmpireId());
-        return new ResultModel("changes updated successfully");
+        return new ResultModel("Umpire details have been updated successfully");
     }
 
 }
