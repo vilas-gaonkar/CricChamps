@@ -10,6 +10,7 @@ import cric.champs.service.system.SystemInterface;
 import cric.champs.service.system.TokenInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +176,21 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
+    public List<Tournaments> getTournamentDetails(int pageSize, int pageNumber) {
+        int offSet = pageSize * (pageNumber - 1);
+        return jdbcTemplate.query("select * from tournaments where userId = ? limit ? offset ?",
+                new BeanPropertyRowMapper<>(Tournaments.class), systemInterface.getUserId(),pageSize,offSet);
+    }
+
+    @Override
+    public Tournaments getTournament(long tournamentId) {
+        List<Tournaments> tournament = systemInterface.verifyTournamentId(tournamentId);
+        if (tournament.isEmpty())
+            throw new NullPointerException("tournament not found");
+        return tournament.get(0);
+    }
+
+    @Override
     public ResultModel cancelTournament(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
@@ -181,6 +199,16 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 TournamentStatus.CANCELLED, tournamentId);
         systemInterface.deleteMatches(tournamentId);
         return new ResultModel("Tournament has been cancelled");
+    }
+
+    @Override
+    public ResultModel setTournamentDate(LocalDate startDate, LocalDate endDate) {
+        return null;
+    }
+
+    @Override
+    public ResultModel setTournamentTime(LocalTime startTime, LocalTime endTime) {
+        return null;
     }
 
     /**
@@ -221,6 +249,22 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         return new ResultModel("Ground details updated successfully");
     }
 
+    @Override
+    public List<Grounds> getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Invalid tournament details");
+        return jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
+    }
+
+    @Override
+    public Grounds getGround(long groundId, long tournamentId) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Invalid tournament details");
+        return jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId).get(0);
+    }
+
     /**
      * ******Umpires Interface******
      */
@@ -256,6 +300,15 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         jdbcTemplate.update("update umpires set umpireName = ? ,city = ? ,phoneNumber = ? , umpirePhoto = ? where umpireId = ? ",
                 umpire.getUmpireName(), umpire.getCity(), umpire.getPhoneNumber(), umpire.getUmpirePhoto(), umpire.getUmpireId());
         return new ResultModel("Umpire details have been updated successfully");
+    }
+
+    @Override
+    public List<Umpires> getUmpireDetails(long tournamentId, int pageSize, int pageNumber) {
+        int offset = pageSize * (pageNumber - 1);
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? limit ? offset ?",
+                new BeanPropertyRowMapper<>(Umpires.class), tournamentId, pageSize, offset);
     }
 
 }

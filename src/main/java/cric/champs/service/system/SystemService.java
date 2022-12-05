@@ -167,15 +167,15 @@ public class SystemService implements SystemInterface {
     public ResultModel deleteMatches(long tournamentId) {
         rejectRequest();
         jdbcTemplate.update("update matches set isCancelled = ? where tournamentId = ? ",
-                MatchStatus.ABANDONED.toString(),tournamentId);
+                MatchStatus.ABANDONED.toString(), tournamentId);
         return new ResultModel("Cancelled successfully");
     }
 
     @Override
     public List<Tournaments> verifyTournamentId(long tournamentId) {
         rejectRequest();
-        return jdbcTemplate.query("select * from tournaments where tournamentId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId);
+        return jdbcTemplate.query("select * from tournaments where tournamentId = ? and userId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, getUserId());
     }
 
     @Override
@@ -187,20 +187,20 @@ public class SystemService implements SystemInterface {
 
     //verify user tournament accounts
     @Override
-    public List<Tournaments> getTournamentByUserID() {
+    public List<Tournaments> verifyUserID() {
         return jdbcTemplate.query("select * from tournaments where userId = ?",
-                new BeanPropertyRowMapper<>(Tournaments.class),getUserId());
+                new BeanPropertyRowMapper<>(Tournaments.class), getUserId());
     }
 
     @Override
     public List<Grounds> verifyGroundId(long groundId, long tournamentId) {
         rejectRequest();
         return jdbcTemplate.query("select * from grounds where groundId = ? and isDeleted = 'false' and tournamentId = ?",
-                new BeanPropertyRowMapper<>(Grounds.class), groundId,tournamentId);
+                new BeanPropertyRowMapper<>(Grounds.class), groundId, tournamentId);
     }
 
     private void rejectRequest() {
-        if(getTournamentByUserID().isEmpty())
+        if (verifyUserID().isEmpty())
             throw new NullPointerException("Access denied");
     }
 
@@ -208,7 +208,7 @@ public class SystemService implements SystemInterface {
     public List<Umpires> verifyUmpireDetails(long tournamentId, long umpireId) {
         rejectRequest();
         return jdbcTemplate.query("select * from umpires where umpireId = ? and tournamentId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Umpires.class),umpireId,tournamentId);
+                new BeanPropertyRowMapper<>(Umpires.class), umpireId, tournamentId);
     }
 
 }

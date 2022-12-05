@@ -32,6 +32,6 @@ public class FixtureService implements FixtureGenerationInterface {
                 new BeanPropertyRowMapper<>(Umpires.class),tournaments.getTournamentId());
         if(grounds.isEmpty()||umpires.isEmpty())
             return new ResultModel("please add ground or umpire");
-
+return null;
     }
 }

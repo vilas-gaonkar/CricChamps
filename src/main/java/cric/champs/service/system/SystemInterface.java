@@ -44,5 +44,5 @@ public interface SystemInterface {
 
     List<Umpires> verifyUmpireDetails(long tournamentId, long umpireId);
 
-    List<Tournaments> getTournamentByUserID();
+    List<Tournaments> verifyUserID();
 }

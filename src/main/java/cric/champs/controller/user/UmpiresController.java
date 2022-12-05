@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,9 +67,14 @@ public class UmpiresController {
         }
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<List<Umpires>> view(@RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+        return ResponseEntity.of(Optional.of(umpiresInterface.getUmpireDetails(tournamentId, pageSize, pageNumber)));
+    }
+
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestPart long umpireId,@RequestPart long tournamentId){
-        return ResponseEntity.of(Optional.of(umpiresInterface.deleteUmpires(umpireId,tournamentId)));
+    public ResponseEntity<ResultModel> delete(@RequestPart long umpireId, @RequestPart long tournamentId) {
+        return ResponseEntity.of(Optional.of(umpiresInterface.deleteUmpires(umpireId, tournamentId)));
     }
 
 }
