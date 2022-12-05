@@ -15,4 +15,6 @@ public interface UmpiresInterface {
 
     List<Umpires> getUmpireDetails(long tournamentId,int pageSize , int pageNumber);
 
+    Umpires getUmpire(long umpireId , long tournamentId);
+
 }

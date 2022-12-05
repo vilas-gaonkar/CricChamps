@@ -302,9 +302,27 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         return new ResultModel("Umpire details have been updated successfully");
     }
 
+    @Override
+    public List<Umpires> getUmpireDetails(long tournamentId, int pageSize, int pageNumber) {
+        int offset = pageSize * (pageNumber - 1);
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? and isDelete = 'false' limit ? offset ?",
+                new BeanPropertyRowMapper<>(Umpires.class), tournamentId, pageSize, offset);
+    }
+
+    @Override
+    public Umpires getUmpire(long umpireId, long tournamentId) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDelete = 'false'",
+                new BeanPropertyRowMapper<>(Umpires.class), tournamentId, umpireId).get(0);
+    }
+
     /**
      * ******Team Interface******
      */
+
     @Override
     public ResultModel registerTeam(Teams teams) {
         jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
@@ -408,16 +426,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Player not found");
         return jdbcTemplate.query("select * from players where playerId = ? and teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), playerId, teamId, tournamentId).get(0);
-    }
-
-
-    @Override
-    public List<Umpires> getUmpireDetails(long tournamentId, int pageSize, int pageNumber) {
-        int offset = pageSize * (pageNumber - 1);
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from umpires where tournamentId = ? limit ? offset ?",
-                new BeanPropertyRowMapper<>(Umpires.class), tournamentId, pageSize, offset);
     }
 
 }
