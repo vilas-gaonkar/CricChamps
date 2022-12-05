@@ -193,6 +193,24 @@ public class SystemService implements SystemInterface {
     }
 
     @Override
+    public List<Teams> verifyTeamDetails(long teamId, long tournamentId) {
+        return jdbcTemplate.query("select * from teams where teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Teams.class), teamId, tournamentId);
+    }
+
+    @Override
+    public List<Players> verifyPlayerDetails(long playerId, long teamId, long tournamentId) {
+        return jdbcTemplate.query("select * from players where playerId = ? and teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Players.class), playerId, teamId, tournamentId);
+    }
+
+    @Override
+    public List<Players> verifyTeamAndTournamentId(long teamId, long tournamentId) {
+        return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId);
+    }
+
+    @Override
     public List<Grounds> verifyGroundId(long groundId, long tournamentId) {
         rejectRequest();
         return jdbcTemplate.query("select * from grounds where groundId = ? and isDeleted = 'false' and tournamentId = ?",
