@@ -40,8 +40,9 @@ public interface SystemInterface {
 
     List<Grounds> verifyLatitudeAndLongitude(double latitude, double longitude, long tournamentId);
 
-    List<Grounds> verifyGroundId(long groundId);
+    List<Grounds> verifyGroundId(long groundId,long tournamentId);
 
     List<Umpires> verifyUmpireDetails(long tournamentId, long umpireId);
 
+    List<Tournaments> getTournamentByUserID();
 }

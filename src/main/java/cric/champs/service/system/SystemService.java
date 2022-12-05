@@ -165,6 +165,7 @@ public class SystemService implements SystemInterface {
 
     @Override
     public ResultModel deleteMatches(long tournamentId) {
+        rejectRequest();
         jdbcTemplate.update("update matches set isCancelled = ? where tournamentId = ? ",
                 MatchStatus.ABANDONED.toString(),tournamentId);
         return new ResultModel("Cancelled successfully");
@@ -172,24 +173,40 @@ public class SystemService implements SystemInterface {
 
     @Override
     public List<Tournaments> verifyTournamentId(long tournamentId) {
+        rejectRequest();
         return jdbcTemplate.query("select * from tournaments where tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Tournaments.class), tournamentId);
     }
 
     @Override
     public List<Grounds> verifyLatitudeAndLongitude(double latitude, double longitude, long tournamentId) {
+        rejectRequest();
         return jdbcTemplate.query("select * from grounds where latitude = ? and longitude = ? and tournamentId = ? " +
                 "and isDeleted = 'false'", new BeanPropertyRowMapper<>(Grounds.class), latitude, longitude, tournamentId);
     }
 
+    //verify user tournament accounts
     @Override
-    public List<Grounds> verifyGroundId(long groundId) {
-        return jdbcTemplate.query("select * from grounds where groundId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Grounds.class), groundId);
+    public List<Tournaments> getTournamentByUserID() {
+        return jdbcTemplate.query("select * from tournaments where userId = ?",
+                new BeanPropertyRowMapper<>(Tournaments.class),getUserId());
+    }
+
+    @Override
+    public List<Grounds> verifyGroundId(long groundId, long tournamentId) {
+        rejectRequest();
+        return jdbcTemplate.query("select * from grounds where groundId = ? and isDeleted = 'false' and tournamentId = ?",
+                new BeanPropertyRowMapper<>(Grounds.class), groundId,tournamentId);
+    }
+
+    private void rejectRequest() {
+        if(getTournamentByUserID().isEmpty())
+            throw new NullPointerException("Access denied");
     }
 
     @Override
     public List<Umpires> verifyUmpireDetails(long tournamentId, long umpireId) {
+        rejectRequest();
         return jdbcTemplate.query("select * from umpires where umpireId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Umpires.class),umpireId,tournamentId);
     }
