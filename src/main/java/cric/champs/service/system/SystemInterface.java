@@ -45,4 +45,10 @@ public interface SystemInterface {
     List<Umpires> verifyUmpireDetails(long tournamentId, long umpireId);
 
     List<Tournaments> getTournamentByUserID();
+
+    List<Teams> verifyTeamDetails(long teamId, long tournamentId);
+
+    List<Players> verifyPlayerDetails(long playerId, long teamId, long tournamentId);
+
+    List<Players> verifyTeamAndTournamentId(long teamId, long tournamentId);
 }

@@ -10,6 +10,7 @@ import cric.champs.service.system.SystemInterface;
 import cric.champs.service.system.TokenInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class UserService implements LoginInterface, TournamentInterface, GroundInterface, UmpiresInterface {
+public class UserService implements LoginInterface, TournamentInterface, GroundInterface, UmpiresInterface, TeamInterface, PlayerInterface {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -257,5 +258,132 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 umpire.getUmpireName(), umpire.getCity(), umpire.getPhoneNumber(), umpire.getUmpirePhoto(), umpire.getUmpireId());
         return new ResultModel("Umpire details have been updated successfully");
     }
+
+    /**
+     * ******Team Interface******
+     */
+    @Override
+    public ResultModel registerTeam(Teams teams) {
+        jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
+                teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), "false");
+        return new ResultModel("Team registered successfully.");
+    }
+
+    @Override
+    public ResultModel deleteTeam(long teamId, long tournamentId) {
+        if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty()) {
+            return new ResultModel("Team is not found");
+        }
+
+        jdbcTemplate.update("update teams set isDeleted = 'true' where teamId = ? and tournamentId = ?", teamId, tournamentId);
+        return new ResultModel("Team deleted successfully.");
+
+    }
+
+    @Override
+    public ResultModel editTeam(Teams teams) {
+        if (systemInterface.verifyTeamDetails(teams.getTeamId(), teams.getTournamentId()).isEmpty()) {
+            return new ResultModel("edited failed");
+        }
+        jdbcTemplate.update("update teams set teamName = ?, city = ?, teamLogo = ? where teamId = ? and tournamentId = ?",
+                teams.getTeamName(), teams.getCity(), teams.getTeamLogo(), teams.getTeamId(), teams.getTournamentId());
+
+        return new ResultModel("edited successfully");
+
+    }
+
+    @Override
+    public List<Teams> getAllTeams(long tournamentId, int pageSize, int pageNumber) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty()) {
+            throw new NullPointerException("Invalid tournament");
+        }
+        return jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' limit ? offset ?",
+                new BeanPropertyRowMapper<>(Teams.class), tournamentId, pageSize, pageNumber);
+    }
+
+    @Override
+    public Teams getTeam(long teamId, long tournamentId) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty()) {
+            throw new NullPointerException("Tournament not found");
+        }
+
+        if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty()) {
+            throw new NullPointerException("Team not found.");
+        }
+        return jdbcTemplate.query("select * from teams where teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Teams.class), teamId, tournamentId).get(0);
+    }
+
+    /**
+     * ******Player Interface******
+     */
+
+    @Override
+    public ResultModel registerPlayer(Players players) {
+        jdbcTemplate.update("insert into players values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, players.getTournamentId(),
+                players.getTeamId(), players.getPlayerName(), players.getCity(), players.getPhoneNumber(), players.getProfilePhoto(),
+                players.getDesignation(), players.getExpertise(), players.getBattingStyle(), players.getBowlingStyle(),
+                players.getBowlingType(), 0, 0, 0, null, players.getPersonalId(), players.getPersonalIdName(), "false");
+        return new ResultModel("Player registered successfully.");
+    }
+
+    @Override
+    public ResultModel deletePlayer(long playerId, long teamId, long tournamentId) {
+        if (!systemInterface.verifyPlayerDetails(playerId, teamId, tournamentId).isEmpty()) {
+            jdbcTemplate.update("update players set isDeleted = 'true' where playerId = ? and teamId = ? and tournamentId = ?",
+                    playerId, teamId, tournamentId);
+
+            return new ResultModel("Player deleted successfully");
+        }
+        return new ResultModel("Player not found");
+    }
+
+    @Override
+    public ResultModel editPlayer(Players players) {
+        if (systemInterface.verifyPlayerDetails(players.getPlayerId(), players.getTeamId(), players.getTournamentId()).isEmpty()) {
+            jdbcTemplate.update("update players set playerName = ?, city = ?, phoneNumber = ?, profilePhoto = ?," +
+                            "designation = ?, expertise = ?, battingStyle = ?, bowlingStyle = ?, bowlingType = ? where playerId = ? " +
+                            "and teamId = ? and tournamentId = ?", players.getPlayerName(), players.getCity(), players.getPhoneNumber(),
+                    players.getProfilePhoto(), players.getDesignation(), players.getExpertise(), players.getBattingStyle(),
+                    players.getBowlingStyle(), players.getBowlingType(), players.getPlayerId(), players.getTeamId(), players.getTournamentId());
+
+            return new ResultModel("Player edited successfully");
+        }
+        return new ResultModel("Player is not found.");
+    }
+
+    @Override
+    public List<Players> getAllPlayers(long teamId, long tournamentId, int pageSize, int pageNumber) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty()) {
+            throw new NullPointerException("Tournament not found");
+        }
+
+        List<Players> players = systemInterface.verifyTeamAndTournamentId(teamId, tournamentId);
+
+        if (players.isEmpty()) {
+            throw new NullPointerException("Players not found");
+        }
+        return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false' limit ? offset ?",
+                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId, pageSize, pageNumber);
+    }
+
+    @Override
+    public Players getPlayer(long playerId, long teamId, long tournamentId) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty()) {
+            throw new NullPointerException("Tournament not found");
+        }
+
+        if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty()) {
+            throw new NullPointerException("Team not found");
+        }
+
+        if (systemInterface.verifyPlayerDetails(playerId, teamId, tournamentId).isEmpty()) {
+            throw new NullPointerException("Player not found");
+        }
+
+        return jdbcTemplate.query("select * from players where playerId = ? and teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Players.class), playerId, teamId, tournamentId).get(0);
+    }
+
 
 }
