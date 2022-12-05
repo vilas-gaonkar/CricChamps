@@ -307,7 +307,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         int offset = pageSize * (pageNumber - 1);
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from umpires where tournamentId = ? and isDelete = 'false' limit ? offset ?",
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? and isDeleted = 'false' limit ? offset ?",
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId, pageSize, offset);
     }
 
@@ -315,7 +315,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public Umpires getUmpire(long umpireId, long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDelete = 'false'",
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId, umpireId).get(0);
     }
 
