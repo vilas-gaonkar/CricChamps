@@ -63,7 +63,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 return null;
             List<Users> user = systemInterface.getUserDetails(email, AccountStatus.VERIFIED.toString());
             if (user.isEmpty())
-                throw new NotVerifiedException("verify your account before login");
+                throw new NotVerifiedException("Please verify your account before logging in");
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
             final UserDetails userDetail = jwtUserDetailsService.loadUserByUsername(email);
             return "Bearer " + jwtUtility.generateToken(userDetail);
@@ -84,14 +84,14 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel signUp(Users user) throws SignupException {
         try {
             if (!systemInterface.verifyEmail(user.getEmail()))
-                return new ResultModel("Email already registered in Cric Champs");
+                return new ResultModel("This email is already registered with Cric Champs");
             jdbcTemplate.update("insert into users values(?,?,?,?,?,?,?,?,?,?,?)", null, user.getUsername(), user.getGender(),
                     user.getEmail(), user.getPhoneNumber(), user.getCity(), user.getProfilePicture(), user.getAge(),
                     passwordEncoder.encode(user.getPassword()), AccountStatus.NOTVERIFIED.toString(), "false");
-            return new ResultModel("Cric Champs account created Successfully");
+            return new ResultModel("Cric Champs account created successfully");
         } catch (Exception exception) {
             exception.printStackTrace();
-            throw new SignupException("Failed to register.Please provide valid details");
+            throw new SignupException("Failed to register. Please provide valid details");
         }
     }
 
@@ -116,7 +116,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                     passwordEncoder.encode(newPassword), systemInterface.getUserId());
             return new ResultModel("Password updated successfully");
         }
-        throw new UpdateFailedException("password miss matched");
+        throw new UpdateFailedException("Please re-check your password");
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                     passwordEncoder.encode(newPassword), email);
             return new ResultModel("Password updated successfully");
         }
-        throw new UpdateFailedException("password miss matched");
+        throw new UpdateFailedException("Please re-check your password");
     }
 
     @Override
@@ -136,7 +136,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                     profilePhoto, systemInterface.getUserId());
             return new ResultModel("Profile photo uploaded successfully");
         }
-        throw new UpdateFailedException("Photo not selected");
+        throw new UpdateFailedException("Please select a Photo");
     }
 
     @Override
@@ -145,7 +145,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (user.getProfilePicture() != null) {
             jdbcTemplate.update("update users set profilePicture = ? where userId = ? and isDeleted = 'false'",
                     null, systemInterface.getUserId());
-            return new ResultModel("photo deleted successfully");
+            return new ResultModel("Photo has been deleted successfully");
         }
         throw new NullPointerException("Photo not uploaded");
     }
@@ -175,12 +175,12 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     @Override
     public ResultModel cancelTournament(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament is not found");
+            throw new NullPointerException("Tournament not found");
 
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentCode = ?",
                 TournamentStatus.CANCELLED, tournamentId);
         systemInterface.deleteMatches(tournamentId);
-        return new ResultModel("tournament cancelled successfully");
+        return new ResultModel("Tournament has been cancelled");
     }
 
     /**
@@ -196,17 +196,17 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 ground.getLatitude(), ground.getLongitude(), "false");
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
                 ground.getTournamentId());
-        return new ResultModel("Grounds added successfully");
+        return new ResultModel("Ground(s) added successfully");
     }
 
     @Override
     public ResultModel deleteGrounds(long groundId) {
         if (systemInterface.verifyGroundId(groundId).isEmpty())
-            throw new NullPointerException("Ground is not found");
+            throw new NullPointerException("Ground not found");
         jdbcTemplate.update("update grounds set isDeleted = 'true' where groundId = ?", groundId);
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId in" +
                 "(select tournamentId from grounds where groundId = ?)", groundId);
-        return new ResultModel("Ground deleted successfully.");
+        return new ResultModel("Ground has been deleted");
     }
 
     @Override
@@ -246,7 +246,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         jdbcTemplate.update("update umpires set isDeleted = 'true' where umpireId = ?", umpireId);
         jdbcTemplate.update("update tournaments set numberOfUmpires = numberOfUmpires - 1 where tournamentId = ?",
                 tournamentId);
-        return new ResultModel("umpire removed successfully");
+        return new ResultModel("Umpire has been removed");
     }
 
     @Override
@@ -255,7 +255,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             return new ResultModel("Invalid umpire details");
         jdbcTemplate.update("update umpires set umpireName = ? ,city = ? ,phoneNumber = ? , umpirePhoto = ? where umpireId = ? ",
                 umpire.getUmpireName(), umpire.getCity(), umpire.getPhoneNumber(), umpire.getUmpirePhoto(), umpire.getUmpireId());
-        return new ResultModel("changes updated successfully");
+        return new ResultModel("changes have been updated");
     }
 
 }
