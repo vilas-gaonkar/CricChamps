@@ -200,6 +200,8 @@ public class SystemService implements SystemInterface {
 
     @Override
     public List<Players> verifyPlayerDetails(long playerId, long teamId, long tournamentId) {
+        if (verifyTournamentId(tournamentId).isEmpty())
+            return null;
         return jdbcTemplate.query("select * from players where playerId = ? and teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), playerId, teamId, tournamentId);
     }
