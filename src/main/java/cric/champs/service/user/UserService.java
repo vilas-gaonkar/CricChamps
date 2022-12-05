@@ -194,7 +194,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel cancelTournament(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentCode = ?",
                 TournamentStatus.CANCELLED, tournamentId);
         systemInterface.deleteMatches(tournamentId);
@@ -202,13 +201,21 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public ResultModel setTournamentDate(LocalDate startDate, LocalDate endDate) {
-        return null;
+    public ResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        jdbcTemplate.update("update tournaments set tournamentStartDate = ? , tournamentEndDate = ? where " +
+                "tournamentId = ? and isDeleted = 'false'",startDate,endDate,tournamentId);
+        return new ResultModel("date added successfully");
     }
 
     @Override
-    public ResultModel setTournamentTime(LocalTime startTime, LocalTime endTime) {
-        return null;
+    public ResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? where " +
+                "tournamentId = ? and isDeleted = 'false'",startTime,endTime,tournamentId);
+        return new ResultModel("Time added successfully");
     }
 
     /**
@@ -277,10 +284,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 umpires.getUmpireName(), umpires.getCity(), umpires.getPhoneNumber(), umpires.getUmpirePhoto(), "false");
         jdbcTemplate.update("update tournaments set numberOfUmpires = numberOfUmpires + 1 where tournamentId = ?",
                 umpires.getTournamentId());
-
         return new ResultModel("Umpire registered successfully");
-
-
     }
 
     @Override

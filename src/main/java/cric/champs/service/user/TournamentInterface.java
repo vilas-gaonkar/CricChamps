@@ -18,8 +18,8 @@ public interface TournamentInterface {
 
     ResultModel cancelTournament(long tournamentId);
 
-    ResultModel setTournamentDate(LocalDate startDate , LocalDate endDate);
+    ResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate);
 
-    ResultModel setTournamentTime(LocalTime startTime , LocalTime endTime);
+    ResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
 
 }
