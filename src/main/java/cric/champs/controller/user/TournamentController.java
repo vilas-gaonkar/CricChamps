@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,20 @@ public class TournamentController {
     @PutMapping("/edit")
     public ResponseEntity<ResultModel> edit(@RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.cancelTournament(tournamentId)));
+    }
+
+    @PatchMapping("/set/date")
+    public ResponseEntity<ResultModel> setTournamentDate(@RequestPart long tournamentId,
+                                                         @RequestPart LocalDate startDate,
+                                                         @RequestPart LocalDate endDate){
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDate(tournamentId, startDate, endDate)));
+    }
+
+    @PatchMapping("/set/time")
+    public ResponseEntity<ResultModel> setTournamentTime(@RequestPart long tournamentId,
+                                                         @RequestPart LocalTime startTime,
+                                                         @RequestPart LocalTime endTime){
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
     }
 
 }
