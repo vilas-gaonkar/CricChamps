@@ -95,7 +95,7 @@ public class LoginController {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (loginInterface.resetPassword(otp, email)) {
             responseHeaders.set("isVerified", "true");
-            return ResponseEntity.ok().headers(responseHeaders).body("verified successfully");
+            return ResponseEntity.ok().headers(responseHeaders).body("Verified successfully");
         }
         responseHeaders.set("isVerified", "false");
         return ResponseEntity.ok().headers(responseHeaders).body("Invalid OTP");
