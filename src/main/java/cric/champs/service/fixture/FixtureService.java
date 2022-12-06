@@ -1,6 +1,7 @@
 package cric.champs.service.fixture;
 
 import cric.champs.entity.*;
+import cric.champs.service.MatchStatus;
 import cric.champs.service.TournamentTypes;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.user.TeamInterface;
@@ -26,7 +27,7 @@ public class FixtureService implements FixtureGenerationInterface {
     private TeamInterface teamInterface;
 
     @Override
-    public ResultModel generateFixture(long tournamentId) {
+    public ResultModel generateFixture(long tournamentId) throws Exception {
         int totalNumberOfMatchExpected;
         int totalNumberOfMatchInOneDay;
         int totalMatchesCanBePlayedInGivenDatesFormed;
@@ -72,62 +73,113 @@ public class FixtureService implements FixtureGenerationInterface {
 
         //checking total matches with expected matches
         if (totalNumberOfMatchExpected < totalMatchesCanBePlayedInGivenDatesFormed)
-            return new ResultModel("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
+            throw new Exception("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
         else
-            generateFixture(tournament, grounds, umpires);
+            return generateFixture(tournament, grounds, umpires);
 
-        return null;
     }
 
-    private void generateFixture(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) {
+    private ResultModel generateFixture(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' limit ? offset ?",
                 new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
 
         long[] teamsId = new long[teams.size()];
-        int index = 0;
+        for(int index = 0; index <teams.size(); index++)
+            teamsId[index] = teams.get(index).getTeamId();
+        /*int index = 0;
         for (Teams team : teams) {
             teamsId[index] = team.getTeamId();
             index++;
+        }*/
+        if(!roundRobinGeneration(teamsId, tournament.getTournamentId()))
+            throw new Exception("cannot generate fixture");
+        else {
+            assignGroundsToAllMatches(grounds);
+            assignTimeToAllMatches(tournament);
+            assignUmpiresToAllMatches(umpires);
+            return new ResultModel("fixture generated successfully");
         }
-        boolean result = roundRobinGeneration(teamsId);
-
     }
 
-    private boolean roundRobinGeneration(long[] teams) {
-        int numberOfTeams = teams.length;
+    private void assignUmpiresToAllMatches(List<Umpires> umpires) {
+    }
+
+    private void assignGroundsToAllMatches(List<Grounds> grounds) {
+    }
+
+    private void assignTimeToAllMatches(Tournaments tournament) {
+    }
+
+    private boolean roundRobinGeneration(long[] teamsId, long tournamentId) {
+        int numberOfTeams = teamsId.length;
         long[] finalTeamsForRotation;
 
         if (numberOfTeams % 2 == 0) {
             finalTeamsForRotation = new long[numberOfTeams - 1];
-            System.arraycopy(teams, 1, finalTeamsForRotation, 0, numberOfTeams - 1);
+            System.arraycopy(teamsId, 1, finalTeamsForRotation, 0, numberOfTeams - 1);
         } else {
             finalTeamsForRotation = new long[numberOfTeams];
-            System.arraycopy(teams, 1, finalTeamsForRotation, 0, numberOfTeams - 1);
+            System.arraycopy(teamsId, 1, finalTeamsForRotation, 0, numberOfTeams - 1);
             finalTeamsForRotation[numberOfTeams - 1] = 0;
         }
         int totalRounds = finalTeamsForRotation.length; //it is even number
         int halfSize = (totalRounds + 1) / 2;
         int round = 1;
-        for (int rounds = totalRounds; rounds > 0; rounds--) {
-            //insert into match
-            System.out.println("week " + (round++));
-            jdbcTemplate.update("insert into matches values(");
-            int teamIdx = rounds % totalRounds;
+        int matchNumber = 1;
 
-            //insert into teams
-            if (finalTeamsForRotation[teamIdx] != 0) {
-                System.out.println(teams[0] + " vs. " + finalTeamsForRotation[teamIdx]);
-            }
-            for (int i = 1; i < halfSize; i++) {
-                int firstTeam = (rounds + i) % totalRounds;
-                int secondTeam = (rounds + totalRounds - i) % totalRounds;
-                if (finalTeamsForRotation[firstTeam] != 0 && finalTeamsForRotation[secondTeam] != 0) {
-                    System.out.println(finalTeamsForRotation[firstTeam] + " vs. " + finalTeamsForRotation[secondTeam]);
+        try {
+            for (int rounds = totalRounds; rounds > 0; rounds--) {
+                //insert into match
+                //System.out.println("week " + (round++));
+                Matches match = insertIntoMatches(tournamentId, round, matchNumber);
+                matchNumber++;
+                round++;
+                /*jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournamentId, null, null,
+                        round, matchNumber, MatchStatus.UPCOMING.toString(), null, null, null, null, "false", null);
+                Matches match = jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
+                        new BeanPropertyRowMapper<>(Matches.class)).get(0);*/
+                int teamIdx = rounds % totalRounds;
+
+                //insert into teams
+                if (finalTeamsForRotation[teamIdx] != 0) {
+                    //insert into verses
+                    insertIntoVersus(teamsId[0], tournamentId, match.getMatchId());
+                    insertIntoVersus(teamsId[teamIdx], tournamentId, match.getMatchId());
+                /* Teams team = systemInterface.verifyTeamDetails(teamsId[0], tournamentId).get(0);
+                jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", match.getMatchId(), teamsId[0],
+                        team.getTeamName(), 0, 0, 0, 0, null, "false");
+
+                System.out.println(teamsId[0] + " vs. " + finalTeamsForRotation[teamIdx]);*/
+                }
+                for (int i = 1; i < halfSize; i++) {
+                    int firstTeam = (rounds + i) % totalRounds;
+                    int secondTeam = (rounds + totalRounds - i) % totalRounds;
+                    if (finalTeamsForRotation[firstTeam] != 0 && finalTeamsForRotation[secondTeam] != 0) {
+                        //System.out.println(finalTeamsForRotation[firstTeam] + " vs. " + finalTeamsForRotation[secondTeam]);
+                        //insert into versus
+                        Matches nextMatch = insertIntoMatches(tournamentId, round, matchNumber);
+                        insertIntoVersus(finalTeamsForRotation[firstTeam], tournamentId, nextMatch.getMatchId());
+                        insertIntoVersus(finalTeamsForRotation[secondTeam], tournamentId, nextMatch.getMatchId());
+                        matchNumber++;
+                    }
                 }
             }
-            System.out.println();
+            return true;
+        } catch (Exception exception) {
+            return false;
         }
-        return false;
+    }
+
+    private Matches insertIntoMatches(long tournamentId, int round, int matchNumber) {
+            jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournamentId, null, null,
+                    round, matchNumber, MatchStatus.UPCOMING.toString(), null, null, null, null, "false", null);
+            return jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
+                    new BeanPropertyRowMapper<>(Matches.class)).get(0);
+    }
+
+    private void insertIntoVersus(long teamId, long tournamentId, long matchId) {
+        jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", matchId, teamId, systemInterface.
+                verifyTeamDetails(teamId, tournamentId).get(0).getTeamName(), 0, 0, 0, 0, null, "false");
     }
 
     private int getNumberMatchPerDay(long numberOfHoursPerDayAvailableForPlayingMatch, int numberOfOvers) {

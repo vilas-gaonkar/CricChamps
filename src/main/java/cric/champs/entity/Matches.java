@@ -30,8 +30,6 @@ public class Matches {
 
     private String matchStatus;
 
-    private String statusDescription;
-
     private LocalDate matchDate;
 
     private LocalDate matchDay;
