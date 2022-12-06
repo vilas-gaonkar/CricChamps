@@ -77,7 +77,7 @@ public class LoginController {
     @PatchMapping("/reset/password")
     public ResponseEntity<ResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
                                                      @RequestHeader String confirmPassword) throws UpdateFailedException {
-        return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword,email)));
+        return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword, email)));
     }
 
     @PatchMapping("/forgot/password")
