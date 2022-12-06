@@ -56,12 +56,12 @@ public class TournamentController {
     }
 
     @GetMapping("/view/tournament")
-    public ResponseEntity<Tournaments> get(long tournamentId) {
+    public ResponseEntity<Tournaments> get(@RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getTournament(tournamentId)));
     }
 
-    @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@RequestPart long tournamentId) {
+    @PutMapping("/cancel")
+    public ResponseEntity<ResultModel> cancelTournament(@RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.cancelTournament(tournamentId)));
     }
 

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 
 
 @Getter
@@ -31,9 +32,9 @@ public class Matches {
 
     private String statusDescription;
 
-    private Date matchDate;
+    private LocalDate matchDate;
 
-    private Date matchDay;
+    private LocalDate matchDay;
 
     private Time matchStartTime;
 
