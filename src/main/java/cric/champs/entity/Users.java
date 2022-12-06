@@ -18,8 +18,6 @@ public class Users {
 
     private long userId;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+$",
-            message = "name should contain only alphabet and white space followed by character")
     private String username;
 
     @Gender
@@ -35,7 +33,6 @@ public class Users {
 
     private String profilePicture;
 
-    @Min(value = 16, message = "minimum age should be 16")
     private int age;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",

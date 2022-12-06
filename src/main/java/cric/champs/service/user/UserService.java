@@ -89,7 +89,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             if (!systemInterface.verifyEmail(user.getEmail()))
                 return new ResultModel("This Email is already registered with Cric Champs");
             jdbcTemplate.update("insert into users values(?,?,?,?,?,?,?,?,?,?,?)", null, user.getUsername(), user.getGender(),
-                    user.getEmail(), user.getPhoneNumber(), user.getCity(), user.getProfilePicture(), user.getAge(),
+                    user.getEmail(), user.getPhoneNumber(), user.getCity(), user.getProfilePicture(), 0,
                     passwordEncoder.encode(user.getPassword()), AccountStatus.NOTVERIFIED.toString(), "false");
             return new ResultModel("Your Cric Champs account has been created successfully");
         } catch (Exception exception) {
