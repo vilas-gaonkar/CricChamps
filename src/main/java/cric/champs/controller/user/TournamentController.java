@@ -8,6 +8,7 @@ import cric.champs.service.user.TournamentInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +32,7 @@ public class TournamentController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@ModelAttribute Tournaments tournament, @RequestPart MultipartFile logo) throws IOException {
+    public ResponseEntity<Map<String, String>> register(@ModelAttribute Tournaments tournament, @RequestPart @Nullable MultipartFile logo) throws IOException {
         Map result = null;
         if (logo == null)
             tournament.setTournamentLogo(null);
