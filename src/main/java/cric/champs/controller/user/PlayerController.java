@@ -23,6 +23,7 @@ public class PlayerController {
     @Autowired
     private PlayerInterface playerInterface;
 
+    @SuppressWarnings("rawtypes")
     @PostMapping("/register")
     public ResponseEntity<ResultModel> register(@ModelAttribute Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
         Map result = null;
@@ -43,6 +44,7 @@ public class PlayerController {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     @PutMapping("/edit")
     public ResponseEntity<ResultModel> edit(@ModelAttribute Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
         Map result = null;
