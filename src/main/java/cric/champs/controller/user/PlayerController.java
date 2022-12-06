@@ -68,13 +68,13 @@ public class PlayerController {
         return ResponseEntity.of(Optional.of(playerInterface.deletePlayer(playerId, teamId, tournamentId)));
     }
 
-    @GetMapping("/view")
+    @GetMapping("/view-all")
     public ResponseEntity<?> getAllPlayers(@RequestPart long teamId, @RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getAllPlayers(teamId, tournamentId, pageSize, pageNumber)));
     }
 
-    @GetMapping("/view/player")
+    @GetMapping("/view")
     public ResponseEntity<?> getPlayer(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));
