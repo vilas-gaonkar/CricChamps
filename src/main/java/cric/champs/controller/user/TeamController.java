@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class TeamController {
     private TeamInterface teamInterface;
 
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -45,7 +46,7 @@ public class TeamController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
+    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -70,13 +71,13 @@ public class TeamController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<?> getAllTeams(@RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<?> getAllTeams(@RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
 
         return ResponseEntity.of(Optional.of(teamInterface.getAllTeams(tournamentId, pageSize, pageNumber)));
     }
 
     @GetMapping("/view")
-    public ResponseEntity<?> getTeam(@RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<?> getTeam(@RequestParam long teamId, @RequestParam long tournamentId) {
 
         return ResponseEntity.of(Optional.of(teamInterface.getTeam(teamId, tournamentId)));
     }

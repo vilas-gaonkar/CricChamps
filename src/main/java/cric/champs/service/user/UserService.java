@@ -201,8 +201,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel cancelTournament(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentCode = ?",
-                TournamentStatus.CANCELLED, tournamentId);
+        jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
+                TournamentStatus.CANCELLED.toString(), tournamentId);
         systemInterface.deleteMatches(tournamentId);
         return new ResultModel("Tournament has been cancelled");
     }
@@ -240,14 +240,19 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public ResultModel registerGrounds(Grounds ground, List<String> groundPhoto) {
+        if(systemInterface.verifyTournamentId(ground.getTournamentId()).isEmpty())
+            throw new NullPointerException("Tournament not found");
+
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("A ground already exists in the given co-ordinates. Please enter different co-ordinates");
+
+
         jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
                 ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getGroundPhoto(),
                 ground.getLatitude(), ground.getLongitude(), "false");
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
                 ground.getTournamentId());
-        return new ResultModel("Ground(s) added successfully");
+        return new ResultModel("Ground added successfully");
     }
 
     @Override
@@ -335,6 +340,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public Umpires getUmpire(long umpireId, long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
+
+        if(systemInterface.verifyUmpireDetails(tournamentId, umpireId).isEmpty())
+            throw  new NullPointerException("Umpire Not Found");
+
         return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId, umpireId).get(0);
     }

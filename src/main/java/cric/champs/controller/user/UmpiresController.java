@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class UmpiresController {
     private UmpiresInterface umpiresInterface;
 
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
         Map result = null;
         if (profilePhoto == null)
             umpire.setUmpirePhoto(null);
@@ -48,7 +49,7 @@ public class UmpiresController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
+    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
         Map result = null;
         if (profilePhoto == null)
             umpire.setUmpirePhoto(null);
@@ -68,7 +69,7 @@ public class UmpiresController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<List<Umpires>> view(@RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<List<Umpires>> view(@RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
         return ResponseEntity.of(Optional.of(umpiresInterface.getUmpireDetails(tournamentId, pageSize, pageNumber)));
     }
 
@@ -78,7 +79,7 @@ public class UmpiresController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Umpires> getUmpire(@RequestPart long umpireId, @RequestPart long tournamentId) {
+    public ResponseEntity<Umpires> getUmpire(@RequestParam long umpireId, @RequestParam long tournamentId) {
         return ResponseEntity.of(Optional.of(umpiresInterface.getUmpire(umpireId, tournamentId)));
     }
 }
