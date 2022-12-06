@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 
@@ -45,5 +44,4 @@ public class Tournaments {
 
     private String tournamentStatus;
 
-    private String isDeleted;
 }

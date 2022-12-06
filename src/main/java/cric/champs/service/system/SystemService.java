@@ -5,6 +5,7 @@ import cric.champs.customexceptions.OTPGenerateException;
 import cric.champs.entity.*;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.MatchStatus;
+import cric.champs.service.TournamentStatus;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -80,7 +81,7 @@ public class SystemService implements SystemInterface {
     }
 
     private List<OTPManager> getOtp(String email) {
-        return jdbcTemplate.query("Select * from otpmanager where email = ?",
+        return jdbcTemplate.query("Select * from otpManager where email = ?",
                 new BeanPropertyRowMapper<>(OTPManager.class), email);
     }
 
@@ -159,8 +160,8 @@ public class SystemService implements SystemInterface {
 
     @Override
     public List<Tournaments> verifyTournamentCode(String tournamentCode) {
-        return jdbcTemplate.query("select * from tournaments where tournamentCode = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Tournaments.class), tournamentCode);
+        return jdbcTemplate.query("select * from tournaments where tournamentCode = ? and tournamentStatus != ?",
+                new BeanPropertyRowMapper<>(Tournaments.class), tournamentCode, TournamentStatus.CANCELLED.toString());
     }
 
     @Override
