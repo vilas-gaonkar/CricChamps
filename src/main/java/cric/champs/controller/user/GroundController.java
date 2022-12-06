@@ -71,7 +71,7 @@ public class GroundController {
         return ResponseEntity.of(Optional.of(groundInterface.getAllGrounds(tournamentId, pageSize, pageNumber)));
     }
 
-    @GetMapping("/view-ground")
+    @GetMapping("/view")
     public ResponseEntity<Grounds> viewGround(@RequestPart long groundId, @RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(groundInterface.getGround(groundId, tournamentId)));
     }

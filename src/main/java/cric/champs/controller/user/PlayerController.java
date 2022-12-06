@@ -74,7 +74,7 @@ public class PlayerController {
         return ResponseEntity.of(Optional.of(playerInterface.getAllPlayers(teamId, tournamentId, pageSize, pageNumber)));
     }
 
-    @GetMapping("/view-player")
+    @GetMapping("/view")
     public ResponseEntity<?> getPlayer(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));

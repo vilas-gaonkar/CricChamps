@@ -75,7 +75,7 @@ public class TeamController {
         return ResponseEntity.of(Optional.of(teamInterface.getAllTeams(tournamentId, pageSize, pageNumber)));
     }
 
-    @GetMapping("/view-team")
+    @GetMapping("/view")
     public ResponseEntity<?> getTeam(@RequestPart long teamId, @RequestPart long tournamentId) {
 
         return ResponseEntity.of(Optional.of(teamInterface.getTeam(teamId, tournamentId)));
