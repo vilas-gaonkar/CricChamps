@@ -50,36 +50,36 @@ public class TournamentController {
         }
     }
 
-    @GetMapping("/view")
+    @GetMapping("/view-all")
     public ResponseEntity<List<Tournaments>> getAll(@RequestParam int pageSize, @RequestParam int pageNumber) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getTournamentDetails(pageSize, pageNumber)));
     }
 
-    @GetMapping("/view/tournament")
+    @GetMapping("/view")
     public ResponseEntity<Tournaments> get(long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getTournament(tournamentId)));
     }
 
-    @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@RequestPart long tournamentId) {
+    @PutMapping("/cancel")
+    public ResponseEntity<ResultModel> cancelTournament(@RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.cancelTournament(tournamentId)));
     }
 
-    @PatchMapping("/set/date")
+    @PatchMapping("/set-date")
     public ResponseEntity<ResultModel> setTournamentDate(@RequestPart long tournamentId,
                                                          @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                          @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDate(tournamentId, startDate, endDate)));
     }
 
-    @PatchMapping("/set/time")
+    @PatchMapping("/set-time")
     public ResponseEntity<ResultModel> setTournamentTime(@RequestPart long tournamentId,
                                                          @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
                                                          @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
     }
 
-    @PatchMapping("/set/date/time")
+    @PatchMapping("/set-date-time")
     public ResponseEntity<ResultModel> setTournamentDateTime(@RequestPart long tournamentId,
                                                              @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                              @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,

@@ -26,4 +26,6 @@ public interface LoginInterface {
 
     ResultModel deleteOldProfilePhoto();
 
+    Users getUserDetails();
+
 }

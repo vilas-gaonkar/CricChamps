@@ -63,7 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String isRefreshToken = httpServletRequest.getHeader("isRefreshToken");
             String url = httpServletRequest.getRequestURL().toString();
 
-            if (isRefreshToken != null && isRefreshToken.equalsIgnoreCase("true") && url.contains("refresh/token"))
+            if (isRefreshToken != null && isRefreshToken.equalsIgnoreCase("true") && url.contains("refresh-token"))
                 allowForGenerateRefreshToken(exception, httpServletRequest);
             else
                 httpServletRequest.setAttribute("exception", "JWT_TOKEN_EXPIRED");
