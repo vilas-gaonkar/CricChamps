@@ -365,10 +365,11 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public List<Teams> getAllTeams(long tournamentId, int pageSize, int pageNumber) {
+        int offSet = pageSize * (pageNumber - 1);
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' limit ? offset ?",
-                new BeanPropertyRowMapper<>(Teams.class), tournamentId, pageSize, pageNumber);
+                new BeanPropertyRowMapper<>(Teams.class), tournamentId, pageSize, offSet);
     }
 
     @Override
@@ -420,13 +421,14 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public List<Players> getAllPlayers(long teamId, long tournamentId, int pageSize, int pageNumber) {
+        int offSet = pageSize * (pageNumber - 1);
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         List<Players> players = systemInterface.verifyTeamAndTournamentId(teamId, tournamentId);
         if (players.isEmpty())
             throw new NullPointerException("Players not found");
         return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false' limit ? offset ?",
-                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId, pageSize, pageNumber);
+                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId, pageSize, offSet);
     }
 
     @Override
