@@ -42,7 +42,7 @@ public class FixtureService implements FixtureGenerationInterface {
             return new ResultModel("please add ground or umpire");
 
         //number of days assigned for this tournament
-        int numberOfTournamentDays = Period.between(tournament.getTournamentStartDate().toLocalDate(), tournament.getTournamentEndDate().toLocalDate()).getDays();
+        int numberOfTournamentDays = Period.between(tournament.getTournamentStartDate(), tournament.getTournamentEndDate()).getDays();
 
         //number of hours available in one day
         long numberOfHoursPerDayAvailableForPlayingMatch = Duration.between(tournament.getTournamentStartTime().toLocalTime(), tournament.getTournamentEndTime().toLocalTime()).toHours();
