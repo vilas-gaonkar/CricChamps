@@ -7,9 +7,11 @@ import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.GroundInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,7 @@ public class GroundController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute Grounds ground, @RequestPart MultipartFile groundPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
             ground.setGroundPhoto(null);
@@ -47,7 +49,7 @@ public class GroundController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute Grounds ground, @RequestPart MultipartFile groundPhoto) throws IOException {
+    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
             ground.setGroundPhoto(null);
@@ -67,17 +69,17 @@ public class GroundController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<List<Grounds>> view(@RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<List<Grounds>> view(@RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
         return ResponseEntity.of(Optional.of(groundInterface.getAllGrounds(tournamentId, pageSize, pageNumber)));
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Grounds> viewGround(@RequestPart long groundId, @RequestPart long tournamentId) {
+    public ResponseEntity<Grounds> viewGround(@RequestParam long groundId, @RequestParam long tournamentId) {
         return ResponseEntity.of(Optional.of(groundInterface.getGround(groundId, tournamentId)));
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestPart long groundId, @RequestPart long tournamentId) {
+    public ResponseEntity<ResultModel> delete(@RequestParam long groundId, @RequestParam long tournamentId) {
         return ResponseEntity.of(Optional.of(groundInterface.deleteGrounds(groundId, tournamentId)));
     }
 

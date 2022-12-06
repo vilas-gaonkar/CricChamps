@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Pattern;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -17,8 +19,12 @@ public class Players {
 
     private long teamId;
 
+
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Player name should only contain alphabets")
     private String playerName;
 
+
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "City name should only contain alphabets")
     private String city;
 
     private String phoneNumber;

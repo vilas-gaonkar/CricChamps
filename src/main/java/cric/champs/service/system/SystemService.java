@@ -39,24 +39,13 @@ public class SystemService implements SystemInterface {
     @Override
     public String generateTournamentCode() {
         Random random = new Random();
-        StringBuilder id = new StringBuilder();
-        for (int index = 0; index < 4; index++) {
-            char character = (char) (65 + random.nextInt(26));
-            try {
-                id.append(character);
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
+        final String Characters = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        final char[] symbols = Characters.toCharArray();
+        char[] tournamentCode = new char[6];
+        for (int index = 0; index < 6; index++) {
+            tournamentCode[index] = symbols[random.nextInt(symbols.length)];
         }
-        for (int index = 0; index < 4; index++) {
-            char number = (char) (48 + random.nextInt(10));
-            try {
-                id.append(number);
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-        }
-        return id.toString();
+        return new String(tournamentCode);
     }
 
     @Override
@@ -175,8 +164,8 @@ public class SystemService implements SystemInterface {
     @Override
     public List<Tournaments> verifyTournamentId(long tournamentId) {
         rejectRequest();
-        return jdbcTemplate.query("select * from tournaments where tournamentId = ? and userId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, getUserId());
+        return jdbcTemplate.query("select * from tournaments where tournamentId = ? and userId = ? and tournamentStatus != ?",
+                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, getUserId(),TournamentStatus.CANCELLED.toString());
     }
 
     @Override

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Pattern;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,6 +19,7 @@ public class UmpiresMatches {
 
     private int matchNumber;
 
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Umpire name should only contain alphabets")
     private String umpireName;
 
     private String isDeleted;

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -46,7 +47,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -71,13 +72,13 @@ public class PlayerController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<?> getAllPlayers(@RequestPart long teamId, @RequestPart long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<?> getAllPlayers(@RequestParam long teamId, @RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getAllPlayers(teamId, tournamentId, pageSize, pageNumber)));
     }
 
     @GetMapping("/view")
-    public ResponseEntity<?> getPlayer(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<?> getPlayer(@RequestParam long playerId, @RequestParam long teamId, @RequestParam long tournamentId) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));
     }
