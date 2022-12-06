@@ -40,7 +40,7 @@ public class SystemService implements SystemInterface {
     public String generateTournamentCode() {
         Random random = new Random();
         StringBuilder id = new StringBuilder();
-        for (int index = 0; index < 4; index++) {
+        for (int index = 0; index < 3; index++) {
             char character = (char) (65 + random.nextInt(26));
             try {
                 id.append(character);
@@ -48,7 +48,7 @@ public class SystemService implements SystemInterface {
                 exception.printStackTrace();
             }
         }
-        for (int index = 0; index < 4; index++) {
+        for (int index = 0; index < 3; index++) {
             char number = (char) (48 + random.nextInt(10));
             try {
                 id.append(number);
