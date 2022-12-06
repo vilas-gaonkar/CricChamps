@@ -102,8 +102,8 @@ public class SystemService implements SystemInterface {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setFrom("raspberrypi001025@gmail.com");
         email.setTo(userEmail);
-        email.setSubject("Cric champs registration OTP");
-        email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
+        email.setSubject("Cric Champs Registration OTP");
+        email.setText("Please enter the following OTP in your Cric Champs App to verify your account: \n" + otp);
         javaMailSender.send(email);
 
         return new ResultModel("OTP sent Successfully");

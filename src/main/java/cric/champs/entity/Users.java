@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.NumberFormat;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -19,23 +21,25 @@ public class Users {
     private long userId;
 
     @Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+$",
-            message = "name should contain only alphabet and white space followed by character")
+            message = "Name should only contain alphabets and white spaces, followed by characters")
     private String username;
 
     @Gender
     private String gender;
 
-    @Email(message = "Invalid Email.Please provide valid Email")
+    @Email(message = "Invalid Email. Please provide valid Email")
     private String email;
 
     @PhoneNumber
     private String phoneNumber;
 
+    @Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+\\s[A-Za-z]+|[A-Za-z]+$",
+            message = "City name should only contain alphabets")
     private String city;
 
     private String profilePicture;
 
-    @Min(value = 16, message = "minimum age should be 16")
+    @Min(value = 16, message = "Minimum age should be 16")
     private int age;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",

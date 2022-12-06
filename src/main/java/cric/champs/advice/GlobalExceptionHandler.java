@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handelMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(errors -> errorMessage.put(errors.getField(), errors.getDefaultMessage()));
         return errorMessage;
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TransientDataAccessResourceException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelTransientDataAccessResourceException(TransientDataAccessResourceException exception) {
+    public Map<String, String> handleTransientDataAccessResourceException(TransientDataAccessResourceException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CommandAcceptanceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handelCommandAcceptanceException(CommandAcceptanceException exception) {
+    public Map<String, String> handleCommandAcceptanceException(CommandAcceptanceException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelNullPointerException(NullPointerException exception) {
+    public Map<String, String> handleNullPointerException(NullPointerException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestPartException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelMissingServletRequestPartException(MissingServletRequestPartException exception) {
+    public Map<String, String> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, Object> handelBindException(BindException exception) {
+    public Map<String, Object> handleBindException(BindException exception) {
         Map<String, Object> errorMessage = new HashMap<>();
         errorMessage.put("Error Message",exception.getMessage());
         return errorMessage;
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelFileNotFoundException(FileNotFoundException exception) {
+    public Map<String, String> handleFileNotFoundException(FileNotFoundException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IndexOutOfBoundsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelIndexOutOfBoundsException(IndexOutOfBoundsException exception) {
+    public Map<String, String> handleIndexOutOfBoundsException(IndexOutOfBoundsException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -118,7 +118,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
-    public Map<String, String> handelHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
+    public Map<String, String> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -126,7 +126,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handelHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
+    public Map<String, String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", "HttpMediaTypeNotSupported");
         return errorMessage;
@@ -134,7 +134,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+    public Map<String, String> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -142,7 +142,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelIOException(IOException exception) {
+    public Map<String, String> handleIOException(IOException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -150,7 +150,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IdentifierGenerationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelIdentifierGenerationException(IdentifierGenerationException exception) {
+    public Map<String, String> handleIdentifierGenerationException(IdentifierGenerationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage() + "\nplease select the photo proper image");
         return errorMessage;
@@ -158,7 +158,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelAccessDeniedException(AccessDeniedException exception) {
+    public Map<String, String> handleAccessDeniedException(AccessDeniedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -166,7 +166,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelIllegalStateException(IllegalStateException exception) {
+    public Map<String, String> handleIllegalStateException(IllegalStateException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -174,7 +174,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
-    public Map<String, String> handelExpiredJwtException(ExpiredJwtException exception) {
+    public Map<String, String> handleExpiredJwtException(ExpiredJwtException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", "jwt token expired");
         return errorMessage;
@@ -190,7 +190,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LoginFailedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelLoginFailedException(LoginFailedException exception) {
+    public Map<String, String> handleLoginFailedException(LoginFailedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -198,7 +198,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SignupException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handelSignupException(SignupException exception) {
+    public Map<String, String> handleSignupException(SignupException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -206,7 +206,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelUsernameNotFoundException(UsernameNotFoundException exception) {
+    public Map<String, String> handleUsernameNotFoundException(UsernameNotFoundException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -214,7 +214,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenExpiredException.class)
     @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
-    public Map<String, String> handelTokenExpiredException(TokenExpiredException exception) {
+    public Map<String, String> handleTokenExpiredException(TokenExpiredException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -222,7 +222,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailValidationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelEmailValidationException(EmailValidationException exception) {
+    public Map<String, String> handleEmailValidationException(EmailValidationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -230,7 +230,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OTPGenerateException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelOTPGenerateException(OTPGenerateException exception) {
+    public Map<String, String> handleOTPGenerateException(OTPGenerateException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -238,7 +238,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UpdateFailedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelUpdateFailedException(UpdateFailedException exception) {
+    public Map<String, String> handleUpdateFailedException(UpdateFailedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -246,7 +246,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotVerifiedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handelNotVerifiedException(NotVerifiedException exception) {
+    public Map<String, String> handleNotVerifiedException(NotVerifiedException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;

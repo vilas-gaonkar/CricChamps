@@ -86,7 +86,7 @@ public class LoginController {
     }
 
     @PatchMapping("/reset")
-    public ResponseEntity<String> resetPassword(@RequestParam int otp, @RequestHeader String email) {
+    public ResponseEntity<String> verifyOTP(@RequestParam int otp, @RequestHeader String email) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (loginInterface.resetPassword(otp, email)) {
             responseHeaders.set("isVerified", "true");
@@ -107,7 +107,7 @@ public class LoginController {
     }
 
     @SuppressWarnings("rawtypes")
-    @PatchMapping("/user/change/photo")
+    @PatchMapping("/user/change/profile-photo")
     public ResponseEntity<ResultModel> changeProfilePhoto(@RequestPart @Nullable MultipartFile profilePhoto) throws IOException, UpdateFailedException {
         Map result;
         if (profilePhoto == null)
@@ -125,7 +125,7 @@ public class LoginController {
         return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
     }
 
-    @DeleteMapping("/user/remove")
+    @DeleteMapping("/user/remove/profile-photo")
     public ResponseEntity<ResultModel> removeProfilePhoto() {
         return ResponseEntity.of(Optional.of(loginInterface.deleteOldProfilePhoto()));
     }

@@ -150,7 +150,14 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                     null, systemInterface.getUserId());
             return new ResultModel("Your Profile Photo has been deleted");
         }
-        throw new NullPointerException("Please select a photo");
+        throw new NullPointerException("No profile photo present");
+    }
+
+    @Override
+    public Users getUserDetails() {
+
+        return jdbcTemplate.query("select * from users where userId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Users.class),systemInterface.getUserId()).get(0);
     }
 
     /**
