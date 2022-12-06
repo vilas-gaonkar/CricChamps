@@ -67,20 +67,20 @@ public class LoginController {
         return new HttpEntity<>(Collections.singletonMap("message", "User logged in successfully"), headers);
     }
 
-    @GetMapping("/refresh/token")
+    @GetMapping("/refresh-token")
     public HttpEntity<?> generateRefreshToken(HttpServletRequest httpServletRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", loginInterface.refreshToken(httpServletRequest));
         return new HttpEntity<>(Collections.singletonMap("message", "Token generated successfully"), headers);
     }
 
-    @PatchMapping("/reset/password")
+    @PatchMapping("/reset-password")
     public ResponseEntity<ResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
                                                      @RequestHeader String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword, email)));
     }
 
-    @PatchMapping("/forgot/password")
+    @PatchMapping("/forgot-password")
     public ResponseEntity<ResultModel> forgotPassword(@RequestHeader String email) throws UsernameNotFoundException, OTPGenerateException {
         return ResponseEntity.of(Optional.of(loginInterface.forgotPassword(email)));
     }
@@ -96,7 +96,7 @@ public class LoginController {
         return ResponseEntity.ok().headers(responseHeaders).body("Invalid OTP");
     }
 
-    @PostMapping("/send/otp")
+    @PostMapping("/send-otp")
     public ResponseEntity<ResultModel> sendOtp(@RequestHeader String email) throws Exception {
         return ResponseEntity.of(Optional.of(systemInterface.sendOTP(email)));
     }
@@ -128,6 +128,11 @@ public class LoginController {
     @DeleteMapping("/user/remove/profile-photo")
     public ResponseEntity<ResultModel> removeProfilePhoto() {
         return ResponseEntity.of(Optional.of(loginInterface.deleteOldProfilePhoto()));
+    }
+
+    @GetMapping("/user/details")
+    public ResponseEntity<?> getUserDetails() {
+        return ResponseEntity.of(Optional.of(loginInterface.getUserDetails()));
     }
 
 }
