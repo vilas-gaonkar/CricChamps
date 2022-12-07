@@ -7,6 +7,7 @@ import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.PlayerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -72,13 +73,13 @@ public class PlayerController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<?> getAllPlayers(@RequestParam long teamId, @RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<?> getAllPlayers(@RequestHeader long teamId, @RequestHeader long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getAllPlayers(teamId, tournamentId, pageSize, pageNumber)));
     }
 
     @GetMapping("/view")
-    public ResponseEntity<?> getPlayer(@RequestParam long playerId, @RequestParam long teamId, @RequestParam long tournamentId) {
+    public ResponseEntity<?> getPlayer(@RequestHeader long playerId, @RequestHeader long teamId, @RequestHeader long tournamentId) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));
     }

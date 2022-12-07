@@ -4,6 +4,7 @@ import com.cloudinary.utils.ObjectUtils;
 import cric.champs.customexceptions.*;
 import cric.champs.entity.ResultModel;
 import cric.champs.entity.Users;
+import cric.champs.service.AccountStatus;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.user.LoginInterface;
@@ -64,7 +65,7 @@ public class LoginController {
             return new HttpEntity<>(Collections.singletonMap("Message", "Invalid credentials"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", result);
-        return new HttpEntity<>(Collections.singletonMap("message", "User logged in successfully"), headers);
+        return new HttpEntity<>(systemInterface.getUserDetails(email, AccountStatus.VERIFIED.toString()), headers);
     }
 
     @GetMapping("/refresh-token")

@@ -19,10 +19,10 @@ public class Teams {
 
     private  String teamName;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Captain's name should only contain alphabets")
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+$", message = "Captain's name should only contain alphabets")
     private String captainName;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "City name should only contain alphabets")
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+$", message = "City name should only contain alphabets")
     private String city;
 
     private int numberOfPlayers;
