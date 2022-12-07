@@ -88,7 +88,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public ResultModel signUp(Users user) throws SignupException {
         try {
             if (!systemInterface.verifyEmail(user.getEmail()))
-                return new ResultModel("This Email is already registered with Cric Champs");
+                throw new NullPointerException("This Email is already registered with Cric Champs");
             jdbcTemplate.update("insert into users values(?,?,?,?,?,?,?,?,?,?,?)", null, user.getUsername(), user.getGender(),
                     user.getEmail(), user.getPhoneNumber(), user.getCity(), user.getProfilePicture(), 0,
                     passwordEncoder.encode(user.getPassword()), AccountStatus.NOTVERIFIED.toString(), "false");
