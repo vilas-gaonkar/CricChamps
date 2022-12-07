@@ -43,12 +43,7 @@ public class TournamentController {
 
         if (result != null)
             tournament.setTournamentLogo(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(tournamentInterface.registerTournament(tournament)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(Collections.singletonMap("error message", exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(tournamentInterface.registerTournament(tournament)));
     }
 
     @GetMapping("/view-all")

@@ -38,12 +38,8 @@ public class PlayerController {
 
         if (result != null)
             player.setProfilePhoto(result.get("url").toString());
-
-        try {
             return ResponseEntity.of(Optional.of(playerInterface.registerPlayer(player)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+
     }
 
     @SuppressWarnings("rawtypes")
@@ -59,12 +55,7 @@ public class PlayerController {
 
         if (result != null)
             player.setProfilePhoto(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(playerInterface.editPlayer(player)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(playerInterface.editPlayer(player)));
     }
 
     @DeleteMapping("/remove")

@@ -4,6 +4,7 @@ import cric.champs.customexceptions.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.hibernate.id.IdentifierGenerationException;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,13 @@ public class GlobalExceptionHandler {
         return errorMessage;
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
     @ExceptionHandler(CommandAcceptanceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleCommandAcceptanceException(CommandAcceptanceException exception) {

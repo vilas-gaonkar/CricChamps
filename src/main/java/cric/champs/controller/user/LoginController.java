@@ -38,7 +38,7 @@ public class LoginController {
     @SuppressWarnings("rawtypes")
     @PostMapping("/sign-up")
     public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Users user, @RequestPart @Nullable MultipartFile profilePhoto)
-            throws IOException {
+            throws IOException, SignupException {
 
         Map result = null;
         if (profilePhoto == null)
@@ -51,11 +51,8 @@ public class LoginController {
         if (result != null)
             user.setProfilePicture(result.get("url").toString());
 
-        try {
-            return ResponseEntity.of(Optional.of(loginInterface.signUp(user)));
-        } catch (Exception e) {
-            return null;
-        }
+        return ResponseEntity.of(Optional.of(loginInterface.signUp(user)));
+
     }
 
     @PostMapping("/login")

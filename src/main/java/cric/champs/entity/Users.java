@@ -33,7 +33,7 @@ public class Users {
     @PhoneNumber
     private String phoneNumber;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+$", message = "City name should only contain alphabets")
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+ $", message = "City name should only contain alphabets")
     private String city;
 
     private String profilePicture;
