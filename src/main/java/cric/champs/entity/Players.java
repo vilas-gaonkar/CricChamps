@@ -20,11 +20,11 @@ public class Players {
     private long teamId;
 
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Player name should only contain alphabets")
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+$", message = "Player name should only contain alphabets")
     private String playerName;
 
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "City name should only contain alphabets")
+    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+|[A-Za-z]+$", message = "City name should only contain alphabets")
     private String city;
 
     private String phoneNumber;

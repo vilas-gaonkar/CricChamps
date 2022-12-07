@@ -7,6 +7,7 @@ import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.PlayerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
