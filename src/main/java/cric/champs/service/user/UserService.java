@@ -94,7 +94,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                     passwordEncoder.encode(user.getPassword()), AccountStatus.NOTVERIFIED.toString(), "false");
             return new ResultModel("Your Cric Champs account has been created successfully");
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new SignupException("Failed to register. Please provide valid details");
         }
     }
