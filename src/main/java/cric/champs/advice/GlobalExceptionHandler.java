@@ -173,6 +173,14 @@ public class GlobalExceptionHandler {
         return errorMessage;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleIllegalArgumentException(IllegalArgumentException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
     public Map<String, String> handleExpiredJwtException(ExpiredJwtException exception) {
