@@ -121,7 +121,7 @@ public class SystemService implements SystemInterface {
         email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
         javaMailSender.send(email);
 
-        return new ResultModel("OTP sent Successfully");
+        return new ResultModel("OTP has been sent to your email");
     }
 
     @Override
@@ -158,7 +158,7 @@ public class SystemService implements SystemInterface {
         rejectRequest();
         jdbcTemplate.update("update matches set isCancelled = ? where tournamentId = ? ",
                 MatchStatus.ABANDONED.toString(), tournamentId);
-        return new ResultModel("Cancelled successfully");
+        return new ResultModel("Tournament has been cancelled");
     }
 
     @Override

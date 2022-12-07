@@ -6,6 +6,7 @@ import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.TournamentStatus;
+import cric.champs.service.TournamentTypes;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.system.TokenInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -100,10 +101,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public ResultModel forgotPassword(String email) throws UsernameNotFoundException, OTPGenerateException {
-        if (!systemInterface.verifyEmail(email)) {
-            systemInterface.forgetOtp(email);
-            return new ResultModel("OTP has been sent to your email");
-        }
+        if (!systemInterface.verifyEmail(email))
+            return systemInterface.forgetOtp(email);
         throw new UsernameNotFoundException("Invalid email");
     }
 
@@ -202,8 +201,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Tournament not found");
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
                 TournamentStatus.CANCELLED.toString(), tournamentId);
-        systemInterface.deleteMatches(tournamentId);
-        return new ResultModel("Tournament has been cancelled");
+        return systemInterface.deleteMatches(tournamentId);
     }
 
     @Override
@@ -350,7 +348,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
      */
 
     @Override
-    public ResultModel registerTeam(Teams teams) {
+    public ResultModel registerTeam(Teams teams) throws Exception {
+        if(systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
+                && systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getNumberOfTeams()==2)
+            throw new Exception("Individual match should not contain more than two teams");
         jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
                 teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), "false");
         return new ResultModel("Team registered successfully.");
