@@ -26,7 +26,7 @@ public class TeamController {
     private TeamInterface teamInterface;
 
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
+    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -37,12 +37,7 @@ public class TeamController {
 
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(teamInterface.registerTeam(team)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(teamInterface.registerTeam(team)));
     }
 
     @PutMapping("/edit")
@@ -57,12 +52,7 @@ public class TeamController {
 
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(teamInterface.editTeam(team)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(teamInterface.editTeam(team)));
     }
 
     @DeleteMapping("/remove")

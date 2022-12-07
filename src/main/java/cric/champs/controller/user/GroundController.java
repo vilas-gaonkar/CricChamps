@@ -40,12 +40,7 @@ public class GroundController {
 
         if (result != null)
             ground.setGroundPhoto(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(groundInterface.registerGrounds(ground, null)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(groundInterface.registerGrounds(ground, null)));
     }
 
     @PutMapping("/edit")
@@ -60,12 +55,7 @@ public class GroundController {
 
         if (result != null)
             ground.setGroundPhoto(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(groundInterface.editGround(ground)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(groundInterface.editGround(ground)));
     }
 
     @GetMapping("/view-all")

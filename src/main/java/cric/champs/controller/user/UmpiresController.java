@@ -40,12 +40,7 @@ public class UmpiresController {
 
         if (result != null)
             umpire.setUmpirePhoto(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(umpiresInterface.registerUmpires(umpire)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(umpiresInterface.registerUmpires(umpire)));
     }
 
     @PutMapping("/edit")
@@ -60,12 +55,7 @@ public class UmpiresController {
 
         if (result != null)
             umpire.setUmpirePhoto(result.get("url").toString());
-
-        try {
-            return ResponseEntity.of(Optional.of(umpiresInterface.editUmpire(umpire)));
-        } catch (Exception exception) {
-            return ResponseEntity.ok(new ResultModel(exception.getMessage()));
-        }
+        return ResponseEntity.of(Optional.of(umpiresInterface.editUmpire(umpire)));
     }
 
     @GetMapping("/view-all")
