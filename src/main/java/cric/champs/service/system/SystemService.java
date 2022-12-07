@@ -70,7 +70,7 @@ public class SystemService implements SystemInterface {
     }
 
     private List<OTPManager> getOtp(String email) {
-        return jdbcTemplate.query("Select * from otpManager where email = ?",
+        return jdbcTemplate.query("Select * from OTPManager where email = ?",
                 new BeanPropertyRowMapper<>(OTPManager.class), email);
     }
 
