@@ -57,7 +57,7 @@ public class TournamentController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Tournaments> get(@RequestParam long tournamentId) {
+    public ResponseEntity<Tournaments> get(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getTournament(tournamentId)));
     }
 

@@ -69,7 +69,7 @@ public class UmpiresController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<List<Umpires>> view(@RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<List<Umpires>> view(@RequestHeader long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
         return ResponseEntity.of(Optional.of(umpiresInterface.getUmpireDetails(tournamentId, pageSize, pageNumber)));
     }
 
@@ -79,7 +79,7 @@ public class UmpiresController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Umpires> getUmpire(@RequestParam long umpireId, @RequestParam long tournamentId) {
+    public ResponseEntity<Umpires> getUmpire(@RequestHeader long umpireId, @RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(umpiresInterface.getUmpire(umpireId, tournamentId)));
     }
 }

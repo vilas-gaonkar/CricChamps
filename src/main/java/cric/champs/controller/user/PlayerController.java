@@ -72,13 +72,13 @@ public class PlayerController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<?> getAllPlayers(@RequestParam long teamId, @RequestParam long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<?> getAllPlayers(@RequestHeader long teamId, @RequestHeader long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getAllPlayers(teamId, tournamentId, pageSize, pageNumber)));
     }
 
     @GetMapping("/view")
-    public ResponseEntity<?> getPlayer(@RequestParam long playerId, @RequestParam long teamId, @RequestParam long tournamentId) {
+    public ResponseEntity<?> getPlayer(@RequestHeader long playerId, @RequestHeader long teamId, @RequestHeader long tournamentId) {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));
     }
