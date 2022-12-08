@@ -1,5 +1,6 @@
 package cric.champs.service.fixture;
 
+import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.*;
 import cric.champs.service.MatchStatus;
 import cric.champs.service.TournamentTypes;
@@ -63,28 +64,32 @@ public class FixtureService implements FixtureGenerationInterface {
             return createRoundRobinForKnockout(totalMatchesCanBePlayedInGivenDatesFormed, tournament, grounds, umpires);
 
         if (tournament.getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString()) && tournament.getNumberOfTeams() == 2) {
-            Matches matches = insertIntoMatches(tournamentId, 1, 1, tournament.getTournamentStartTime().toLocalTime(), tournament.getTournamentEndTime().toLocalTime(),
+            Matches matches = insertIntoMatchesOfLeague(tournamentId, 1, 1, tournament.getTournamentStartTime().toLocalTime(), tournament.getTournamentEndTime().toLocalTime(),
                     tournament.getTournamentStartDate());
             List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId in(select tournamentId from tournaments where tournamentId = ?)",
                     new BeanPropertyRowMapper<>(Teams.class), tournamentId);
-            insertIntoVersus(teams.get(0).getTeamId(), tournament.getTournamentId(), matches.getMatchId());
-            insertIntoVersus(teams.get(1).getTeamId(), tournament.getTournamentId(), matches.getMatchId());
+            insertIntoVersusOfLeague(teams.get(0).getTeamId(), tournament.getTournamentId(), matches.getMatchId());
+            insertIntoVersusOfLeague(teams.get(1).getTeamId(), tournament.getTournamentId(), matches.getMatchId());
         } else
-            throw new NullPointerException("teams required to generate individual match tournament is 2 only");
+            throw new FixtureGenerationException("teams required to generate individual match tournament is 2 only");
 
-        throw new NullPointerException("teams required to generate individual match tournament is 2 only");
+        throw new FixtureGenerationException("Cannot generate fixture");
     }
 
     private ResultModel createRoundRobinForKnockout(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         if (tournament.getNumberOfTeams() > 1) {
-            int totalNumberOfMatchExpected = tournament.getNumberOfTeams() - 1;
+            int totalNumberOfMatchExpected;
+            if (tournament.getNumberOfTeams() % 2 == 0)
+                totalNumberOfMatchExpected = tournament.getNumberOfTeams() - 1;
+            else
+                totalNumberOfMatchExpected = tournament.getNumberOfTeams();
             //checking total matches with expected matches
             if (totalNumberOfMatchExpected < totalMatchesCanBePlayedInGivenDatesFormed)
-                throw new Exception("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
+                throw new FixtureGenerationException("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
             else
                 return generateFixtureKnockout(tournament, grounds, umpires);
         } else
-            throw new NullPointerException("minimum teams required to generate knockout tournament is 2");
+            throw new FixtureGenerationException("minimum teams required to generate knockout tournament is 2");
     }
 
     private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) {
@@ -96,12 +101,12 @@ public class FixtureService implements FixtureGenerationInterface {
             int totalNumberOfMatchExpected = (tournament.getNumberOfTeams() * (tournament.getNumberOfTeams() - 1) / 2) + 3;
             //checking total matches with expected matches
             if (totalNumberOfMatchExpected < totalMatchesCanBePlayedInGivenDatesFormed)
-                throw new Exception("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
+                throw new FixtureGenerationException("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
             else
                 return generateFixtureLeague(tournament, grounds, umpires);
 
         } else
-            throw new NullPointerException("minimum teams required to generate league tournament is 3");
+            throw new FixtureGenerationException("minimum teams required to generate league tournament is 3");
     }
 
     private ResultModel generateFixtureLeague(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
@@ -116,23 +121,42 @@ public class FixtureService implements FixtureGenerationInterface {
             teamsId[index] = team.getTeamId();
             index++;
         }*/
-        if (!roundRobinGeneration(teamsId, tournament))
-            throw new Exception("cannot generate fixture");
+        if (!roundRobinGenerationForLeague(teamsId, tournament))
+            throw new FixtureGenerationException("cannot generate fixture");
         else {
-            assignGroundsToAllMatches(grounds, tournament);
+            assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
             return new ResultModel("fixture generated successfully");
         }
     }
 
-    private void assignGroundsToAllMatches(List<Grounds> grounds, Tournaments tournament) {
+    private void assignGroundsAndUmpiresToAllLeagueMatches(List<Grounds> grounds, Tournaments tournament, List<Umpires> umpires) {
         List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and isCancelled = 'false' " +
                 "order by matchId", new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId());
         int matchPerGround = matches.size() / tournament.getNumberOfGrounds();
         int remainingMatches = matches.size() - tournament.getNumberOfGrounds() * matchPerGround;
+        assignGroundsToLeague(grounds, matches, matchPerGround, remainingMatches);
+        assignUmpiresToAllLeagueMatches(umpires, matches);
+    }
+
+    private void assignUmpiresToAllLeagueMatches(List<Umpires> umpires, List<Matches> matches) {
 
     }
 
-    private boolean roundRobinGeneration(long[] teamsId, Tournaments tournament) {
+    private void assignGroundsToLeague(List<Grounds> grounds, List<Matches> matches, int matchPerGround, int remainingMatches) {
+        for (Grounds ground : grounds)
+            for (int matchIndex = 0; matchIndex < matchPerGround; matchIndex++)
+                jdbcTemplate.update("update matches set groundId = ? and roundName = ? where matchId = ?",
+                        ground.getGroundId(), ground.getGroundName(), matches.get(matchIndex).getMatchId());
+
+        for (Grounds ground : grounds)
+            if (remainingMatches != 0) {
+                jdbcTemplate.update("update matches set groundId = ? and roundName = ? where matchId = ?",
+                        ground.getGroundId(), ground.getGroundName(), matches.get(matches.size() - remainingMatches).getMatchId());
+                remainingMatches--;
+            } else return;
+    }
+
+    private boolean roundRobinGenerationForLeague(long[] teamsId, Tournaments tournament) {
         int numberOfTeams = teamsId.length;
         long[] finalTeamsForRotation;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
@@ -164,7 +188,7 @@ public class FixtureService implements FixtureGenerationInterface {
                     startDate = startDate.plusDays(1);
                 }
 
-                Matches match = insertIntoMatches(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
                 startTime = inningEndTime;
                 matchNumber++;
                 round++;
@@ -177,8 +201,8 @@ public class FixtureService implements FixtureGenerationInterface {
                 //insert into teams
                 if (finalTeamsForRotation[teamIdx] != 0) {
                     //insert into verses
-                    insertIntoVersus(teamsId[0], tournament.getTournamentId(), match.getMatchId());
-                    insertIntoVersus(teamsId[teamIdx], tournament.getTournamentId(), match.getMatchId());
+                    insertIntoVersusOfLeague(teamsId[0], tournament.getTournamentId(), match.getMatchId());
+                    insertIntoVersusOfLeague(teamsId[teamIdx], tournament.getTournamentId(), match.getMatchId());
                 /* Teams team = systemInterface.verifyTeamDetails(teamsId[0], tournamentId).get(0);
                 jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", match.getMatchId(), teamsId[0],
                         team.getTeamName(), 0, 0, 0, 0, null, "false");
@@ -198,10 +222,10 @@ public class FixtureService implements FixtureGenerationInterface {
                             inningEndTime = getEndTime(tournament, startTime);
                             startDate = startDate.plusDays(1);
                         }
-                        Matches nextMatch = insertIntoMatches(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+                        Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
 
-                        insertIntoVersus(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
-                        insertIntoVersus(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
+                        insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
+                        insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
                         startTime = inningEndTime;
                         matchNumber++;
                     }
@@ -215,9 +239,9 @@ public class FixtureService implements FixtureGenerationInterface {
                     inningEndTime = getEndTime(tournament, startTime);
                     startDate = startDate.plusDays(1);
                 }
-                Matches match = insertIntoMatches(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
-                insertIntoVersusOfFinals(match.getMatchId());
-                insertIntoVersusOfFinals(match.getMatchId());
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
                 startTime = inningEndTime;
                 matchNumber++;
             }
@@ -227,7 +251,7 @@ public class FixtureService implements FixtureGenerationInterface {
         }
     }
 
-    private void insertIntoVersusOfFinals(long matchId) {
+    private void insertIntoVersusOfFinalsForLeague(long matchId) {
         jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", matchId, null, null, 0, 0, 0, 0, null, "false");
     }
 
@@ -242,14 +266,14 @@ public class FixtureService implements FixtureGenerationInterface {
             return startTime.plusHours(5);
     }
 
-    private Matches insertIntoMatches(long tournamentId, int round, int matchNumber, LocalTime startTime, LocalTime endTime, LocalDate matchDate) {
+    private Matches insertIntoMatchesOfLeague(long tournamentId, int round, int matchNumber, LocalTime startTime, LocalTime endTime, LocalDate matchDate) {
         jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournamentId, null, null,
                 round, matchNumber, MatchStatus.UPCOMING.toString(), matchDate, DayOfWeek.from(matchDate).name(), startTime, endTime, "false", null);
         return jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
                 new BeanPropertyRowMapper<>(Matches.class)).get(0);
     }
 
-    private void  insertIntoVersus(long teamId, long tournamentId, long matchId) {
+    private void insertIntoVersusOfLeague(long teamId, long tournamentId, long matchId) {
         jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", matchId, teamId, systemInterface.
                 verifyTeamDetails(teamId, tournamentId).get(0).getTeamName(), 0, 0, 0, 0, null, "false");
     }
