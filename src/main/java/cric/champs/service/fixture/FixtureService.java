@@ -110,23 +110,22 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     private ResultModel generateFixtureLeague(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
-        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' limit ? offset ?",
-                new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
-
-        long[] teamsId = new long[teams.size()];
-        for (int index = 0; index < teams.size(); index++)
-            teamsId[index] = teams.get(index).getTeamId();
-        /*int index = 0;
-        for (Teams team : teams) {
-            teamsId[index] = team.getTeamId();
-            index++;
-        }*/
+        long[] teamsId = getTeamIds(tournament);
         if (!roundRobinGenerationForLeague(teamsId, tournament))
             throw new FixtureGenerationException("cannot generate fixture");
         else {
             assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
             return new ResultModel("fixture generated successfully");
         }
+    }
+
+    private long[] getTeamIds(Tournaments tournament) {
+        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false'",
+                new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
+        long[] teamsId = new long[teams.size()];
+        for (int index = 0; index < teams.size(); index++)
+            teamsId[index] = teams.get(index).getTeamId();
+        return teamsId;
     }
 
     private void assignGroundsAndUmpiresToAllLeagueMatches(List<Grounds> grounds, Tournaments tournament, List<Umpires> umpires) {
