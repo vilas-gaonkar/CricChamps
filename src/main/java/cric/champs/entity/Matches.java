@@ -24,6 +24,10 @@ public class Matches {
 
     private String groundName;
 
+    private long umpireId;
+
+    private String umpireName;
+
     private int roundNumber;
 
     private int matchNumber;
