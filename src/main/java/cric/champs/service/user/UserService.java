@@ -168,9 +168,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyTournamentCode(tournamentCode).isEmpty())
             registerTournament(tournaments);
 
-        jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
+        jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
                 systemInterface.getUserId(), tournaments.getTournamentName(), tournaments.getTournamentType(),
-                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0,
+                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0,0,0,0,
                 TournamentStatus.UPCOMING.toString());
 
         result.put("tournamentName", tournaments.getTournamentName());

@@ -92,8 +92,45 @@ public class FixtureService implements FixtureGenerationInterface {
             throw new FixtureGenerationException("minimum teams required to generate knockout tournament is 2");
     }
 
-    private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) {
-        return null;
+    private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws FixtureGenerationException {
+        long[] teamsId = getTeamIds(tournament);
+        if (!roundRobinGenerationForKnockout(teamsId, tournament))
+            throw new FixtureGenerationException("cannot generate fixture");
+        else {
+            assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
+            return new ResultModel("fixture generated successfully");
+        }
+    }
+
+    private boolean roundRobinGenerationForKnockout(long[] teamsId, Tournaments tournament) {
+        int numberOfTeams = teamsId.length;
+        long byeTeamId=0;
+        int matchNumber=1;
+        LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
+        LocalDate startDate = tournament.getTournamentStartDate();
+        LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
+
+
+        if (numberOfTeams % 2 == 1) {
+            byeTeamId = teamsId[teamsId.length - 1];
+        }
+
+        for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex++) {
+            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            if (endTime.isBefore(startTime.plusHours(inningEndTime.getHour()))) {
+                startDate = startDate.plusDays(1);
+                startTime = tournament.getTournamentStartTime().toLocalTime();
+            }
+            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(inningEndTime.getHour()), startDate);
+            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+            insertIntoVersusOfLeague(teamsId[(teamsId.length / 2) + teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+
+            startTime = startTime.plusHours(inningEndTime.getHour());
+            matchNumber++;
+
+        }
+
+        return false;
     }
 
     private ResultModel createRoundRobinForLeague(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
@@ -271,8 +308,10 @@ public class FixtureService implements FixtureGenerationInterface {
             return startTime.plusHours(2);
         else if (tournament.getNumberOfOvers() > 16 && tournament.getNumberOfOvers() < 31)
             return startTime.plusHours(3);
-        else
+        else if (tournament.getNumberOfOvers() > 31 && tournament.getNumberOfOvers() < 41)
             return startTime.plusHours(5);
+        else
+            return startTime.plusHours(8);
     }
 
     private Matches insertIntoMatchesOfLeague(long tournamentId, int round, int matchNumber, LocalTime startTime, LocalTime endTime, LocalDate matchDate) {
@@ -283,7 +322,7 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     private void insertIntoVersusOfLeague(long teamId, long tournamentId, long matchId) {
-        jdbcTemplate.update("insert into versus (?,?,?,?,?,?,?,?,?)", matchId, teamId, systemInterface.
+        jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matchId, teamId, systemInterface.
                 verifyTeamDetails(teamId, tournamentId).get(0).getTeamName(), 0, 0, 0, 0, null, "false");
     }
 
@@ -294,7 +333,9 @@ public class FixtureService implements FixtureGenerationInterface {
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 2;
         else if (numberOfOvers > 16 && numberOfOvers < 31)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 3;
-        else
+        else if (numberOfOvers > 31 && numberOfOvers < 41)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 5;
+        else
+            return (int) numberOfHoursPerDayAvailableForPlayingMatch / 8;
     }
 }

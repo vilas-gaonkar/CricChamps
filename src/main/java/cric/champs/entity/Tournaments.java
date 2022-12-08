@@ -42,6 +42,12 @@ public class Tournaments {
 
     private int numberOfUmpires;
 
+    private int totalRoundRobinMatches;
+
+    private int totalMatchesCompleted;
+
+    private int totalHoursPerMatch;
+
     private String tournamentStatus;
 
 }
