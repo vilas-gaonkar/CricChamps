@@ -20,11 +20,11 @@ public class Matches {
 
     private long tournamentId;
 
-    private long groundId;
+    private Long groundId;
 
     private String groundName;
 
-    private long umpireId;
+    private Long umpireId;
 
     private String umpireName;
 
@@ -36,7 +36,7 @@ public class Matches {
 
     private LocalDate matchDate;
 
-    private LocalDate matchDay;
+    private String  matchDay;
 
     private Time matchStartTime;
 
