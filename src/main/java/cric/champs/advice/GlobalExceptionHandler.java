@@ -277,4 +277,11 @@ public class GlobalExceptionHandler {
         return errorMessage;
     }
 
+    @ExceptionHandler(InsufficientTimeException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleInsufficientTimeException(InsufficientTimeException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
 }
