@@ -38,8 +38,7 @@ public class PlayerController {
 
         if (result != null)
             player.setProfilePhoto(result.get("url").toString());
-            return ResponseEntity.of(Optional.of(playerInterface.registerPlayer(player)));
-
+        return ResponseEntity.of(Optional.of(playerInterface.registerPlayer(player)));
     }
 
     @SuppressWarnings("rawtypes")
@@ -74,4 +73,5 @@ public class PlayerController {
 
         return ResponseEntity.of(Optional.of(playerInterface.getPlayer(playerId, teamId, tournamentId)));
     }
+
 }

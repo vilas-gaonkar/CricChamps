@@ -28,7 +28,7 @@ public class UmpiresController {
     @Autowired
     private UmpiresInterface umpiresInterface;
 
-    @PostMapping("/register")
+    @PostMapping("/add")
     public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
         Map result = null;
         if (profilePhoto == null)

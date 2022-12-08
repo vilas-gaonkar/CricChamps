@@ -3,6 +3,7 @@ package cric.champs.service.fixture;
 import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.*;
 import cric.champs.service.MatchStatus;
+import cric.champs.service.TournamentStatus;
 import cric.champs.service.TournamentTypes;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.user.TeamInterface;
@@ -30,10 +31,11 @@ public class FixtureService implements FixtureGenerationInterface {
     public ResultModel generateFixture(long tournamentId) throws Exception {
         int totalNumberOfMatchInOneDay;
         int totalMatchesCanBePlayedInGivenDatesFormed;
-
         Tournaments tournament = systemInterface.verifyTournamentId(tournamentId).get(0);
         if (tournament == null || tournament.getTournamentType() == null)
             throw new NullPointerException("Invalid tournament id");
+        if (checkAllConditionBeforeFixtureGeneration(tournament))
+            throw new FixtureGenerationException("tournament already completed or in progress");
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ?",
                 new BeanPropertyRowMapper<>(Grounds.class), tournament.getTournamentId());
         List<Umpires> umpires = jdbcTemplate.query("select * from umpires where tournamentId = ?",
@@ -74,6 +76,14 @@ public class FixtureService implements FixtureGenerationInterface {
             throw new FixtureGenerationException("teams required to generate individual match tournament is 2 only");
 
         throw new FixtureGenerationException("Cannot generate fixture");
+    }
+
+    private boolean checkAllConditionBeforeFixtureGeneration(Tournaments tournament) {
+        if (tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.PROGRESS.toString()) ||
+                tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.COMPLETED.toString()) ||
+                tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.CANCELLED.toString()))
+            return true;
+        return false;
     }
 
     private ResultModel createRoundRobinForKnockout(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {

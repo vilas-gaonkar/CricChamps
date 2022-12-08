@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TeamInterface {
 
-    ResultModel registerTeam(Teams teams) throws Exception;
+    long registerTeam(Teams teams) throws Exception;
 
     ResultModel deleteTeam(long teamId, long tournamentId);
 

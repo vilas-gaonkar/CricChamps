@@ -28,7 +28,7 @@ public class GroundController {
     private GroundInterface groundInterface;
 
     @SuppressWarnings("rawtypes")
-    @PostMapping("/register")
+    @PostMapping("/add")
     public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)

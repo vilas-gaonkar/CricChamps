@@ -6,12 +6,15 @@ import cric.champs.entity.Teams;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.TeamInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,8 +28,8 @@ public class TeamController {
     @Autowired
     private TeamInterface teamInterface;
 
-    @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
+    @PostMapping("/create")
+    public HttpEntity<Map<String ,String>> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -37,7 +40,9 @@ public class TeamController {
 
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
-        return ResponseEntity.of(Optional.of(teamInterface.registerTeam(team)));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("teamId",String.valueOf(teamInterface.registerTeam(team)));
+        return new HttpEntity<>(Collections.singletonMap("message", "team created successfully"), headers);
     }
 
     @PutMapping("/edit")
@@ -49,7 +54,6 @@ public class TeamController {
             team.setTeamLogo(null);
         else
             result = uploadImageTOCloud.uploadImage(teamPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
-
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
         return ResponseEntity.of(Optional.of(teamInterface.editTeam(team)));
