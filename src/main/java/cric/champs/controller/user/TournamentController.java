@@ -31,7 +31,7 @@ public class TournamentController {
     private UploadImageTOCloud uploadImageTOCloud;
 
     @SuppressWarnings("rawtypes")
-    @PostMapping("/register")
+    @PostMapping("/create")
     public ResponseEntity<Map<String, String>> register(@ModelAttribute Tournaments tournament, @RequestPart @Nullable MultipartFile logo) throws IOException {
         Map result = null;
         if (logo == null)

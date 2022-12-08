@@ -242,7 +242,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("A ground already exists in the given co-ordinates. Please enter different co-ordinates");
 
-
         jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
                 ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getGroundPhoto(),
                 ground.getLatitude(), ground.getLongitude(), "false");
@@ -347,13 +346,14 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
      */
 
     @Override
-    public ResultModel registerTeam(Teams teams) throws Exception {
+    public long registerTeam(Teams teams) throws Exception {
         if(systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
                 && systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getNumberOfTeams()==2)
             throw new Exception("Individual match should not contain more than two teams");
         jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
                 teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), "false");
-        return new ResultModel("Team registered successfully.");
+        Teams team = jdbcTemplate.query("select *  from teams order by teamId desc",new BeanPropertyRowMapper<>(Teams.class)).get(0);
+        return team.getTeamId();
     }
 
     @Override
