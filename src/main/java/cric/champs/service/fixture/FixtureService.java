@@ -115,7 +115,11 @@ public class FixtureService implements FixtureGenerationInterface {
             byeTeamId = teamsId[teamsId.length - 1];
         }
 
-        for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex++) {
+        int numberOfExceptedMatches = numberOfTeams-1;
+        int numberOfPlayingMatches = numberOfTeams/2;
+        int numberOfMatchesAfter = numberOfExceptedMatches-numberOfPlayingMatches;
+
+        for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
             LocalTime inningEndTime = getEndTime(tournament, startTime);
             if (endTime.isBefore(startTime.plusHours(inningEndTime.getHour()))) {
                 startDate = startDate.plusDays(1);
@@ -124,6 +128,21 @@ public class FixtureService implements FixtureGenerationInterface {
             Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(inningEndTime.getHour()), startDate);
             insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
             insertIntoVersusOfLeague(teamsId[(teamsId.length / 2) + teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+
+            startTime = startTime.plusHours(inningEndTime.getHour());
+            matchNumber++;
+
+        }
+
+        for (int teamIdIndex = 0; teamIdIndex < numberOfMatchesAfter; teamIdIndex++) {
+            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            if (endTime.isBefore(startTime.plusHours(inningEndTime.getHour()))) {
+                startDate = startDate.plusDays(1);
+                startTime = tournament.getTournamentStartTime().toLocalTime();
+            }
+            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(inningEndTime.getHour()), startDate);
+            insertIntoVersusOfLeague(0, tournament.getTournamentId(), match.getMatchId());
+            insertIntoVersusOfLeague(0, tournament.getTournamentId(), match.getMatchId());
 
             startTime = startTime.plusHours(inningEndTime.getHour());
             matchNumber++;
