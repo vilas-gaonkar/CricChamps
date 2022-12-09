@@ -98,7 +98,12 @@ public class FixtureService implements FixtureGenerationInterface {
                 new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId());
         if(teams.size()>0)
             return true;
-
+        List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and isCancelled = 'false' order by matchNumber DESC",
+                new BeanPropertyRowMapper<>(Matches.class),tournament.getTournamentId());
+        if(!matches.isEmpty()) {
+            jdbcTemplate.update("delete from matches where tournamentId = ? and isCancelled = 'false'", tournament.getTournamentId());
+            return false;
+        }
         return false;
     }
 
