@@ -121,7 +121,7 @@ public class FixtureService implements FixtureGenerationInterface {
      */
     private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws FixtureGenerationException {
         long[] teamsId = getTeamIds(tournament);
-        if (!roundRobinGenerationForKnockout(teamsId, tournament))
+        if (!roundRobinGenerationForKnockoutMethodOne(teamsId, tournament))
             throw new FixtureGenerationException("cannot generate fixture");
         else {
             assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
@@ -130,9 +130,9 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     /**
-     * Fixture for knockout tournament
+     * Fixture for knockout tournament method one
      */
-    private boolean roundRobinGenerationForKnockout(long[] teamsId, Tournaments tournament) {
+    private boolean roundRobinGenerationForKnockoutMethodOne(long[] teamsId, Tournaments tournament) {
         int numberOfTeams = teamsId.length;
         long byeTeamId = 0;
         int matchNumber = 1;
@@ -180,6 +180,9 @@ public class FixtureService implements FixtureGenerationInterface {
         return false;
     }
 
+    /**
+     * Fixture for knockout tournament method one
+     */
     private boolean roundRobinGenerationForKnockoutMethodTwo(long[] teamsId, Tournaments tournament) {
         int numberOfTeams = teamsId.length;
         long byeTeamId = 0;
@@ -228,6 +231,9 @@ public class FixtureService implements FixtureGenerationInterface {
         return false;
     }
 
+    /**
+     * Fixture for knockout tournament method one
+     */
     private boolean roundRobinGenerationForKnockoutMethodThree(long[] teamsId, Tournaments tournament) {
         int numberOfTeams = teamsId.length;
         long byeTeamId = 0;
@@ -235,7 +241,6 @@ public class FixtureService implements FixtureGenerationInterface {
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
-
 
         if (numberOfTeams % 2 == 1) {
             byeTeamId = teamsId[teamsId.length - 1];
