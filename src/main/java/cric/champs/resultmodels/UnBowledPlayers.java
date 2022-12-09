@@ -10,4 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UnBowledPlayers {
+
+    private long playerId;
 }

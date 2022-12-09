@@ -94,7 +94,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.COMPLETED.toString()) ||
                 tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.CANCELLED.toString()))
             return true;
-        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and numberOfPlayer < 2",
+        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and numberOfPlayers < 2",
                 new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId());
         if(teams.size()>0)
             return true;
@@ -425,7 +425,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 System.out.println(++round);
                 inningEndTime = getEndTime(tournament, startTime);
 
-                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime()) || tournament.getNumberOfOvers()>40) {
+                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
                     startTime = tournament.getTournamentStartTime().toLocalTime();
                     inningEndTime = getEndTime(tournament, startTime);
                     startDate = startDate.plusDays(1);
