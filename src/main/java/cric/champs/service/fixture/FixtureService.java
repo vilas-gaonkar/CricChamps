@@ -397,7 +397,7 @@ public class FixtureService implements FixtureGenerationInterface {
         long[] finalTeamsForRotation;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
-        LocalTime inningEndTime;
+        LocalTime marchEndTime;
 
         if (numberOfTeams % 2 == 0) {
             finalTeamsForRotation = new long[numberOfTeams - 1];
@@ -414,16 +414,16 @@ public class FixtureService implements FixtureGenerationInterface {
 
         try {
             for (int rounds = totalRounds; rounds > 0; rounds--) {
-                System.out.println(++round);
-                inningEndTime = getEndTime(tournament, startTime);
+               ++round;
+                marchEndTime = getEndTime(tournament, startTime);
 
-                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                if (!marchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
                     startTime = tournament.getTournamentStartTime().toLocalTime();
-                    inningEndTime = getEndTime(tournament, startTime);
+                    marchEndTime = getEndTime(tournament, startTime);
                     startDate = startDate.plusDays(1);
                 }
-                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
-                startTime = inningEndTime;
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, marchEndTime, startDate);
+                startTime = marchEndTime;
                 matchNumber++;
                 int teamIdx = rounds % totalRounds;
 
@@ -438,16 +438,16 @@ public class FixtureService implements FixtureGenerationInterface {
                     int secondTeam = (rounds + totalRounds - i) % totalRounds;
                     if (finalTeamsForRotation[firstTeam] != 0 && finalTeamsForRotation[secondTeam] != 0) {
                         //insert into versus
-                        inningEndTime = getEndTime(tournament, startTime);
-                        if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                        marchEndTime = getEndTime(tournament, startTime);
+                        if (!marchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
                             startTime = tournament.getTournamentStartTime().toLocalTime();
-                            inningEndTime = getEndTime(tournament, startTime);
+                            marchEndTime = getEndTime(tournament, startTime);
                             startDate = startDate.plusDays(1);
                         }
-                        Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+                        Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, marchEndTime, startDate);
                         insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
                         insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
-                        startTime = inningEndTime;
+                        startTime = marchEndTime;
                         matchNumber++;
                     }
                 }
