@@ -314,7 +314,7 @@ public class FixtureService implements FixtureGenerationInterface {
      * assigning final matches
      */
     private void addEliminationMatchesToTournament(Tournaments tournament, int numberOfMatches) {
-        Matches matches = jdbcTemplate.query("select * from matches order by roundNumber DESC",
+        Matches matches = jdbcTemplate.query("select * from matches order by matchNumber DESC",
                 new BeanPropertyRowMapper<>(Matches.class)).get(0);
         int round = matches.getRoundNumber() + 1;
         int matchNumber = matches.getMatchNumber() + 1;
@@ -366,33 +366,32 @@ public class FixtureService implements FixtureGenerationInterface {
     private void assignUmpiresToAllLeagueMatches(List<Umpires> umpires, List<Matches> matches, Tournaments tournament) {
         int matchPerGround = matches.size() / tournament.getNumberOfUmpires();
         int remainingMatches = matches.size() - tournament.getNumberOfUmpires() * matchPerGround;
+        int matchCount = 0;
         for (Umpires umpire : umpires)
             for (int matchIndex = 0; matchIndex < matchPerGround; matchIndex++)
-                jdbcTemplate.update("update matches set umpireId = ? and umpireName = ? where matchId = ?",
-                        umpire.getUmpireId(), umpire.getUmpireName(), matches.get(matchIndex).getMatchId());
+                jdbcTemplate.update("update matches set umpireId = ?, umpireName = ? where matchId = ?",
+                        umpire.getUmpireId(), umpire.getUmpireName(), matches.get(matchCount++).getMatchId());
         for (Umpires umpire : umpires)
-            if (remainingMatches != 0) {
-                jdbcTemplate.update("update matches set groundId = ? and groundName = ? where matchId = ?",
-                        umpire.getUmpireId(), umpire.getUmpireName(), matches.get(matches.size() - remainingMatches).getMatchId());
-                remainingMatches--;
-            } else return;
+            if (remainingMatches != 0)
+                jdbcTemplate.update("update matches set umpireId = ?, umpireName = ? where matchId = ?",
+                        umpire.getUmpireId(), umpire.getUmpireName(), matches.get(matches.size() - remainingMatches--).getMatchId());
     }
 
     /**
      * assign grounds for all tournament matches
      */
     private void assignGroundsToLeague(List<Grounds> grounds, List<Matches> matches, int matchPerGround, int remainingMatches) {
+        int matchCount = 0;
         for (Grounds ground : grounds)
             for (int matchIndex = 0; matchIndex < matchPerGround; matchIndex++)
-                jdbcTemplate.update("update matches set groundId = ? and groundName = ? where matchId = ?",
-                        ground.getGroundId(), ground.getGroundName(), matches.get(matchIndex).getMatchId());
+                jdbcTemplate.update("update matches set groundId = ?,groundName = ? where matchId = ?",
+                        ground.getGroundId(), ground.getGroundName(), matches.get(matchCount++).getMatchId());
 
         for (Grounds ground : grounds)
-            if (remainingMatches != 0) {
-                jdbcTemplate.update("update matches set groundId = ? and groundName = ? where matchId = ?",
-                        ground.getGroundId(), ground.getGroundName(), matches.get(matches.size() - remainingMatches).getMatchId());
-                remainingMatches--;
-            } else return;
+            if (remainingMatches != 0)
+                jdbcTemplate.update("update matches set groundId = ?, groundName = ? where matchId = ?",
+                        ground.getGroundId(), ground.getGroundName(), matches.get(matches.size() - remainingMatches--).getMatchId());
+
     }
 
     /**
