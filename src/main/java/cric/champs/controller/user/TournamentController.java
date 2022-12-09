@@ -14,6 +14,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -86,7 +87,7 @@ public class TournamentController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Tournaments> getTournament(@RequestHeader String tournamentCode){
+    public ResponseEntity<Tournaments> getTournament(@RequestHeader @Size(min = 6, max = 6, message = "Invalid tournament code") String tournamentCode) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getDetailsByTournamentCode(tournamentCode)));
     }
 }
