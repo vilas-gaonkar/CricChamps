@@ -40,7 +40,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 new BeanPropertyRowMapper<>(Grounds.class), tournament.getTournamentId());
         List<Umpires> umpires = jdbcTemplate.query("select * from umpires where tournamentId = ?",
                 new BeanPropertyRowMapper<>(Umpires.class), tournament.getTournamentId());
-        if (grounds.isEmpty() || umpires.isEmpty())
+        if (grounds.isEmpty())
             throw new NullPointerException("please add ground or umpire");
 
         //number of days assigned for this tournament
@@ -102,16 +102,15 @@ public class FixtureService implements FixtureGenerationInterface {
      */
     private ResultModel createRoundRobinForKnockout(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         if (tournament.getNumberOfTeams() > 1) {
-            int totalNumberOfMatchExpected;
-            if (tournament.getNumberOfTeams() % 2 == 0)
-                totalNumberOfMatchExpected = tournament.getNumberOfTeams() - 1;
-            else
-                totalNumberOfMatchExpected = tournament.getNumberOfTeams();
+            int totalNumberOfMatchExpected = tournament.getNumberOfTeams() - 1;
             //checking total matches with expected matches
             if (totalNumberOfMatchExpected < totalMatchesCanBePlayedInGivenDatesFormed)
                 throw new FixtureGenerationException("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
-            else
-                return generateFixtureKnockout(tournament, grounds, umpires);
+            else {
+                jdbcTemplate.update("update tournaments set totalRoundRobinMatches = ? where tournamentId = ?",
+                        tournament.getNumberOfTeams()/2,tournament.getTournamentId());
+                return generateFixtureKnockout(tournament, grounds, umpires, totalNumberOfMatchExpected);
+            }
         } else
             throw new FixtureGenerationException("minimum teams required to generate knockout tournament is 2");
     }
@@ -119,9 +118,9 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for knockout tournament
      */
-    private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws FixtureGenerationException {
+    private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires,int totalNumberOfMatchExpected) throws FixtureGenerationException {
         long[] teamsId = getTeamIds(tournament);
-        if (!roundRobinGenerationForKnockoutMethodOne(teamsId, tournament))
+        if (!roundRobinGenerationForKnockoutRoundOne(teamsId, tournament,totalNumberOfMatchExpected))
             throw new FixtureGenerationException("cannot generate fixture");
         else {
             assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
@@ -130,9 +129,9 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     /**
-     * Fixture for knockout tournament method one
+     * Fixture for knockout tournament round one
      */
-    private boolean roundRobinGenerationForKnockoutMethodOne(long[] teamsId, Tournaments tournament) {
+    private boolean roundRobinGenerationForKnockoutRoundOne(long[] teamsId, Tournaments tournament, int totalNumberOfMatchExpected) {
         int numberOfTeams = teamsId.length;
         long byeTeamId = 0;
         int matchNumber = 1;
@@ -140,16 +139,13 @@ public class FixtureService implements FixtureGenerationInterface {
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
 
-
-        if (numberOfTeams % 2 == 1) {
+        if (numberOfTeams % 2 == 1)
             byeTeamId = teamsId[teamsId.length - 1];
-        }
 
-        int numberOfExceptedMatches = numberOfTeams - 1;
-        int numberOfPlayingMatches = numberOfTeams / 2;
-        int numberOfMatchesAfter = numberOfExceptedMatches - numberOfPlayingMatches;
+        int halfSize = numberOfTeams / 2;
+        int dummyMatch = totalNumberOfMatchExpected - halfSize;
 
-        for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
+        for (int teamIdIndex = 0; teamIdIndex < halfSize; teamIdIndex++) {
             LocalTime inningEndTime = getEndTime(tournament, startTime);
             if (endTime.isBefore(startTime.plusHours(inningEndTime.getHour()))) {
                 startDate = startDate.plusDays(1);
@@ -183,7 +179,7 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for knockout tournament method one
      */
-    private boolean roundRobinGenerationForKnockoutMethodTwo(long[] teamsId, Tournaments tournament) {
+    private boolean roundRobinGenerationForKnockoutNextMatches(long[] teamsId, Tournaments tournament,int totalNumberOfMatchExpected) {
         int numberOfTeams = teamsId.length;
         long byeTeamId = 0;
         int matchNumber = 1;
@@ -232,33 +228,29 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     /**
-     * Fixture for knockout tournament method one
+     * Fixture for knockout tournament elimination rounds for finals
      */
-    private boolean roundRobinGenerationForKnockoutMethodThree(long[] teamsId, Tournaments tournament) {
-        int numberOfTeams = teamsId.length;
+    private boolean roundRobinGenerationForKnockoutMethodThree(Tournaments tournament,int totalNumberOfMatchExpected) {
+        long[] teamsId = getTeamIds(tournament);
         long byeTeamId = 0;
+        int halfSize = teamsId.length / 2;
+        int numberOfMatchesAfter = totalNumberOfMatchExpected - halfSize;
         int matchNumber = 1;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
 
-        if (numberOfTeams % 2 == 1) {
+        if (teamsId.length % 2 == 1)
             byeTeamId = teamsId[teamsId.length - 1];
-        }
-
-        int numberOfExceptedMatches = numberOfTeams - 1;
-        int numberOfPlayingMatches = numberOfTeams / 2;
-        int numberOfMatchesAfter = numberOfExceptedMatches - numberOfPlayingMatches;
-
-        for (int teamIdIndex = 0; teamIdIndex < numberOfExceptedMatches; teamIdIndex = teamIdIndex + 2) {
+        for (int teamIdIndex = 0; teamIdIndex < teamsId.length; teamIdIndex = teamIdIndex + 2) {
             LocalTime inningEndTime = getEndTime(tournament, startTime);
             if (endTime.isBefore(startTime.plusHours(inningEndTime.getHour()))) {
                 startDate = startDate.plusDays(1);
                 startTime = tournament.getTournamentStartTime().toLocalTime();
             }
             Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(inningEndTime.getHour()), startDate);
-            insertIntoVersusOfLeague(0, tournament.getTournamentId(), match.getMatchId());
-            insertIntoVersusOfLeague(0, tournament.getTournamentId(), match.getMatchId());
+            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+            insertIntoVersusOfLeague(teamsId[teamIdIndex+1], tournament.getTournamentId(), match.getMatchId());
 
             startTime = startTime.plusHours(inningEndTime.getHour());
             matchNumber++;
@@ -289,8 +281,12 @@ public class FixtureService implements FixtureGenerationInterface {
             //checking total matches with expected matches
             if (totalNumberOfMatchExpected > totalMatchesCanBePlayedInGivenDatesFormed)
                 throw new FixtureGenerationException("Cannot generate the fixture for tournament please provide more ground or decrease the overs");
-            else
+            else {
+                jdbcTemplate.update("update tournaments set totalRoundRobinMatches = ? where tournamentId = ?",
+                        totalNumberOfMatchExpected-3,tournament.getTournamentId());
                 return generateFixtureLeague(tournament, grounds, umpires);
+            }
+
         } else
             throw new FixtureGenerationException("minimum teams required to generate league tournament is 3");
     }
@@ -386,12 +382,10 @@ public class FixtureService implements FixtureGenerationInterface {
             for (int matchIndex = 0; matchIndex < matchPerGround; matchIndex++)
                 jdbcTemplate.update("update matches set groundId = ?,groundName = ? where matchId = ?",
                         ground.getGroundId(), ground.getGroundName(), matches.get(matchCount++).getMatchId());
-
         for (Grounds ground : grounds)
             if (remainingMatches != 0)
                 jdbcTemplate.update("update matches set groundId = ?, groundName = ? where matchId = ?",
                         ground.getGroundId(), ground.getGroundName(), matches.get(matches.size() - remainingMatches--).getMatchId());
-
     }
 
     /**
@@ -427,7 +421,6 @@ public class FixtureService implements FixtureGenerationInterface {
                     inningEndTime = getEndTime(tournament, startTime);
                     startDate = startDate.plusDays(1);
                 }
-
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
                 startTime = inningEndTime;
                 matchNumber++;
@@ -440,7 +433,6 @@ public class FixtureService implements FixtureGenerationInterface {
                     insertIntoVersusOfLeague(finalTeamsForRotation[teamIdx], tournament.getTournamentId(), match.getMatchId());
                 }
                 for (int i = 1; i < halfSize; i++) {
-
                     int firstTeam = (rounds + i) % totalRounds;
                     int secondTeam = (rounds + totalRounds - i) % totalRounds;
                     if (finalTeamsForRotation[firstTeam] != 0 && finalTeamsForRotation[secondTeam] != 0) {
