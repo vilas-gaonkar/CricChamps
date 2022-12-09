@@ -425,7 +425,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 System.out.println(++round);
                 inningEndTime = getEndTime(tournament, startTime);
 
-                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime()) || tournament.getNumberOfOvers()>40) {
                     startTime = tournament.getTournamentStartTime().toLocalTime();
                     inningEndTime = getEndTime(tournament, startTime);
                     startDate = startDate.plusDays(1);
