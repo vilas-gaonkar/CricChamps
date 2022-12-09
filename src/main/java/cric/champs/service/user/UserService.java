@@ -168,9 +168,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyTournamentCode(tournamentCode).isEmpty())
             registerTournament(tournaments);
 
-        jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
+        jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
                 systemInterface.getUserId(), tournaments.getTournamentName(), tournaments.getTournamentType(),
-                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0,0,0,0,
+                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0,0,0,0,0,
                 TournamentStatus.UPCOMING.toString());
 
         result.put("tournamentName", tournaments.getTournamentName());
@@ -192,6 +192,15 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (tournament.isEmpty())
             throw new NullPointerException("tournament not found");
         return tournament.get(0);
+    }
+
+    @Override
+    public Tournaments getDetailsByTournamentCode(String tournamentCode) {
+        List<Tournaments> tournament = systemInterface.verifyTournamentCode(tournamentCode);
+        if (tournament.isEmpty())
+            throw new NullPointerException("Invalid tournament code");
+        else
+            return tournament.get(0);
     }
 
     @Override
@@ -222,9 +231,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
+    public ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException {
+        if (!systemInterface.verifyTimeDurationGiven(tournamentId))
+            throw new FixtureGenerationException("Insufficient time for fixture generation");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
                 "tournamentEndDate = ? where tournamentId = ? and isDeleted = 'false'", startTime, endTime, startDate, endDate, tournamentId);
         return new ResultModel("Date and Time updated successfully");

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +57,16 @@ public class SystemService implements SystemInterface {
 
     @Override
     public boolean verifyOtp(int otp, String email) {
-        OTPManager otpManager = getOtp(email).get(0);
-        return otp == otpManager.getOtp() && otpManager.getExpireAt().isAfter(LocalDateTime.now());
+        List<OTPManager> otpManager = getOtp(email);
+        if (otpManager.isEmpty())
+            throw new NullPointerException("Invalid request");
+        return otp == otpManager.get(0).getOtp() && otpManager.get(0).getExpireAt().isAfter(LocalDateTime.now());
     }
 
     @Override
     public ResultModel verifyUserAccount(int otp, String email) throws EmailValidationException {
         if (verifyOtp(otp, email)) {
+            jdbcTemplate.update("delete from OTPManager where email = ?", email);
             jdbcTemplate.update("update users set accountStatus = ?", AccountStatus.VERIFIED.toString());
             return new ResultModel("Email verified successfully");
         }
@@ -77,7 +81,6 @@ public class SystemService implements SystemInterface {
     @Override
     public ResultModel sendOTP(String userEmail) throws OTPGenerateException {
         List<Users> user = getUserDetails(userEmail, AccountStatus.NOTVERIFIED.toString());
-
         if (user.isEmpty())
             throw new OTPGenerateException("enter valid registered email");
         List<OTPManager> otpManager = getOtp(userEmail);
@@ -95,14 +98,12 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric Champs Registration OTP");
         email.setText("Please enter the following OTP in your Cric Champs App to verify your account: \n" + otp);
         javaMailSender.send(email);
-
         return new ResultModel("OTP sent Successfully");
     }
 
     @Override
     public ResultModel forgetOtp(String userEmail) throws OTPGenerateException {
         List<Users> user = getUserDetails(userEmail, AccountStatus.VERIFIED.toString());
-
         if (user.isEmpty())
             throw new OTPGenerateException("enter valid registered email");
         List<OTPManager> otpManager = getOtp(userEmail);
@@ -120,7 +121,6 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric champs registration OTP");
         email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
         javaMailSender.send(email);
-
         return new ResultModel("OTP has been sent to your email");
     }
 
@@ -165,7 +165,7 @@ public class SystemService implements SystemInterface {
     public List<Tournaments> verifyTournamentId(long tournamentId) {
         rejectRequest();
         return jdbcTemplate.query("select * from tournaments where tournamentId = ? and userId = ? and tournamentStatus != ?",
-                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, getUserId(),TournamentStatus.CANCELLED.toString());
+                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, getUserId(), TournamentStatus.CANCELLED.toString());
     }
 
     @Override
@@ -180,6 +180,27 @@ public class SystemService implements SystemInterface {
     public List<Tournaments> verifyUserID() {
         return jdbcTemplate.query("select * from tournaments where userId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), getUserId());
+    }
+
+    @Override
+    public boolean verifyTimeDurationGiven(long tournamentId) {
+        List<Tournaments> tournament = verifyTournamentId(tournamentId);
+        if (tournament.isEmpty())
+            throw new NullPointerException("Tournament not found");
+        if (tournament.get(0).getNumberOfOvers() < 6)
+            return getDuration(tournament) == 1;
+        else if (tournament.get(0).getNumberOfOvers() > 6 && tournament.get(0).getNumberOfOvers() < 16)
+            return getDuration(tournament) == 2;
+        else if (tournament.get(0).getNumberOfOvers() > 16 && tournament.get(0).getNumberOfOvers() < 31)
+            return getDuration(tournament) == 3;
+        else if (tournament.get(0).getNumberOfOvers() > 31 && tournament.get(0).getNumberOfOvers() < 41)
+            return getDuration(tournament) == 5;
+        else
+            return getDuration(tournament) == 8;
+    }
+
+    private long getDuration(List<Tournaments> tournament) {
+        return Duration.between(tournament.get(0).getTournamentStartTime().toLocalTime(), tournament.get(0).getTournamentEndTime().toLocalTime()).toHours();
     }
 
     @Override

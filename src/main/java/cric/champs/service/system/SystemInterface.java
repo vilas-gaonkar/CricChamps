@@ -51,4 +51,6 @@ public interface SystemInterface {
     List<Players> verifyTeamAndTournamentId(long teamId, long tournamentId);
 
     List<Tournaments> verifyUserID();
+
+    boolean verifyTimeDurationGiven(long tournamentId);
 }

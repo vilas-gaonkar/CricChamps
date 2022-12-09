@@ -48,6 +48,8 @@ public class Tournaments {
 
     private int totalHoursPerMatch;
 
+    private int numberOfOversPerBowler;
+
     private String tournamentStatus;
 
 }

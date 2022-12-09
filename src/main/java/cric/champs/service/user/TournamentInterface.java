@@ -1,5 +1,6 @@
 package cric.champs.service.user;
 
+import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.ResultModel;
 import cric.champs.entity.Tournaments;
 
@@ -16,12 +17,14 @@ public interface TournamentInterface {
 
     Tournaments getTournament(long tournamentId);
 
+    Tournaments getDetailsByTournamentCode(String tournamentCode);
+
     ResultModel cancelTournament(long tournamentId);
 
     ResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate);
 
     ResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
 
-    ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime);
+    ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException;
 
 }

@@ -1,6 +1,7 @@
 package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
+import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.ResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.service.cloud.UploadImageTOCloud;
@@ -80,8 +81,12 @@ public class TournamentController {
                                                              @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                              @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                                              @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+                                                             @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) throws FixtureGenerationException {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTime(tournamentId, startDate, endDate, startTime, endTime)));
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<Tournaments> getTournament(@RequestHeader String tournamentCode){
+        return ResponseEntity.of(Optional.of(tournamentInterface.getDetailsByTournamentCode(tournamentCode)));
+    }
 }
