@@ -230,7 +230,7 @@ public class FixtureService implements FixtureGenerationInterface {
             startTime = startTime.plusHours(hour);
             matchNumber++;
         }
-        return false;
+        return true;
     }
 
     /**
