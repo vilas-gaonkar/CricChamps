@@ -18,6 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -56,7 +60,11 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public HttpEntity<?> login(@RequestHeader String email, @RequestHeader String password) throws LoginFailedException, NotVerifiedException {
+    public HttpEntity<?> login(@RequestHeader @Email(message = "enter valid email") String email,
+                               @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+                                       message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
+                                               "one special character with minimum length 8 maximum length 250")
+                               String password) throws LoginFailedException, NotVerifiedException {
         String result = loginInterface.signIn(email, password);
         if (result == null)
             return new HttpEntity<>(Collections.singletonMap("Message", "Invalid credentials"));
@@ -73,18 +81,26 @@ public class LoginController {
     }
 
     @PatchMapping("/reset-password")
-    public ResponseEntity<SuccessResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
-                                                            @RequestHeader String confirmPassword) throws UpdateFailedException {
+    public ResponseEntity<SuccessResultModel> resetPassword(@RequestHeader @Email(message = "enter valid email") String email,
+                                                            @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+                                                                    message = "Please provide password at least one uppercase letter,one lowercase letter,one number and "
+                                                                            + "one special character with minimum length 8 maximum length 250") String newPassword,
+                                                            @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+                                                                    message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
+                                                                            "one special character with minimum length 8 maximum length 250") String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword, email)));
     }
 
     @PatchMapping("/forgot-password")
-    public ResponseEntity<SuccessResultModel> forgotPassword(@RequestHeader String email) throws UsernameNotFoundException, OTPGenerateException {
+    public ResponseEntity<SuccessResultModel> forgotPassword(@RequestHeader @Email(message = "enter valid email") String email)
+            throws UsernameNotFoundException, OTPGenerateException {
         return ResponseEntity.of(Optional.of(loginInterface.forgotPassword(email)));
     }
 
     @PatchMapping("/reset")
-    public ResponseEntity<String> verifyOTP(@RequestParam int otp, @RequestHeader String email) {
+    public ResponseEntity<String> verifyOTP(@RequestParam @Min(value = 100000, message = "enter valid otp")
+                                            @Max(value = 999999, message = "enter valid otp") int otp,
+                                            @RequestHeader @Email(message = "enter valid email") String email) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (loginInterface.resetPassword(otp, email)) {
             responseHeaders.set("isVerified", "true");
@@ -95,7 +111,7 @@ public class LoginController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<SuccessResultModel> sendOtp(@RequestHeader String email) throws Exception {
+    public ResponseEntity<SuccessResultModel> sendOtp(@RequestHeader @Email(message = "enter valid email") String email) throws Exception {
         return ResponseEntity.of(Optional.of(systemInterface.sendOTP(email)));
     }
 
@@ -119,7 +135,12 @@ public class LoginController {
     }
 
     @PatchMapping("/user/change/password")
-    public ResponseEntity<SuccessResultModel> changePassword(@RequestHeader String newPassword, @RequestHeader String confirmPassword) throws UpdateFailedException {
+    public ResponseEntity<SuccessResultModel> changePassword(@RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+            message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
+                    "one special character with minimum length 8 maximum length 250") String newPassword,
+                                                             @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+                                                                     message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
+                                                                             "one special character with minimum length 8 maximum length 250") String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
     }
 

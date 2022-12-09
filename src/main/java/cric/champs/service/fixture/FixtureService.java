@@ -331,24 +331,31 @@ public class FixtureService implements FixtureGenerationInterface {
      * assigning final matches
      */
     private void addEliminationMatchesToTournament(Tournaments tournament, int numberOfMatches) {
-        Matches matches = jdbcTemplate.query("select * from matches order by matchNumber DESC",
-                new BeanPropertyRowMapper<>(Matches.class)).get(0);
+        Matches matches = jdbcTemplate.query("select * from matches where tournamentId = ? and isCancelled = 'false' order by matchNumber DESC",
+                new BeanPropertyRowMapper<>(Matches.class),tournament.getTournamentId()).get(0);
         int round = matches.getRoundNumber() + 1;
         int matchNumber = matches.getMatchNumber() + 1;
         LocalDate startDate = matches.getMatchDate();
         LocalTime startTime = matches.getMatchEndTime().toLocalTime();
         //final matches
         for (int index = 0; index < numberOfMatches; index++) {
-            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            LocalDateTime matchEndTimes = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime));
+            LocalTime matchEndTime = matchEndTimes.toLocalTime();
+            if(!matchEndTimes.isBefore(LocalDateTime.of(startDate,tournament.getTournamentEndTime().toLocalTime()))){
+                startTime = tournament.getTournamentStartTime().toLocalTime();
+                matchEndTime = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime)).toLocalTime();
+                startDate = startDate.plusDays(1);
+            }
+            /*LocalTime inningEndTime = getEndTime(tournament, startTime);
             if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
                 startTime = tournament.getTournamentStartTime().toLocalTime();
                 inningEndTime = getEndTime(tournament, startTime);
                 startDate = startDate.plusDays(1);
-            }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+            }*/
+            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
             insertIntoVersusOfFinalsForLeague(match.getMatchId());
             insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            startTime = inningEndTime;
+            startTime = matchEndTime;
             matchNumber++;
         }
     }
@@ -417,7 +424,7 @@ public class FixtureService implements FixtureGenerationInterface {
         long[] finalTeamsForRotation;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
-        LocalTime inningEndTime;
+        LocalTime matchEndTime;
 
         if (numberOfTeams % 2 == 0) {
             finalTeamsForRotation = new long[numberOfTeams - 1];
@@ -434,16 +441,24 @@ public class FixtureService implements FixtureGenerationInterface {
 
         try {
             for (int rounds = totalRounds; rounds > 0; rounds--) {
-                System.out.println(++round);
-                inningEndTime = getEndTime(tournament, startTime);
-
-                if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+               ++round;
+                //matchEndTime = getEndTime(tournament, startTime);
+//sample
+                LocalDateTime matchEndTimes = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime));
+                matchEndTime = matchEndTimes.toLocalTime();
+                if(!matchEndTimes.isBefore(LocalDateTime.of(startDate,tournament.getTournamentEndTime().toLocalTime()))){
                     startTime = tournament.getTournamentStartTime().toLocalTime();
-                    inningEndTime = getEndTime(tournament, startTime);
+                    matchEndTime = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime)).toLocalTime();
                     startDate = startDate.plusDays(1);
                 }
-                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
-                startTime = inningEndTime;
+                //sample
+                /*if (!matchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                    startTime = tournament.getTournamentStartTime().toLocalTime();
+                    matchEndTime = getEndTime(tournament, startTime);
+                    startDate = startDate.plusDays(1);
+                }*/
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
+                startTime = matchEndTime;
                 matchNumber++;
                 int teamIdx = rounds % totalRounds;
 
@@ -458,16 +473,23 @@ public class FixtureService implements FixtureGenerationInterface {
                     int secondTeam = (rounds + totalRounds - i) % totalRounds;
                     if (finalTeamsForRotation[firstTeam] != 0 && finalTeamsForRotation[secondTeam] != 0) {
                         //insert into versus
-                        inningEndTime = getEndTime(tournament, startTime);
-                        if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                        matchEndTimes = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime));
+                        matchEndTime = matchEndTimes.toLocalTime();
+                        if(!matchEndTimes.isBefore(LocalDateTime.of(startDate,tournament.getTournamentEndTime().toLocalTime()))){
                             startTime = tournament.getTournamentStartTime().toLocalTime();
-                            inningEndTime = getEndTime(tournament, startTime);
+                            matchEndTime = getEndDateTime(tournament,LocalDateTime.of(startDate,startTime)).toLocalTime();
                             startDate = startDate.plusDays(1);
                         }
-                        Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, inningEndTime, startDate);
+                        /*matchEndTime = getEndTime(tournament, startTime);
+                        if (!matchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
+                            startTime = tournament.getTournamentStartTime().toLocalTime();
+                            matchEndTime = getEndTime(tournament, startTime);
+                            startDate = startDate.plusDays(1);
+                        }*/
+                        Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
                         insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
                         insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
-                        startTime = inningEndTime;
+                        startTime = matchEndTime;
                         matchNumber++;
                     }
                 }
@@ -476,6 +498,19 @@ public class FixtureService implements FixtureGenerationInterface {
         } catch (Exception exception) {
             return false;
         }
+    }
+
+    private LocalDateTime getEndDateTime(Tournaments tournament, LocalDateTime startTime) {
+        if (tournament.getNumberOfOvers() < 6)
+            return startTime.plusHours(1);
+        else if (tournament.getNumberOfOvers() > 6 && tournament.getNumberOfOvers() < 16)
+            return startTime.plusHours(2);
+        else if (tournament.getNumberOfOvers() > 16 && tournament.getNumberOfOvers() < 31)
+            return startTime.plusHours(3);
+        else if (tournament.getNumberOfOvers() > 31 && tournament.getNumberOfOvers() < 41)
+            return startTime.plusHours(5);
+        else
+            return startTime.plusHours(8);
     }
 
     /**
