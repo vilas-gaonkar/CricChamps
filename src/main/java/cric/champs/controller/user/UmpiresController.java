@@ -1,7 +1,7 @@
 package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Umpires;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.UmpiresInterface;
@@ -29,7 +29,7 @@ public class UmpiresController {
     private UmpiresInterface umpiresInterface;
 
     @PostMapping("/add")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
         Map result = null;
         if (profilePhoto == null)
             umpire.setUmpirePhoto(null);
@@ -44,7 +44,7 @@ public class UmpiresController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Umpires umpire, @Nullable @RequestPart MultipartFile profilePhoto) throws IOException {
         Map result = null;
         if (profilePhoto == null)
             umpire.setUmpirePhoto(null);
@@ -64,7 +64,7 @@ public class UmpiresController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestPart long umpireId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestPart long umpireId, @RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(umpiresInterface.deleteUmpires(umpireId, tournamentId)));
     }
 

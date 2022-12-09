@@ -2,7 +2,7 @@ package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.customexceptions.*;
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Users;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.cloud.UploadImageTOCloud;
@@ -37,7 +37,7 @@ public class LoginController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/sign-up")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Users user, @RequestPart @Nullable MultipartFile profilePhoto)
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Users user, @RequestPart @Nullable MultipartFile profilePhoto)
             throws IOException, SignupException {
 
         Map result = null;
@@ -73,13 +73,13 @@ public class LoginController {
     }
 
     @PatchMapping("/reset-password")
-    public ResponseEntity<ResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
-                                                     @RequestHeader String confirmPassword) throws UpdateFailedException {
+    public ResponseEntity<SuccessResultModel> resetPassword(@RequestHeader String email, @RequestHeader String newPassword,
+                                                            @RequestHeader String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword, email)));
     }
 
     @PatchMapping("/forgot-password")
-    public ResponseEntity<ResultModel> forgotPassword(@RequestHeader String email) throws UsernameNotFoundException, OTPGenerateException {
+    public ResponseEntity<SuccessResultModel> forgotPassword(@RequestHeader String email) throws UsernameNotFoundException, OTPGenerateException {
         return ResponseEntity.of(Optional.of(loginInterface.forgotPassword(email)));
     }
 
@@ -95,18 +95,18 @@ public class LoginController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<ResultModel> sendOtp(@RequestHeader String email) throws Exception {
+    public ResponseEntity<SuccessResultModel> sendOtp(@RequestHeader String email) throws Exception {
         return ResponseEntity.of(Optional.of(systemInterface.sendOTP(email)));
     }
 
     @PatchMapping("/verify")
-    public ResponseEntity<ResultModel> verifyEmail(@RequestParam int otp, @RequestHeader String email) throws Exception {
+    public ResponseEntity<SuccessResultModel> verifyEmail(@RequestParam int otp, @RequestHeader String email) throws Exception {
         return ResponseEntity.of(Optional.of(systemInterface.verifyUserAccount(otp, email)));
     }
 
     @SuppressWarnings("rawtypes")
     @PatchMapping("/user/change/profile-photo")
-    public ResponseEntity<ResultModel> changeProfilePhoto(@RequestPart @Nullable MultipartFile profilePhoto) throws IOException, UpdateFailedException {
+    public ResponseEntity<SuccessResultModel> changeProfilePhoto(@RequestPart @Nullable MultipartFile profilePhoto) throws IOException, UpdateFailedException {
         Map result;
         if (profilePhoto == null)
             return ResponseEntity.of(Optional.of(loginInterface.changeProfilePhoto(null)));
@@ -119,12 +119,12 @@ public class LoginController {
     }
 
     @PatchMapping("/user/change/password")
-    public ResponseEntity<ResultModel> changePassword(@RequestHeader String newPassword, @RequestHeader String confirmPassword) throws UpdateFailedException {
+    public ResponseEntity<SuccessResultModel> changePassword(@RequestHeader String newPassword, @RequestHeader String confirmPassword) throws UpdateFailedException {
         return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
     }
 
     @DeleteMapping("/user/remove/profile-photo")
-    public ResponseEntity<ResultModel> removeProfilePhoto() {
+    public ResponseEntity<SuccessResultModel> removeProfilePhoto() {
         return ResponseEntity.of(Optional.of(loginInterface.deleteOldProfilePhoto()));
     }
 

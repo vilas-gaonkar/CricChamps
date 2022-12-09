@@ -2,6 +2,7 @@ package cric.champs.service.fixture;
 
 import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.*;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.MatchStatus;
 import cric.champs.service.TournamentStatus;
 import cric.champs.service.TournamentTypes;
@@ -29,20 +30,20 @@ public class FixtureService implements FixtureGenerationInterface {
     private TeamInterface teamInterface;
 
     @Override
-    public ResultModel generateFixture(long tournamentId) throws Exception {
+    public SuccessResultModel generateFixture(long tournamentId) throws Exception {
         int totalNumberOfMatchInOneDay;
         int totalMatchesCanBePlayedInGivenDatesFormed;
         Tournaments tournament = systemInterface.verifyTournamentId(tournamentId).get(0);
         if (tournament == null || tournament.getTournamentType() == null)
             throw new NullPointerException("Invalid tournament id");
         if (checkAllConditionBeforeFixtureGeneration(tournament))
-            throw new FixtureGenerationException("tournament already completed or in progress");
+            throw new FixtureGenerationException("tournament already completed or in progress or team contain less than 2 players");
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ?",
                 new BeanPropertyRowMapper<>(Grounds.class), tournament.getTournamentId());
-        List<Umpires> umpires = jdbcTemplate.query("select * from umpires where tournamentId = ?",
-                new BeanPropertyRowMapper<>(Umpires.class), tournament.getTournamentId());
         if (grounds.isEmpty())
             throw new NullPointerException("please add ground or umpire");
+        List<Umpires> umpires = jdbcTemplate.query("select * from umpires where tournamentId = ?",
+                new BeanPropertyRowMapper<>(Umpires.class), tournament.getTournamentId());
 
         //number of days assigned for this tournament
         int numberOfTournamentDays = Period.between(tournament.getTournamentStartDate(), tournament.getTournamentEndDate()).getDays();
@@ -53,10 +54,8 @@ public class FixtureService implements FixtureGenerationInterface {
         //number of matches can play in one day
         totalNumberOfMatchInOneDay = getNumberMatchPerDay(numberOfHoursPerDayAvailableForPlayingMatch, tournament.getNumberOfOvers());
 
-
         //number of matches per day in all grounds according to number of grounds and umpires
         totalMatchesCanBePlayedInGivenDatesFormed = totalNumberOfMatchInOneDay * tournament.getNumberOfGrounds() * numberOfTournamentDays;
-
 
         //Fixture for league tournament
         if (tournament.getTournamentType().equalsIgnoreCase(TournamentTypes.LEAGUE.toString()))
@@ -95,13 +94,18 @@ public class FixtureService implements FixtureGenerationInterface {
                 tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.COMPLETED.toString()) ||
                 tournament.getTournamentStatus().equalsIgnoreCase(TournamentStatus.CANCELLED.toString()))
             return true;
+        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and numberOfPlayer < 2",
+                new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId());
+        if(teams.size()>0)
+            return true;
+
         return false;
     }
 
     /**
      * Fixture for knockout tournament
      */
-    private ResultModel createRoundRobinForKnockout(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
+    private SuccessResultModel createRoundRobinForKnockout(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         if (tournament.getNumberOfTeams() > 1) {
             int totalNumberOfMatchExpected = tournament.getNumberOfTeams() - 1;
             //checking total matches with expected matches
@@ -119,13 +123,13 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for knockout tournament
      */
-    private ResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires,int totalNumberOfMatchExpected) throws FixtureGenerationException {
+    private SuccessResultModel generateFixtureKnockout(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires, int totalNumberOfMatchExpected) throws FixtureGenerationException {
         long[] teamsId = getTeamIds(tournament);
         if (!roundRobinGenerationForKnockoutRoundOne(teamsId, tournament,totalNumberOfMatchExpected))
             throw new FixtureGenerationException("cannot generate fixture");
         else {
             assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
-            return new ResultModel("fixture generated successfully");
+            return new SuccessResultModel("fixture generated successfully");
         }
     }
 
@@ -280,7 +284,7 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for league tournament
      */
-    private ResultModel createRoundRobinForLeague(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
+    private SuccessResultModel createRoundRobinForLeague(int totalMatchesCanBePlayedInGivenDatesFormed, Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         if (tournament.getNumberOfTeams() > 2) {
             int totalNumberOfMatchExpected = (tournament.getNumberOfTeams() * (tournament.getNumberOfTeams() - 1) / 2) + 3;
             //checking total matches with expected matches
@@ -299,7 +303,7 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for league tournament
      */
-    private ResultModel generateFixtureLeague(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
+    private SuccessResultModel generateFixtureLeague(Tournaments tournament, List<Grounds> grounds, List<Umpires> umpires) throws Exception {
         long[] teamsId = getTeamIds(tournament);
         if (!roundRobinGenerationForLeague(teamsId, tournament))
             throw new FixtureGenerationException("cannot generate fixture");
@@ -307,7 +311,7 @@ public class FixtureService implements FixtureGenerationInterface {
             addEliminationMatchesToTournament(tournament, 2);
             addEliminationMatchesToTournament(tournament, 1);
             assignGroundsAndUmpiresToAllLeagueMatches(grounds, tournament, umpires);
-            return new ResultModel("fixture generated successfully");
+            return new SuccessResultModel("fixture generated successfully");
         }
     }
 

@@ -1,8 +1,9 @@
 package cric.champs.service.user;
 
 import cric.champs.customexceptions.FixtureGenerationException;
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
+import cric.champs.resultmodels.TournamentResultModel;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public interface TournamentInterface {
 
-    Map<String, String> registerTournament(Tournaments tournaments);
+    TournamentResultModel registerTournament(Tournaments tournaments);
 
     List<Tournaments> getTournamentDetails(int pageSize, int pageNumber);
 
@@ -19,12 +20,12 @@ public interface TournamentInterface {
 
     Tournaments getDetailsByTournamentCode(String tournamentCode);
 
-    ResultModel cancelTournament(long tournamentId);
+    SuccessResultModel cancelTournament(long tournamentId);
 
-    ResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate);
+    SuccessResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate);
 
-    ResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
+    SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
 
-    ResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException;
+    SuccessResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException;
 
 }

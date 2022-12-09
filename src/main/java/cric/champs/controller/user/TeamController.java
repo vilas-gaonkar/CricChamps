@@ -1,20 +1,19 @@
 package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
-import cric.champs.entity.ResultModel;
 import cric.champs.entity.Teams;
+import cric.champs.resultmodels.SuccessResultModel;
+import cric.champs.resultmodels.TeamResultModel;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.TeamInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public class TeamController {
     private TeamInterface teamInterface;
 
     @PostMapping("/create")
-    public HttpEntity<Map<String ,String>> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
+    public HttpEntity<TeamResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -40,13 +39,11 @@ public class TeamController {
 
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("teamId",String.valueOf(teamInterface.registerTeam(team)));
-        return new HttpEntity<>(Collections.singletonMap("message", "team created successfully"), headers);
+        return new HttpEntity<>(teamInterface.registerTeam(team));
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -60,7 +57,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestPart long teamId, @RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(teamInterface.deleteTeam(teamId, tournamentId)));
     }
 

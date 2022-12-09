@@ -2,7 +2,7 @@ package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.entity.Grounds;
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.GroundInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class GroundController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/add")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
             ground.setGroundPhoto(null);
@@ -44,7 +44,7 @@ public class GroundController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
         Map result = null;
         if (groundPhoto == null)
             ground.setGroundPhoto(null);
@@ -69,7 +69,7 @@ public class GroundController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestParam long groundId, @RequestParam long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestParam long groundId, @RequestParam long tournamentId) {
         return ResponseEntity.of(Optional.of(groundInterface.deleteGrounds(groundId, tournamentId)));
     }
 

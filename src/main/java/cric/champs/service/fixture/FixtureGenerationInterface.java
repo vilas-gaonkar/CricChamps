@@ -1,7 +1,7 @@
 package cric.champs.service.fixture;
 
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 
 public interface FixtureGenerationInterface {
-    ResultModel generateFixture(long tournamentId) throws Exception;
+    SuccessResultModel generateFixture(long tournamentId) throws Exception;
 }
