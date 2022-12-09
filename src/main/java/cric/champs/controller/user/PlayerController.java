@@ -2,7 +2,7 @@ package cric.champs.controller.user;
 
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.entity.Players;
-import cric.champs.entity.ResultModel;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.cloud.UploadImageTOCloud;
 import cric.champs.service.user.PlayerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<ResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -43,7 +43,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PutMapping("/edit")
-    public ResponseEntity<ResultModel> edit(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -58,7 +58,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<ResultModel> delete(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
         return ResponseEntity.of(Optional.of(playerInterface.deletePlayer(playerId, teamId, tournamentId)));
     }
 

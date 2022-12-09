@@ -1,14 +1,13 @@
-package cric.champs.entity;
+package cric.champs.resultmodels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResultModel {
-    private String message;
+public class FieldersResultModel {
 }

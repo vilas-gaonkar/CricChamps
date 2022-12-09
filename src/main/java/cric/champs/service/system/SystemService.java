@@ -3,6 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.customexceptions.OTPGenerateException;
 import cric.champs.entity.*;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.MatchStatus;
 import cric.champs.service.TournamentStatus;
@@ -64,11 +65,11 @@ public class SystemService implements SystemInterface {
     }
 
     @Override
-    public ResultModel verifyUserAccount(int otp, String email) throws EmailValidationException {
+    public SuccessResultModel verifyUserAccount(int otp, String email) throws EmailValidationException {
         if (verifyOtp(otp, email)) {
             jdbcTemplate.update("delete from OTPManager where email = ?", email);
             jdbcTemplate.update("update users set accountStatus = ?", AccountStatus.VERIFIED.toString());
-            return new ResultModel("Email verified successfully");
+            return new SuccessResultModel("Email verified successfully");
         }
         throw new EmailValidationException("Incorrect OTP");
     }
@@ -79,7 +80,7 @@ public class SystemService implements SystemInterface {
     }
 
     @Override
-    public ResultModel sendOTP(String userEmail) throws OTPGenerateException {
+    public SuccessResultModel sendOTP(String userEmail) throws OTPGenerateException {
         List<Users> user = getUserDetails(userEmail, AccountStatus.NOTVERIFIED.toString());
         if (user.isEmpty())
             throw new OTPGenerateException("enter valid registered email");
@@ -98,11 +99,11 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric Champs Registration OTP");
         email.setText("Please enter the following OTP in your Cric Champs App to verify your account: \n" + otp);
         javaMailSender.send(email);
-        return new ResultModel("OTP sent Successfully");
+        return new SuccessResultModel("OTP sent Successfully");
     }
 
     @Override
-    public ResultModel forgetOtp(String userEmail) throws OTPGenerateException {
+    public SuccessResultModel forgetOtp(String userEmail) throws OTPGenerateException {
         List<Users> user = getUserDetails(userEmail, AccountStatus.VERIFIED.toString());
         if (user.isEmpty())
             throw new OTPGenerateException("enter valid registered email");
@@ -121,7 +122,7 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric champs registration OTP");
         email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
         javaMailSender.send(email);
-        return new ResultModel("OTP has been sent to your email");
+        return new SuccessResultModel("OTP has been sent to your email");
     }
 
     @Override
@@ -154,11 +155,11 @@ public class SystemService implements SystemInterface {
     }
 
     @Override
-    public ResultModel deleteMatches(long tournamentId) {
+    public SuccessResultModel deleteMatches(long tournamentId) {
         rejectRequest();
         jdbcTemplate.update("update matches set isCancelled = ? where tournamentId = ? ",
                 MatchStatus.ABANDONED.toString(), tournamentId);
-        return new ResultModel("Tournament has been cancelled");
+        return new SuccessResultModel("Tournament has been cancelled");
     }
 
     @Override
@@ -177,7 +178,8 @@ public class SystemService implements SystemInterface {
 
     //verify user tournament accounts
     @Override
-    public List<Tournaments> verifyUserID() {
+    public List<Tournaments>
+    verifyUserID() {
         return jdbcTemplate.query("select * from tournaments where userId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), getUserId());
     }
