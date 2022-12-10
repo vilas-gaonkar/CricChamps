@@ -157,42 +157,47 @@ public class FixtureService implements FixtureGenerationInterface {
         int halfSize = teamsId.length / 2;
         int dummyMatch = totalNumberOfMatchExpected - halfSize;
 
-        LocalTime inningEndTime = getEndTime(tournament, startTime);
-        long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
+        try {
+            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
 
-        for (int teamIdIndex = 0; teamIdIndex < halfSize; teamIdIndex++) {
+            for (int teamIdIndex = 0; teamIdIndex < halfSize; teamIdIndex++) {
 
-            if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
-                startDateTime = startDateTime.plusDays(1);
-                startDate = startDate.plusDays(1);
-                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
-                endDateTime = endDateTime.plusDays(1);
+                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
+                    startDateTime = startDateTime.plusDays(1);
+                    startDate = startDate.plusDays(1);
+                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    endDateTime = endDateTime.plusDays(1);
+                }
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.plusHours(hour).toLocalTime(), startDate);
+                insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+                insertIntoVersusOfLeague(teamsId[(teamsId.length / 2) + teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+
+                startDateTime = startDateTime.plusHours(hour);
+                matchNumber++;
+
             }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.plusHours(hour).toLocalTime(), startDate);
-            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
-            insertIntoVersusOfLeague(teamsId[(teamsId.length / 2) + teamIdIndex], tournament.getTournamentId(), match.getMatchId());
 
-            startDateTime = startDateTime.plusHours(hour);
-            matchNumber++;
-
-        }
-
-        for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
+            for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
 //            LocalTime inningEndTime = getEndTime(tournament, startTime);
-            if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
-                startDateTime = startDateTime.plusDays(1);
-                startDate = startDate.plusDays(1);
-                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
-                endDateTime = endDateTime.plusDays(1);
-            }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
+                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
+                    startDateTime = startDateTime.plusDays(1);
+                    startDate = startDate.plusDays(1);
+                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    endDateTime = endDateTime.plusDays(1);
+                }
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
 
-            startDateTime = startDateTime.plusHours(hour);
-            matchNumber++;
+                startDateTime = startDateTime.plusHours(hour);
+                matchNumber++;
+            }
+            return true;
+        }catch (Exception e){
+         return false;
         }
-        return true;
+
     }
 
     /**
@@ -205,44 +210,53 @@ public class FixtureService implements FixtureGenerationInterface {
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
 
+        LocalDateTime startDateTime = LocalDateTime.of(startDate,startTime);
+        LocalDateTime endDateTime = LocalDateTime.of(startDate,endTime);
+
 
         if (teamsId.length % 2 == 1) {
-            byeTeamId = teamsId[teamsId.length - 1];
+            byeTeamId = teamsId[teamsId.length/2];
         }
 
         int numberOfPlayingMatches = teamsId.length / 2;
         int numberOfMatchesAfter = totalNumberOfMatchExpected - numberOfPlayingMatches;
 
-        LocalTime inningEndTime = getEndTime(tournament, startTime);
-        long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
+        try {
+            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
 
-        for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
-            if (endTime.isBefore(startTime.plusHours(hour))) {
+            for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
+                startDateTime = startDateTime.plusDays(1);
                 startDate = startDate.plusDays(1);
-                startTime = tournament.getTournamentStartTime().toLocalTime();
+                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                endDateTime = endDateTime.plusDays(1);
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+                insertIntoVersusOfLeague(teamsId[teamsId.length - (teamIdIndex + 1)], tournament.getTournamentId(), match.getMatchId());
+
+                startDateTime = startDateTime.plusHours(hour);
+                matchNumber++;
+
             }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(hour), startDate);
-            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
-            insertIntoVersusOfLeague(teamsId[teamsId.length - (teamIdIndex + 1)], tournament.getTournamentId(), match.getMatchId());
 
-            startTime = startTime.plusHours(hour);
-            matchNumber++;
+            for (int teamIdIndex = 0; teamIdIndex < numberOfMatchesAfter; teamIdIndex++) {
+                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
+                    startDateTime = startDateTime.plusDays(1);
+                    startDate = startDate.plusDays(1);
+                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    endDateTime = endDateTime.plusDays(1);
+                }
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
+                insertIntoVersusOfFinalsForLeague(match.getMatchId());
 
-        }
-
-        for (int teamIdIndex = 0; teamIdIndex < numberOfMatchesAfter; teamIdIndex++) {
-            if (endTime.isBefore(startTime.plusHours(hour))) {
-                startDate = startDate.plusDays(1);
-                startTime = tournament.getTournamentStartTime().toLocalTime();
+                startDateTime = startDateTime.plusHours(hour);
+                matchNumber++;
             }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startTime, startTime.plusHours(hour), startDate);
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
-
-            startTime = startTime.plusHours(hour);
-            matchNumber++;
+            return true;
+        }catch (Exception e){
+            return false;
         }
-        return true;
     }
 
     /**
@@ -264,23 +278,24 @@ public class FixtureService implements FixtureGenerationInterface {
         if (teamsId.length % 2 == 1)
             byeTeamId = teamsId[teamsId.length - 1];
 
-        LocalTime inningEndTime = getEndTime(tournament, startTime);
-        long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
+        try {
+            LocalTime inningEndTime = getEndTime(tournament, startTime);
+            long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
 
-        for (int teamIdIndex = 0; teamIdIndex < teamsId.length; teamIdIndex = teamIdIndex + 2) {
-            if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
-                startDateTime = startDateTime.plusDays(1);
-                startDate = startDate.plusDays(1);
-                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
-                endDateTime = endDateTime.plusDays(1);
+            for (int teamIdIndex = 0; teamIdIndex < teamsId.length; teamIdIndex = teamIdIndex + 2) {
+                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
+                    startDateTime = startDateTime.plusDays(1);
+                    startDate = startDate.plusDays(1);
+                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    endDateTime = endDateTime.plusDays(1);
+                }
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
+                insertIntoVersusOfLeague(teamsId[teamIdIndex+1], tournament.getTournamentId(), match.getMatchId());
+
+                startDateTime = startDateTime.plusHours(hour);
+                matchNumber++;
             }
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
-            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
-            insertIntoVersusOfLeague(teamsId[teamIdIndex+1], tournament.getTournamentId(), match.getMatchId());
-
-            startDateTime = startDateTime.plusHours(hour);
-            matchNumber++;
-        }
 
 //        for (int teamIdIndex = 0; teamIdIndex < numberOfMatchesAfter; teamIdIndex++) {
 //            LocalTime inningEndTime = getEndTime(tournament, startTime);
@@ -295,7 +310,10 @@ public class FixtureService implements FixtureGenerationInterface {
 //            startTime = startTime.plusHours(inningEndTime.getHour());
 //            matchNumber++;
 //        }
-        return true;
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     /**
