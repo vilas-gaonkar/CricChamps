@@ -165,7 +165,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
                     startDateTime = startDateTime.plusDays(1);
                     startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.plusHours(hour).toLocalTime(), startDate);
@@ -182,7 +182,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
                     startDateTime = startDateTime.plusDays(1);
                     startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
@@ -193,8 +193,8 @@ public class FixtureService implements FixtureGenerationInterface {
                 matchNumber++;
             }
             return true;
-        }catch (Exception e){
-         return false;
+        } catch (Exception e) {
+            return false;
         }
 
     }
@@ -209,12 +209,12 @@ public class FixtureService implements FixtureGenerationInterface {
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
 
-        LocalDateTime startDateTime = LocalDateTime.of(startDate,startTime);
-        LocalDateTime endDateTime = LocalDateTime.of(startDate,endTime);
+        LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
+        LocalDateTime endDateTime = LocalDateTime.of(startDate, endTime);
 
 
         if (teamsId.length % 2 == 1) {
-            byeTeamId = teamsId[teamsId.length/2];
+            byeTeamId = teamsId[teamsId.length / 2];
         }
 
         int numberOfPlayingMatches = teamsId.length / 2;
@@ -227,7 +227,7 @@ public class FixtureService implements FixtureGenerationInterface {
             for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
                 startDateTime = startDateTime.plusDays(1);
                 startDate = startDate.plusDays(1);
-                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                 endDateTime = endDateTime.plusDays(1);
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
@@ -242,7 +242,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
                     startDateTime = startDateTime.plusDays(1);
                     startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
@@ -253,7 +253,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 matchNumber++;
             }
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -285,12 +285,12 @@ public class FixtureService implements FixtureGenerationInterface {
                 if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
                     startDateTime = startDateTime.plusDays(1);
                     startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
+                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
-                insertIntoVersusOfLeague(teamsId[teamIdIndex+1], tournament.getTournamentId(), match.getMatchId());
+                insertIntoVersusOfLeague(teamsId[teamIdIndex + 1], tournament.getTournamentId(), match.getMatchId());
 
                 startDateTime = startDateTime.plusHours(hour);
                 matchNumber++;
@@ -310,7 +310,7 @@ public class FixtureService implements FixtureGenerationInterface {
 //            matchNumber++;
 //        }
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
