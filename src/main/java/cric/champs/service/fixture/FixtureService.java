@@ -226,10 +226,12 @@ public class FixtureService implements FixtureGenerationInterface {
             long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
 
             for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
-                startDateTime = startDateTime.plusDays(1);
-                startDate = startDate.plusDays(1);
-                startDateTime = LocalDateTime.of(startDate,tournament.getTournamentStartTime().toLocalTime());
-                endDateTime = endDateTime.plusDays(1);
+                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
+                    startDateTime = startDateTime.plusDays(1);
+                    startDate = startDate.plusDays(1);
+                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
+                    endDateTime = endDateTime.plusDays(1);
+                }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
                 insertIntoVersusOfLeague(teamsId[teamsId.length - (teamIdIndex + 1)], tournament.getTournamentId(), match.getMatchId());
