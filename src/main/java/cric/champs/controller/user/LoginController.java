@@ -70,7 +70,7 @@ public class LoginController {
             return new HttpEntity<>(Collections.singletonMap("Message", "Invalid credentials"));
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", result);
-        return new HttpEntity<>(systemInterface.getUserDetails(email, AccountStatus.VERIFIED.toString()), headers);
+        return new HttpEntity<>(systemInterface.getUserDetails(email, AccountStatus.VERIFIED.toString()).get(0), headers);
     }
 
     @GetMapping("/refresh-token")

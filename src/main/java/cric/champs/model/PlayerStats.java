@@ -42,6 +42,8 @@ public class PlayerStats {
 
     private double bestBowlingEconomy;
 
+    private double bestBowlingStrikeRate;
+
     private int mostFiveWicketsHaul;
 
 }
