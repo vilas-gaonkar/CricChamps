@@ -330,12 +330,6 @@ public class FixtureService implements FixtureGenerationInterface {
                 matchEndTime = getEndDateTime(tournament, LocalDateTime.of(startDate, startTime)).toLocalTime();
                 startDate = startDate.plusDays(1);
             }
-            /*LocalTime inningEndTime = getEndTime(tournament, startTime);
-            if (!inningEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
-                startTime = tournament.getTournamentStartTime().toLocalTime();
-                inningEndTime = getEndTime(tournament, startTime);
-                startDate = startDate.plusDays(1);
-            }*/
             insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
             startTime = matchEndTime;
             matchNumber++;
@@ -424,8 +418,6 @@ public class FixtureService implements FixtureGenerationInterface {
         try {
             for (int rounds = totalRounds; rounds > 0; rounds--) {
                 ++round;
-                //matchEndTime = getEndTime(tournament, startTime);
-//sample
                 LocalDateTime matchEndTimes = getEndDateTime(tournament, LocalDateTime.of(startDate, startTime));
                 matchEndTime = matchEndTimes.toLocalTime();
                 if (!matchEndTimes.isBefore(LocalDateTime.of(startDate, tournament.getTournamentEndTime().toLocalTime()))) {
@@ -433,17 +425,10 @@ public class FixtureService implements FixtureGenerationInterface {
                     matchEndTime = getEndDateTime(tournament, LocalDateTime.of(startDate, startTime)).toLocalTime();
                     startDate = startDate.plusDays(1);
                 }
-                //sample
-                /*if (!matchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
-                    startTime = tournament.getTournamentStartTime().toLocalTime();
-                    matchEndTime = getEndTime(tournament, startTime);
-                    startDate = startDate.plusDays(1);
-                }*/
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
                 startTime = matchEndTime;
                 matchNumber++;
                 int teamIdx = rounds % totalRounds;
-
                 //insert into teams
                 if (finalTeamsForRotation[teamIdx] != 0) {
                     //insert into verses
@@ -462,12 +447,6 @@ public class FixtureService implements FixtureGenerationInterface {
                             matchEndTime = getEndDateTime(tournament, LocalDateTime.of(startDate, startTime)).toLocalTime();
                             startDate = startDate.plusDays(1);
                         }
-                        /*matchEndTime = getEndTime(tournament, startTime);
-                        if (!matchEndTime.isBefore(tournament.getTournamentEndTime().toLocalTime())) {
-                            startTime = tournament.getTournamentStartTime().toLocalTime();
-                            matchEndTime = getEndTime(tournament, startTime);
-                            startDate = startDate.plusDays(1);
-                        }*/
                         Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
                         insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
                         insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
@@ -493,13 +472,6 @@ public class FixtureService implements FixtureGenerationInterface {
             return startDateTime.plusHours(5);
         else
             return startDateTime.plusHours(8);
-    }
-
-    /**
-     * add to versus for final
-     */
-    private void insertIntoVersusOfFinalsForLeague(long matchId) {
-        jdbcTemplate.update("insert into versus values (?,?,?,?,?,?,?,?,?)", matchId, null, null, 0, 0, 0, 0, null, "false");
     }
 
     /**
