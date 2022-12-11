@@ -21,7 +21,7 @@ public class Commentary {
 
     private int overs;
 
-    private int balls;
+    private String balls;
 
     private String ballStatus;
 

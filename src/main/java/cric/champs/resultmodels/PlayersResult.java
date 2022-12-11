@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FieldersResultModel {
+public class PlayersResult {
 
     private long playerId;
+
+    private String playerName;
 }
