@@ -195,7 +195,6 @@ public class FixtureService implements FixtureGenerationInterface {
         } catch (Exception e) {
             return false;
         }
-
     }
 
     /**
@@ -213,14 +212,11 @@ public class FixtureService implements FixtureGenerationInterface {
             byeTeamId = teamsId[teamsId.length-1];
             isBye=true;
         }
-        int numberOfPlayingMatches = teamsId.length / 2;
-
         try {
             List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
                     new BeanPropertyRowMapper<>(Matches.class),tournament.getTournamentId(),MatchStatus.UPCOMING.toString());
-
             long matchId = matches.get(0).getMatchId();
-            for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex=teamIdIndex+2) {
+            for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex=teamIdIndex+2) {
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), matchId);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex + 1], tournament.getTournamentId(), matchId);
                 matchId++;
@@ -228,7 +224,6 @@ public class FixtureService implements FixtureGenerationInterface {
             if (isBye)
                 jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
             return true;
-
         } catch (Exception e) {
             return false;
         }
@@ -237,13 +232,12 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for finals league
      */
-    public boolean roundRobinGenerationForKnockoutMethodThree(Tournaments tournament) {
+    public boolean roundRobinGenerationForKnockoutLeague(Tournaments tournament) {
         long[] teamsId = getTeamIdForLeague(tournament);
         int matchNumber = 1;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
-
         LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
         LocalDateTime endDateTime = LocalDateTime.of(startDate, endTime);
 
@@ -343,9 +337,7 @@ public class FixtureService implements FixtureGenerationInterface {
                 inningEndTime = getEndTime(tournament, startTime);
                 startDate = startDate.plusDays(1);
             }*/
-            Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
-            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
+            insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
             startTime = matchEndTime;
             matchNumber++;
         }
