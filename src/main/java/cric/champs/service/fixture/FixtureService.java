@@ -375,8 +375,8 @@ public class FixtureService implements FixtureGenerationInterface {
                 startDate = startDate.plusDays(1);
             }*/
             Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
+            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
+            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
             startTime = matchEndTime;
             matchNumber++;
         }
@@ -509,8 +509,8 @@ public class FixtureService implements FixtureGenerationInterface {
                             startDate = startDate.plusDays(1);
                         }*/
                         Matches nextMatch = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
-                        //insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
-                        //insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
+                        insertIntoVersusOfLeague(finalTeamsForRotation[firstTeam], tournament.getTournamentId(), nextMatch.getMatchId());
+                        insertIntoVersusOfLeague(finalTeamsForRotation[secondTeam], tournament.getTournamentId(), nextMatch.getMatchId());
                         startTime = matchEndTime;
                         matchNumber++;
                     }
