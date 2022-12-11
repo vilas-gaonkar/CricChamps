@@ -280,16 +280,6 @@ public class FixtureService implements FixtureGenerationInterface {
         return teamsId;
     }
 
-    public long[] getTeamIdForKnockout(Tournaments tournament) {
-        List<Teams> teams = jdbcTemplate.query("select * from teams where teamId in(select teamId from versus where matchId in " +
-                        "(select matchId from matches where tournamentId = ?) and matchResult = 'WIN') and isDeleted='false' order by teamId DESC",
-                new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
-        long[] teamsId = new long[teams.size()];
-        for (int index = 0; index < teams.size(); index++)
-            teamsId[index] = teams.get(index).getTeamId();
-        return teamsId;
-    }
-
     /**
      * Fixture for league tournament
      */
