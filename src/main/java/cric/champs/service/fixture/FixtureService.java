@@ -3,15 +3,14 @@ package cric.champs.service.fixture;
 import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.*;
 import cric.champs.resultmodels.SuccessResultModel;
-import cric.champs.service.MatchStatus;
-import cric.champs.service.TournamentStatus;
-import cric.champs.service.TournamentTypes;
+import cric.champs.service.*;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.user.TeamInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.ls.LSInput;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -142,6 +141,7 @@ public class FixtureService implements FixtureGenerationInterface {
      */
     private boolean roundRobinGenerationForKnockoutRoundOne(long[] teamsId, Tournaments tournament, int totalNumberOfMatchExpected) {
         long byeTeamId = 0;
+        boolean isBye = false;
         int matchNumber = 1;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
@@ -150,9 +150,10 @@ public class FixtureService implements FixtureGenerationInterface {
         LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
         LocalDateTime endDateTime = LocalDateTime.of(startDate, endTime);
 
-        if (teamsId.length % 2 == 1)
+        if (teamsId.length % 2 == 1) {
             byeTeamId = teamsId[teamsId.length - 1];
-
+            isBye = true;
+        }
         int halfSize = teamsId.length / 2;
         int dummyMatch = totalNumberOfMatchExpected - halfSize;
 
@@ -174,9 +175,17 @@ public class FixtureService implements FixtureGenerationInterface {
 
                 startDateTime = startDateTime.plusHours(hour);
                 matchNumber++;
-
             }
-
+            if (isBye) {
+                jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournament.getTournamentId(), null, null, null, null,
+                        1, matchNumber, MatchStatus.BYE.toString(), LocalDate.now(), DayOfWeek.from(LocalDate.now()).name(), LocalTime.now(), LocalTime.now(), "false", null);
+                Matches matches = jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
+                        new BeanPropertyRowMapper<>(Matches.class)).get(0);
+                jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matches.getMatchId(), byeTeamId, systemInterface.
+                        verifyTeamDetails(byeTeamId, tournament.getTournamentId()).get(0).getTeamName(), 0, 0, 0, 0, VersusStatus.WIN.toString(), "false");
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
+                matchNumber++;
+            }
             for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
 //            LocalTime inningEndTime = getEndTime(tournament, startTime);
                 if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
@@ -186,8 +195,8 @@ public class FixtureService implements FixtureGenerationInterface {
                     endDateTime = endDateTime.plusDays(1);
                 }
                 Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
-                insertIntoVersusOfFinalsForLeague(match.getMatchId());
-                insertIntoVersusOfFinalsForLeague(match.getMatchId());
+//                insertIntoVersusOfFinalsForLeague(match.getMatchId());
+//                insertIntoVersusOfFinalsForLeague(match.getMatchId());
 
                 startDateTime = startDateTime.plusHours(hour);
                 matchNumber++;
@@ -200,68 +209,54 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     /**
-     * Fixture for knockout tournament method one
+     * Fixture for finals knockout
      */
-    private boolean roundRobinGenerationForKnockoutNextMatches(long[] teamsId, Tournaments tournament, int totalNumberOfMatchExpected) {
+    public boolean roundRobinGenerationForKnockoutNextMatches(Tournaments tournament) {
         long byeTeamId = 0;
-        int matchNumber = 1;
-        LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
-        LocalDate startDate = tournament.getTournamentStartDate();
-        LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
+        boolean isBye = false;
+//        long[] teamsId = getTeamIdForKnockout(tournament);
 
-        LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
-        LocalDateTime endDateTime = LocalDateTime.of(startDate, endTime);
+        List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? order by teamId DESC",
+                new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId(),TeamStatus.WIN.toString());
+
+        long[] teamsId = new long[teams.size()];
+        for (int index = 0; index < teams.size(); index++)
+            teamsId[index] = teams.get(index).getTeamId();
 
 
         if (teamsId.length % 2 == 1) {
-            byeTeamId = teamsId[teamsId.length / 2];
+            byeTeamId = teamsId[teamsId.length-1];
+            isBye=true;
         }
 
         int numberOfPlayingMatches = teamsId.length / 2;
-        int numberOfMatchesAfter = totalNumberOfMatchExpected - numberOfPlayingMatches;
 
         try {
-            LocalTime inningEndTime = getEndTime(tournament, startTime);
-            long hour = startTime.until(inningEndTime, ChronoUnit.HOURS);
 
-            for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex++) {
-                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
-                    startDateTime = startDateTime.plusDays(1);
-                    startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
-                    endDateTime = endDateTime.plusDays(1);
-                }
-                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
-                insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
-                insertIntoVersusOfLeague(teamsId[teamsId.length - (teamIdIndex + 1)], tournament.getTournamentId(), match.getMatchId());
+            List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
+                    new BeanPropertyRowMapper<>(Matches.class),tournament.getTournamentId(),MatchStatus.UPCOMING.toString());
 
-                startDateTime = startDateTime.plusHours(hour);
-                matchNumber++;
+            long matchId = matches.get(0).getMatchId();
+            for (int teamIdIndex = 0; teamIdIndex < numberOfPlayingMatches; teamIdIndex=teamIdIndex+2) {
+
+                insertIntoVersusOfLeague(teamsId[teamIdIndex],tournament.getTournamentId(),matchId);
+                insertIntoVersusOfLeague(teamsId[teamIdIndex+1],tournament.getTournamentId(),matchId);
+                matchId++;
 
             }
 
-            for (int teamIdIndex = 0; teamIdIndex < numberOfMatchesAfter; teamIdIndex++) {
-                if (endDateTime.isBefore(startDateTime.plusHours(hour))) {
-                    startDateTime = startDateTime.plusDays(1);
-                    startDate = startDate.plusDays(1);
-                    startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
-                    endDateTime = endDateTime.plusDays(1);
-                }
-                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
-                insertIntoVersusOfFinalsForLeague(match.getMatchId());
-                insertIntoVersusOfFinalsForLeague(match.getMatchId());
-
-                startDateTime = startDateTime.plusHours(hour);
-                matchNumber++;
+            if (isBye) {
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
             }
             return true;
+
         } catch (Exception e) {
             return false;
         }
     }
 
     /**
-     * Fixture for finals
+     * Fixture for finals league
      */
     public boolean roundRobinGenerationForKnockoutMethodThree(Tournaments tournament) {
         long[] teamsId = getTeamIdForLeague(tournament);
@@ -296,6 +291,7 @@ public class FixtureService implements FixtureGenerationInterface {
             return false;
         }
     }
+
     public long[] getTeamIdForLeague(Tournaments tournament) {
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' order by points DESC limit 4",
                 new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
@@ -307,7 +303,7 @@ public class FixtureService implements FixtureGenerationInterface {
 
     public long[] getTeamIdForKnockout(Tournaments tournament) {
         List<Teams> teams = jdbcTemplate.query("select * from teams where teamId in(select teamId from versus where matchId in " +
-                        "(select matchId from matches where tournamentId = ?) and matchResult = 'WIN') and isDeleted='false'",
+                        "(select matchId from matches where tournamentId = ?) and matchResult = 'WIN') and isDeleted='false' order by teamId DESC",
                 new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId());
         long[] teamsId = new long[teams.size()];
         for (int index = 0; index < teams.size(); index++)
@@ -379,8 +375,8 @@ public class FixtureService implements FixtureGenerationInterface {
                 startDate = startDate.plusDays(1);
             }*/
             Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startTime, matchEndTime, startDate);
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
-            insertIntoVersusOfFinalsForLeague(match.getMatchId());
+            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
+            //insertIntoVersusOfFinalsForLeague(match.getMatchId());
             startTime = matchEndTime;
             matchNumber++;
         }

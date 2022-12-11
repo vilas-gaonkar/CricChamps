@@ -41,6 +41,8 @@ public class Teams {
 
     private String teamLogo;
 
+    private String teamStatus;
+
     private String isDeleted;
 
 }
