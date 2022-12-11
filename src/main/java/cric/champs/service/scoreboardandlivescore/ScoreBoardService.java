@@ -7,7 +7,6 @@ import cric.champs.model.BowlerSB;
 import cric.champs.model.ExtraRuns;
 import cric.champs.model.FallOfWicketSB;
 import cric.champs.resultmodels.ScoreBoardResult;
-import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
