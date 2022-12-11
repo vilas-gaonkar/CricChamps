@@ -141,6 +141,7 @@ public class FixtureService implements FixtureGenerationInterface {
         long byeTeamId = 0;
         boolean isBye = false;
         int matchNumber = 1;
+        int round = 1;
         LocalTime startTime = tournament.getTournamentStartTime().toLocalTime();
         LocalDate startDate = tournament.getTournamentStartDate();
         LocalTime endTime = tournament.getTournamentEndTime().toLocalTime();
@@ -163,7 +164,7 @@ public class FixtureService implements FixtureGenerationInterface {
                     startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
-                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.plusHours(hour).toLocalTime(), startDate);
+                Matches match = insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startDateTime.toLocalTime(), startDateTime.plusHours(hour).toLocalTime(), startDate);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), match.getMatchId());
                 insertIntoVersusOfLeague(teamsId[(teamsId.length / 2) + teamIdIndex], tournament.getTournamentId(), match.getMatchId());
                 startDateTime = startDateTime.plusHours(hour);
@@ -171,12 +172,12 @@ public class FixtureService implements FixtureGenerationInterface {
             }
             if (isBye) {
                 jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournament.getTournamentId(), null, null, null, null,
-                        1, matchNumber, MatchStatus.BYE.toString(), LocalDate.now(), DayOfWeek.from(LocalDate.now()).name(), LocalTime.now(), LocalTime.now(), "false", null);
+                        round, matchNumber, MatchStatus.BYE.toString(), LocalDate.now(), DayOfWeek.from(LocalDate.now()).name(), LocalTime.now(), LocalTime.now(), "false", null);
                 Matches matches = jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
                         new BeanPropertyRowMapper<>(Matches.class)).get(0);
                 jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matches.getMatchId(), byeTeamId, systemInterface.
                         verifyTeamDetails(byeTeamId, tournament.getTournamentId()).get(0).getTeamName(), 0, 0, 0, 0, VersusStatus.WIN.toString(), "false");
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
                 matchNumber++;
             }
             for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
@@ -186,7 +187,7 @@ public class FixtureService implements FixtureGenerationInterface {
                     startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
-               insertIntoMatchesOfLeague(tournament.getTournamentId(), 1, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
                 startDateTime = startDateTime.plusHours(hour);
                 matchNumber++;
             }
@@ -203,25 +204,29 @@ public class FixtureService implements FixtureGenerationInterface {
         long byeTeamId = 0;
         boolean isBye = false;
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? order by teamId DESC",
-                new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId(),TeamStatus.WIN.toString());
+                new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId(), TeamStatus.WIN.toString());
         long[] teamsId = new long[teams.size()];
         for (int index = 0; index < teams.size(); index++)
             teamsId[index] = teams.get(index).getTeamId();
         if (teamsId.length % 2 == 1) {
-            byeTeamId = teamsId[teamsId.length-1];
-            isBye=true;
+            byeTeamId = teamsId[teamsId.length - 1];
+            isBye = true;
         }
         try {
             List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
-                    new BeanPropertyRowMapper<>(Matches.class),tournament.getTournamentId(),MatchStatus.UPCOMING.toString());
+                    new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.UPCOMING.toString());
+            List<Matches> matches1 = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ? order by matchId DESC limit 1",
+                    new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.PAST.toString());
             long matchId = matches.get(0).getMatchId();
-            for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex=teamIdIndex+2) {
+            int round = matches1.get(0).getRoundNumber() + 1;
+            for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex = teamIdIndex + 2) {
                 insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), matchId);
                 insertIntoVersusOfLeague(teamsId[teamIdIndex + 1], tournament.getTournamentId(), matchId);
+                jdbcTemplate.update("update matches set roundNumber = ? where matchId = ?", round, matchId);
                 matchId++;
             }
             if (isBye)
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
             return true;
         } catch (Exception e) {
             return false;
