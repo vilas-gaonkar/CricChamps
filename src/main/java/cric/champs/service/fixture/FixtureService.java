@@ -229,7 +229,7 @@ public class FixtureService implements FixtureGenerationInterface {
     }
 
     /**
-     * Fixture for finals league
+     * Fixture for finals league ***use***
      */
     public boolean roundRobinGenerationForKnockoutLeague(Tournaments tournament) {
         long[] teamsId = getTeamIdForLeague(tournament);

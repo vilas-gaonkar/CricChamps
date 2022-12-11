@@ -34,6 +34,4 @@ public class FixtureController {
         return ResponseEntity.of(Optional.of(fixtureService.roundRobinGenerationForKnockoutNextMatches(tournaments)));
     }
 
-
-
 }
