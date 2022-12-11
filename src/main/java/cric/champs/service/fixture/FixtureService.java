@@ -3,10 +3,7 @@ package cric.champs.service.fixture;
 import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.entity.*;
 import cric.champs.resultmodels.SuccessResultModel;
-import cric.champs.service.MatchStatus;
-import cric.champs.service.TournamentStatus;
-import cric.champs.service.TournamentTypes;
-import cric.champs.service.VersusStatus;
+import cric.champs.service.*;
 import cric.champs.service.system.SystemInterface;
 import cric.champs.service.user.TeamInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +183,7 @@ public class FixtureService implements FixtureGenerationInterface {
                         new BeanPropertyRowMapper<>(Matches.class)).get(0);
                 jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matches.getMatchId(), byeTeamId, systemInterface.
                         verifyTeamDetails(byeTeamId, tournament.getTournamentId()).get(0).getTeamName(), 0, 0, 0, 0, VersusStatus.WIN.toString(), "false");
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?","WIN",byeTeamId,tournament.getTournamentId());
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
                 matchNumber++;
             }
             for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
@@ -220,7 +217,7 @@ public class FixtureService implements FixtureGenerationInterface {
 //        long[] teamsId = getTeamIdForKnockout(tournament);
 
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? order by teamId DESC",
-                new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId(),"WIN");
+                new BeanPropertyRowMapper<>(Teams.class),tournament.getTournamentId(),TeamStatus.WIN.toString());
 
         long[] teamsId = new long[teams.size()];
         for (int index = 0; index < teams.size(); index++)
@@ -249,7 +246,7 @@ public class FixtureService implements FixtureGenerationInterface {
             }
 
             if (isBye) {
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?","WIN",byeTeamId,tournament.getTournamentId());
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(),byeTeamId,tournament.getTournamentId());
             }
             return true;
 
