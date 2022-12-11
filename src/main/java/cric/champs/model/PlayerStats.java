@@ -36,7 +36,7 @@ public class PlayerStats {
 
     private int mostWickets;
 
-    private int mostRuns;
+    private int totalRuns;
 
     private double bestBowlingAverage;
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Pattern;
 import java.sql.Time;
 import java.time.LocalDate;
 
@@ -18,6 +19,7 @@ public class Tournaments {
 
     private long userId;
 
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Tournament name should only contain alphabets")
     private String tournamentName;
 
     private String tournamentType;

@@ -23,8 +23,6 @@ public class Players {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Player name should only contain alphabets")
     private String playerName;
 
-
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "City name should only contain alphabets")
     private String city;
 
     private String phoneNumber;

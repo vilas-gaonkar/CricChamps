@@ -11,7 +11,6 @@ import cric.champs.service.AccountStatus;
 import cric.champs.service.TournamentStatus;
 import cric.champs.service.TournamentTypes;
 import cric.champs.service.system.SystemInterface;
-import cric.champs.service.system.TokenInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -41,9 +40,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Autowired
     private SystemInterface systemInterface;
-
-    @Autowired
-    private TokenInterface tokenInterface;
 
     @Autowired
     private JWTUtility jwtUtility;

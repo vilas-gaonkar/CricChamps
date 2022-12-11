@@ -1,4 +1,4 @@
-package cric.champs.controller.user;
+package cric.champs.controller.Admin;
 
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.SuccessResultModel;

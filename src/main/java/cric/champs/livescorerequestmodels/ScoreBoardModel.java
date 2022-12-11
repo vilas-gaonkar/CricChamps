@@ -9,17 +9,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExtraModel {
-    private boolean extraStatus = false;
+public class ScoreBoardModel {
 
-    private String extraType;
+    private Long tournamentId;
 
-    private int bye;
+    private Long matchId;
 
-    private int legBye;
-
-    private int wide;
-
-    private int noBall;
+    private Long teamId;
 
 }

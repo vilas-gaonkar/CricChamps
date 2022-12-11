@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WicketModel {
 
-    private boolean status = false;
+    private boolean wicketStatus = false;
     
     private Long tournamentId;
 
@@ -23,14 +23,14 @@ public class WicketModel {
 
     private Long batsmanId;
 
-    private String batsman;
+    private String batsmanName;
 
     private Long fielderId;
 
     private String fielderName;
 
-    private Long new_batsmanId;
+    private Long newBatsmanId;
 
-    private String new_batsman;
+    private String newBatsmanName;
 
 }

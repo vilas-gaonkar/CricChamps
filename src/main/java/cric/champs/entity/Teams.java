@@ -16,13 +16,11 @@ public class Teams {
     private long teamId;
 
     private long tournamentId;
-
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Team name should only contain alphabets")
     private  String teamName;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Captain's name should only contain alphabets")
     private String captainName;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "City name should only contain alphabets")
     private String city;
 
     private int numberOfPlayers;

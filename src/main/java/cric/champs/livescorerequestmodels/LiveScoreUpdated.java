@@ -15,11 +15,11 @@ public class LiveScoreUpdated {
 
     private Long matchId;
 
-    private Long playingTeamId;
+    private Long battingTeamId;
 
     private Long strikeBatsmanId;
 
-    private String nonStrikeBatsmanId;
+    private Long nonStrikeBatsmanId;
 
     private Long bowlerId;
 
@@ -27,12 +27,10 @@ public class LiveScoreUpdated {
 
     private int over;
 
-    private int balls;
+    private int ball;
 
-    private int run;
+    private int runs;
 
     private ExtraModel extraModel;
-
-
 
 }

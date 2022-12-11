@@ -15,9 +15,9 @@ public class Grounds {
 
     private long tournamentId;
 
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Ground name should only contain alphabets")
     private String groundName;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "City name should only contain alphabets")
     private String city;
 
     private String groundLocation;
