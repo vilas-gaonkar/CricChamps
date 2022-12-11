@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.ls.LSInput;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -483,17 +482,17 @@ public class FixtureService implements FixtureGenerationInterface {
         }
     }
 
-    private LocalDateTime getEndDateTime(Tournaments tournament, LocalDateTime startTime) {
+    private LocalDateTime getEndDateTime(Tournaments tournament, LocalDateTime startDateTime) {
         if (tournament.getNumberOfOvers() < 6)
-            return startTime.plusHours(1);
+            return startDateTime.plusHours(1);
         else if (tournament.getNumberOfOvers() > 6 && tournament.getNumberOfOvers() < 16)
-            return startTime.plusHours(2);
+            return startDateTime.plusHours(2);
         else if (tournament.getNumberOfOvers() > 16 && tournament.getNumberOfOvers() < 31)
-            return startTime.plusHours(3);
+            return startDateTime.plusHours(3);
         else if (tournament.getNumberOfOvers() > 31 && tournament.getNumberOfOvers() < 41)
-            return startTime.plusHours(5);
+            return startDateTime.plusHours(5);
         else
-            return startTime.plusHours(8);
+            return startDateTime.plusHours(8);
     }
 
     /**
