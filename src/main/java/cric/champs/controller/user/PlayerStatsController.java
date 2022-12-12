@@ -79,9 +79,15 @@ public class PlayerStatsController {
         return ResponseEntity.of(Optional.of(playerStatsInterface.viewBestBowlingStrikeRate(tournamentId)));
     }
 
+    //needed for both
     @GetMapping("/highest-score-team")
     ResponseEntity<List<PlayerStats>> viewHighestScoreTeam(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(playerStatsInterface.viewHighestScoreTeam(tournamentId)));
+    }
+
+    @GetMapping("/all-stats")
+    ResponseEntity<List<PlayerStats>> viewAll(@RequestHeader String playerStats, @RequestHeader long tournamentId) {
+        return ResponseEntity.of(Optional.of(playerStatsInterface.viewPlayerStats(playerStats, tournamentId)));
     }
 
 }

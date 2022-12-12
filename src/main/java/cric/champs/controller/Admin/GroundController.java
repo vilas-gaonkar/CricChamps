@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,18 +30,19 @@ public class GroundController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/add")
-    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable List<MultipartFile> groundPhoto) throws IOException {
         Map result = null;
+        List<String> groundPhotos = new ArrayList<>();
         if (groundPhoto == null)
-            ground.setGroundPhoto(null);
+            groundPhotos = null;
         else if (groundPhoto.isEmpty())
-            ground.setGroundPhoto(null);
+            groundPhotos = null;
         else
-            result = uploadImageTOCloud.uploadImage(groundPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
-
-        if (result != null)
-            ground.setGroundPhoto(result.get("url").toString());
-        return ResponseEntity.of(Optional.of(groundInterface.registerGrounds(ground, null)));
+            for (MultipartFile file : groundPhoto) {
+                result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+                groundPhotos.add(result.get("url").toString());
+            }
+        return ResponseEntity.of(Optional.of(groundInterface.registerGrounds(ground, groundPhotos)));
     }
 
     @PutMapping("/edit")

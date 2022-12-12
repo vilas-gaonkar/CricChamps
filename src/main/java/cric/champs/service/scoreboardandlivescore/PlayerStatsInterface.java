@@ -32,4 +32,6 @@ public interface PlayerStatsInterface {
 
     List<PlayerStats> viewHighestScoreTeam(long tournamentId);
 
+    List<PlayerStats> viewPlayerStats(String playerStatsField, long tournamentId);
+
 }

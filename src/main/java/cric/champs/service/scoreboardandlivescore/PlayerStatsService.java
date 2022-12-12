@@ -1,7 +1,9 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.model.PlayerStats;
+import cric.champs.service.PlayerStatsEnum;
 import cric.champs.service.system.SystemInterface;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -120,8 +122,18 @@ public class PlayerStatsService implements PlayerStatsInterface {
     public List<PlayerStats> viewHighestScoreTeam(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from players where tournamentId = ? order by teamHighestScore DESC limit ?",
+        return jdbcTemplate.query("select * from teams where tournamentId = ? order by teamHighestScore DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
+    }
+
+    @Override
+    public List<PlayerStats> viewPlayerStats(String playerStatsField, long tournamentId) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Invalid tournament");
+        if (EnumUtils.isValidEnum(PlayerStatsEnum.class, playerStatsField))
+            return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by ? DESC limit ?",
+                    new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, playerStatsField, limit);
+        throw new NullPointerException("Invalid player stats field");
     }
 
 }
