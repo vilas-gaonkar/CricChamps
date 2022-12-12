@@ -57,7 +57,7 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-        if(setStatus(liveScoreUpdateModel.getTournamentId(),liveScoreUpdateModel.getMatchId())) {
+        if (setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId())) {
             updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
             updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
         }
