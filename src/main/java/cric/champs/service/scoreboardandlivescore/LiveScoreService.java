@@ -2,10 +2,10 @@ package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.entity.Matches;
+import cric.champs.entity.Players;
 import cric.champs.entity.Teams;
 import cric.champs.entity.Tournaments;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
-import cric.champs.model.Versus;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.fixture.FixtureGenerationInterface;
 import cric.champs.service.system.SystemInterface;
@@ -35,26 +35,39 @@ public class LiveScoreService implements LiveInterface {
     public SuccessResultModel updateLiveScore(LiveScoreUpdate liveScoreUpdateModel) throws LiveScoreUpdationException {
         List<Tournaments> tournament = systemInterface.verifyTournamentId(liveScoreUpdateModel.getTournamentId());
         List<Matches> matches = systemInterface.verifyMatchId(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId());
-        List<Teams> strikeTeam = systemInterface.verifyTeamDetails(liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getTournamentId());
-        if (tournament.isEmpty() || matches.isEmpty() || strikeTeam.isEmpty())
+        if (tournament.isEmpty() || matches.isEmpty())
             throw new LiveScoreUpdationException("Invalid Tournament Updation");
-        List<Versus> matchTeams = jdbcTemplate.query("select * from versus where matchId = ?",
-                new BeanPropertyRowMapper<>(Versus.class), liveScoreUpdateModel.getMatchId());
-        if (!matchTeams.contains(strikeTeam))
+        if (liveScoreUpdateModel.getBall() > 6)
+            throw new LiveScoreUpdationException("Invalid ball");
+        if (liveScoreUpdateModel.getOver() > tournament.get(0).getNumberOfOvers())
+            throw new LiveScoreUpdationException("Inavlid over");
+        if (liveScoreUpdateModel.getRuns() > 7)
+            throw new LiveScoreUpdationException("Invalid runs");
+        List<Teams> strikeTeam = systemInterface.verifyTeamDetails(liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getTournamentId());
+        List<Teams> nonStrikeTeam = jdbcTemplate.query("select * from teams where teamId in (select teamId from versus matchId = ? and teamId != ?)",
+                new BeanPropertyRowMapper<>(Teams.class), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId());
+        if (strikeTeam.isEmpty() || nonStrikeTeam.isEmpty())
             throw new LiveScoreUpdationException("Invalid Team");
-
+        List<Players> strikePlayer = jdbcTemplate.query("select * from players where playerId = ? and teamId = ?",
+                new BeanPropertyRowMapper<>(Players.class), liveScoreUpdateModel.getStrikeBatsmanId(), liveScoreUpdateModel.getBattingTeamId());
+        List<Players> nonStrikePlayer = jdbcTemplate.query("select * from players where playerId = ? and teamId = ?",
+                new BeanPropertyRowMapper<>(Players.class), liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getBattingTeamId());
+        List<Players> bowlingPlayer = jdbcTemplate.query("select * from players where playerId = ? and teamId = ?",
+                new BeanPropertyRowMapper<>(Players.class), liveScoreUpdateModel.getBowlerId(), nonStrikeTeam.get(0).getTeamId());
+        if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
+            throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
 
-        updateScoreBoard(tournament.get(0), matches.get(0), matchTeams, strikeTeam.get(0),liveScoreUpdateModel);
-        updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), matchTeams, strikeTeam.get(0),liveScoreUpdateModel);
+        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
+        updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
 
         return null;
     }
 
-    private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams,LiveScoreUpdate liveScoreUpdateModel) {
+    private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
     }
 
-    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
+    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
 
     }
 
