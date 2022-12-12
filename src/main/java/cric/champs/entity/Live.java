@@ -25,7 +25,13 @@ public class Live {
 
     private double requiredRunRate;
 
-    private int partnershipRuns;
+    private int run;
 
-    private int totalPartnershipBalls;
+    private int wickets;
+    
+    private int overs;
+
+    private int balls;
+
+    private int runsNeeded;
 }
