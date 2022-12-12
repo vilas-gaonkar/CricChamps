@@ -1,10 +1,7 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.customexceptions.LiveScoreUpdationException;
-import cric.champs.entity.Matches;
-import cric.champs.entity.Players;
-import cric.champs.entity.Teams;
-import cric.champs.entity.Tournaments;
+import cric.champs.entity.*;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.MatchStatus;
@@ -68,13 +65,26 @@ public class LiveScoreService implements LiveInterface {
 
     private boolean setStatus(Long tournamentId, Long matchId) {
         jdbcTemplate.update("update matches set matchStatus = ? where matchId = ? and tournamentId = ?", MatchStatus.LIVE.toString(),
-                matchId,tournamentId);
+                matchId, tournamentId);
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?", TournamentStatus.PROGRESS.toString(),
                 tournamentId);
         return true;
     }
 
     private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
+        List<Live> lives = jdbcTemplate.query("select * from live where teamId = ? and matchId = ? and tournamentId = ?",
+                new BeanPropertyRowMapper<>(Live.class),liveScoreUpdateModel.getBattingTeamId(),liveScoreUpdateModel.getMatchId(),
+                liveScoreUpdateModel.getTournamentId());
+        if(lives.isEmpty()){
+            if (liveScoreUpdateModel.getExtraModel().isExtraStatus()){
+                jdbcTemplate.update("insert into live values(?,?,?,?,?,?,?,)", null, liveScoreUpdateModel.getTournamentId(),
+                        liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), matchTeams.get(0).getTeamName(),
+                        0, 0);
+                jdbcTemplate.update("");
+            }
+
+        }
+
     }
 
     private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
