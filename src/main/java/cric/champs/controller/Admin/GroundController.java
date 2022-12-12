@@ -34,9 +34,9 @@ public class GroundController {
         Map result;
         List<String> groundPhotos = new ArrayList<>();
         if (groundPhoto == null)
-            groundPhotos = null;
+            groundPhotos =  new ArrayList<>();
         else if (groundPhoto.isEmpty())
-            groundPhotos = null;
+            groundPhotos =  new ArrayList<>();
         else
             for (MultipartFile file : groundPhoto) {
                 result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource type", "auto"));
@@ -50,9 +50,9 @@ public class GroundController {
         Map result;
         List<String> groundPhotos = new ArrayList<>();
         if (groundPhoto == null)
-            groundPhotos = null;
+            groundPhotos =  new ArrayList<>();
         else if (groundPhoto.isEmpty())
-            groundPhotos = null;
+            groundPhotos =  new ArrayList<>();
         else
             for(MultipartFile file:groundPhoto) {
                 result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource type", "auto"));
