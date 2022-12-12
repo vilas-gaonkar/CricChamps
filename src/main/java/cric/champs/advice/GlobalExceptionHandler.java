@@ -119,9 +119,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleDuplicateKeyException(DuplicateKeyException exception) {
+    public Map<String, String> handleDuplicateKeyException() {
         Map<String, String> stringStringMap = new HashMap<>();
-        stringStringMap.put("Error Message", "Already Done");
+        stringStringMap.put("Error Message", "already present");
         return stringStringMap;
     }
 
@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
+    public Map<String, String> handleHttpMediaTypeNotSupportedException() {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", "HttpMediaTypeNotSupported");
         return errorMessage;
@@ -191,7 +191,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
-    public Map<String, String> handleExpiredJwtException(ExpiredJwtException exception) {
+    public Map<String, String> handleExpiredJwtException() {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", "jwt token expired");
         return errorMessage;
@@ -280,6 +280,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientTimeException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleInsufficientTimeException(InsufficientTimeException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(LiveScoreUpdationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleLiveScoreUpdationException(LiveScoreUpdationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;

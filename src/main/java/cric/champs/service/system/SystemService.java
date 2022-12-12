@@ -201,6 +201,12 @@ public class SystemService implements SystemInterface {
             return getDuration(tournament) == 8;
     }
 
+    @Override
+    public List<Matches> verifyMatchId(Long tournamentId, Long matchId) {
+        return jdbcTemplate.query("select * from matches where matchId = ? and tournamentId = ?",
+                new BeanPropertyRowMapper<>(Matches.class),matchId,tournamentId);
+    }
+
     private long getDuration(List<Tournaments> tournament) {
         return Duration.between(tournament.get(0).getTournamentStartTime().toLocalTime(), tournament.get(0).getTournamentEndTime().toLocalTime()).toHours();
     }
