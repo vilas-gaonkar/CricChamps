@@ -24,7 +24,6 @@ public class BatsmanSB {
 
     private long playerId;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Player name should only contain alphabets")
     private String playerName;
 
     private int runs;

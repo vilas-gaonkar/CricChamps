@@ -15,6 +15,4 @@ public class ExtraModel {
 
     private String extraType;
 
-    private int extraRuns;
-
 }

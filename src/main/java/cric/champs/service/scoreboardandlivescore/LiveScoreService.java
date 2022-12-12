@@ -44,7 +44,7 @@ public class LiveScoreService implements LiveInterface {
             throw new LiveScoreUpdationException("Invalid Team");
 
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-        
+
         updateScoreBoard(tournament.get(0),matches.get(0),matchTeams,strikeTeam.get(0));
         updateLiveScoreAndCommentry(tournament.get(0),matches.get(0),matchTeams,strikeTeam.get(0));
 

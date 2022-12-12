@@ -19,7 +19,6 @@ public class PlayerStats {
 
     private long teamId;
 
-    @Pattern(regexp = "^[A-Za-z]+\\s+|\\s+[A-Za-z]+\\s+$", message = "Player name should only contain alphabets")
     private String playerName;
 
     private double battingAverage;
