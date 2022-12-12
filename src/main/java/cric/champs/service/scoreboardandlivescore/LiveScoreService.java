@@ -36,16 +36,14 @@ public class LiveScoreService implements LiveInterface {
         List<Tournaments> tournament = systemInterface.verifyTournamentId(liveScoreUpdateModel.getTournamentId());
         List<Matches> matches = systemInterface.verifyMatchId(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId());
         List<Teams> strikeTeam = systemInterface.verifyTeamDetails(liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getTournamentId());
-        if (tournament.isEmpty() || matches.isEmpty()||strikeTeam.isEmpty())
+        if (tournament.isEmpty() || matches.isEmpty() || strikeTeam.isEmpty())
             throw new LiveScoreUpdationException("Invalid Tournament Updation");
         List<Versus> matchTeams = jdbcTemplate.query("select * from versus where matchId = ?",
                 new BeanPropertyRowMapper<>(Versus.class), liveScoreUpdateModel.getMatchId());
         if (!matchTeams.contains(strikeTeam))
             throw new LiveScoreUpdationException("Invalid Team");
 
-
-
-
+        numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
 
 
         return null;
@@ -75,16 +73,16 @@ public class LiveScoreService implements LiveInterface {
         return totalRuns / numberOfOver;
     }
 
-    private double netRunRatePlayed(int totalScoreInEveryMatch, int totalOver) {
-        return totalScoreInEveryMatch / totalOver;
+    private double netRunRatePlayed(int totalScoreInEveryMatch) {
+        return totalScoreInEveryMatch / numberOfOversOfTournament;
     }
 
-    private double netRunRateGiven(int totalScoreConceded, int totalOvers) {
-        return totalScoreConceded / totalOvers;
+    private double netRunRateGiven(int totalScoreConceded) {
+        return totalScoreConceded / numberOfOversOfTournament;
     }
 
-    private double netRunRate(int totalScoreInEveryMatch, int totalOver, int totalScoreConceded, int totalOvers) {
-        return netRunRatePlayed(totalScoreInEveryMatch, totalOver) - netRunRateGiven(totalScoreConceded, totalOvers);
+    private double netRunRate(int totalScoreInEveryMatch, int totalScoreConceded) {
+        return netRunRatePlayed(totalScoreInEveryMatch) - netRunRateGiven(totalScoreConceded);
     }
 
     private double requiredRunRate(int runNeededToWin, int remainingOvers) {
