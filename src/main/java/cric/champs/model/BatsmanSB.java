@@ -39,6 +39,8 @@ public class BatsmanSB {
 
     private String batsmanStatus;
 
+    private String strikePosition;
+
     private String outByStatus;
 
     private String outByPlayer;

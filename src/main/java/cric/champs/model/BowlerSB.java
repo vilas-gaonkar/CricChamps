@@ -37,4 +37,6 @@ public class BowlerSB {
     private int wickets;
 
     private double economyRate;
+
+    private String bowlerStatus;
 }
