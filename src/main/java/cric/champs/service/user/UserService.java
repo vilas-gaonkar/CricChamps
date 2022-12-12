@@ -268,7 +268,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public SuccessResultModel editGround(Grounds ground) {
+    public SuccessResultModel editGround(Grounds ground, List<String> groundPhoto) {
         if (systemInterface.verifyGroundId(ground.getGroundId(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid ground");
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
@@ -276,6 +276,12 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?," +
                         " where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
                 ground.getLatitude(), ground.getLongitude(), ground.getGroundId());
+        jdbcTemplate.update("delete from groundPhotos where groundId = ?", ground.getGroundId());
+        if (!groundPhoto.isEmpty())
+            for (String photo : groundPhoto)
+                jdbcTemplate.update("insert into groundPhotos values(?,?)", ground.getGroundId(), photo);
+        jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
+                ground.getTournamentId());
         return new SuccessResultModel("Ground details updated successfully");
     }
 

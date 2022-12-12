@@ -31,7 +31,7 @@ public class GroundController {
     @SuppressWarnings("rawtypes")
     @PostMapping("/add")
     public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable List<MultipartFile> groundPhoto) throws IOException {
-        Map result = null;
+        Map result;
         List<String> groundPhotos = new ArrayList<>();
         if (groundPhoto == null)
             groundPhotos = null;
@@ -46,18 +46,20 @@ public class GroundController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable MultipartFile groundPhoto) throws IOException {
-        Map result = null;
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Grounds ground, @RequestPart @Nullable List<MultipartFile> groundPhoto) throws IOException {
+        Map result;
+        List<String> groundPhotos = new ArrayList<>();
         if (groundPhoto == null)
-            ground.setGroundPhoto(null);
+            groundPhotos = null;
         else if (groundPhoto.isEmpty())
-            ground.setGroundPhoto(null);
+            groundPhotos = null;
         else
-            result = uploadImageTOCloud.uploadImage(groundPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            for(MultipartFile file:groundPhoto) {
+                result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+                groundPhotos.add(result.get("url").toString());
+            }
 
-        if (result != null)
-            ground.setGroundPhoto(result.get("url").toString());
-        return ResponseEntity.of(Optional.of(groundInterface.editGround(ground)));
+        return ResponseEntity.of(Optional.of(groundInterface.editGround(ground,groundPhotos)));
     }
 
     @GetMapping("/view-all")

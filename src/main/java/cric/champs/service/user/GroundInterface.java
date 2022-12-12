@@ -11,7 +11,7 @@ public interface GroundInterface {
 
     SuccessResultModel deleteGrounds(long groundId, long tournamentId);
 
-    SuccessResultModel editGround(Grounds ground);
+    SuccessResultModel editGround(Grounds ground, List<String> groundPhoto);
 
     List<Grounds> getAllGrounds(long tournamentId, int pageSize, int pageNumber);
 
