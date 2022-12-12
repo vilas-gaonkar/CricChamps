@@ -90,4 +90,9 @@ public class TournamentController {
     public ResponseEntity<Tournaments> getTournament(@RequestHeader @Size(min = 6, max = 6, message = "Invalid tournament code") String tournamentCode) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getDetailsByTournamentCode(tournamentCode)));
     }
+
+    @PatchMapping("/set-overs")
+    public ResponseEntity<SuccessResultModel> setTournamentOver(@RequestHeader long tournamentId, @RequestHeader int numberOfOvers) {
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentOver(tournamentId, numberOfOvers)));
+    }
 }

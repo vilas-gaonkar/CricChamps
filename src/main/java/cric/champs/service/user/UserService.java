@@ -235,6 +235,13 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         return new SuccessResultModel("Date and Time updated successfully");
     }
 
+    @Override
+    public SuccessResultModel setTournamentOver(long tournamentId, int numberOfOvers) {
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        return null;
+    }
+
     /**
      * ******Grounds Interface******
      */
@@ -295,10 +302,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
         List<GroundPhotos> groundPhotos = new ArrayList<>();
-        for(Grounds ground : grounds)
+        for (Grounds ground : grounds)
             groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
                     new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
-        return new GroundResult(grounds,groundPhotos);
+        return new GroundResult(grounds, groundPhotos);
     }
 
     @Override
@@ -308,10 +315,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId);
         List<GroundPhotos> groundPhotos = new ArrayList<>();
-        for(Grounds ground : grounds)
+        for (Grounds ground : grounds)
             groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
                     new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
-        return new GroundResult(grounds,groundPhotos);
+        return new GroundResult(grounds, groundPhotos);
     }
 
     /**

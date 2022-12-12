@@ -28,4 +28,6 @@ public interface TournamentInterface {
 
     SuccessResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException;
 
+    SuccessResultModel setTournamentOver(long tournamentId, int numberOfOvers);
+
 }
