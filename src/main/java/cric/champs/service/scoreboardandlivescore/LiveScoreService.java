@@ -7,6 +7,8 @@ import cric.champs.entity.Teams;
 import cric.champs.entity.Tournaments;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
 import cric.champs.resultmodels.SuccessResultModel;
+import cric.champs.service.MatchStatus;
+import cric.champs.service.TournamentStatus;
 import cric.champs.service.fixture.FixtureGenerationInterface;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,10 @@ public class LiveScoreService implements LiveInterface {
     }
 
     private boolean setStatus(Long tournamentId, Long matchId) {
+        jdbcTemplate.update("update matches set matchStatus = ? where matchId = ? and tournamentId = ?", MatchStatus.LIVE.toString(),
+                matchId,tournamentId);
+        jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?", TournamentStatus.PROGRESS.toString(),
+                tournamentId);
         return true;
     }
 

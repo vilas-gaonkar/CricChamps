@@ -239,7 +239,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public SuccessResultModel setTournamentOver(long tournamentId, int numberOfOvers) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        return null;
+        jdbcTemplate.update("update tournaments set numberOfOvers = ? where tournamentId = ?",numberOfOvers,
+                tournamentId);
+        return new SuccessResultModel("Overs updated successfully");
     }
 
     /**
