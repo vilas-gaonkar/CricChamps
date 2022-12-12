@@ -274,8 +274,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("latitude and longitude already added");
         jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?," +
-                        " GroundPhoto = ? where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
-                ground.getLatitude(), ground.getLongitude(), ground.getGroundPhoto(), ground.getGroundId());
+                        " where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
+                ground.getLatitude(), ground.getLongitude(), ground.getGroundId());
         return new SuccessResultModel("Ground details updated successfully");
     }
 

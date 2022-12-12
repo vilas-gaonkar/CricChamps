@@ -22,8 +22,6 @@ public class Grounds {
 
     private String groundLocation;
 
-    private String groundPhoto;
-
     @NotBlank(message = "Latitude cannot be empty")
     private double latitude;
 
