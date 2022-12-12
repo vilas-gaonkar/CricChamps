@@ -45,16 +45,17 @@ public class LiveScoreService implements LiveInterface {
 
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
 
-        updateScoreBoard(tournament.get(0),matches.get(0),matchTeams,strikeTeam.get(0));
-        updateLiveScoreAndCommentry(tournament.get(0),matches.get(0),matchTeams,strikeTeam.get(0));
+        updateScoreBoard(tournament.get(0), matches.get(0), matchTeams, strikeTeam.get(0),liveScoreUpdateModel);
+        updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), matchTeams, strikeTeam.get(0),liveScoreUpdateModel);
 
         return null;
     }
 
-    private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams) {
+    private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams,LiveScoreUpdate liveScoreUpdateModel) {
     }
 
-    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams) {
+    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Versus> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
+
     }
 
     private double getBattingStrikeRate(int runsScored, int numberOfBallFaced) {
