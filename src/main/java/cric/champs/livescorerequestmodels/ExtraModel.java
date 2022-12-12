@@ -22,4 +22,6 @@ public class ExtraModel {
 
     private int noBall;
 
+    private int penaltyRuns;
+
 }
