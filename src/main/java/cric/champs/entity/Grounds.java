@@ -22,10 +22,10 @@ public class Grounds {
 
     private String groundLocation;
 
-    @NotBlank(message = "Latitude cannot be empty")
+
     private double latitude;
 
-    @NotBlank(message = "Longitude cannot be empty")
+
     private double longitude;
 
     private String isDeleted;
