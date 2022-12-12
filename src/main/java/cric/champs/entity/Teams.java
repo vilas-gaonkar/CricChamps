@@ -17,7 +17,7 @@ public class Teams {
 
     private long tournamentId;
     @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Team name should only contain alphabets")
-    private  String teamName;
+    private String teamName;
 
     private String captainName;
 
@@ -25,7 +25,7 @@ public class Teams {
 
     private int numberOfPlayers;
 
-    private int  totalMatchesPlayed;
+    private int totalMatchesPlayed;
 
     private int totalWins;
 
@@ -34,6 +34,8 @@ public class Teams {
     private int totalDrawOrCancelledOrNoResult;
 
     private int points;
+
+    private int teamHighestScore;
 
     private double netRunRate;
 

@@ -29,6 +29,7 @@ public class ScoreBoardController {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoardResults(scoreBoardModel)));
     }
 
+    //split apis
     @PostMapping("/")
     public ResponseEntity<ScoreBoard> viewScoreBoard(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoard(scoreBoardModel)));

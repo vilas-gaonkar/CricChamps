@@ -167,9 +167,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
         jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
                 systemInterface.getUserId(), tournaments.getTournamentName(), tournaments.getTournamentType(),
-                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0,0,0,0,0,
+                tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0,
                 TournamentStatus.UPCOMING.toString());
-        return new TournamentResultModel(tournaments.getTournamentName(),tournamentCode,"Tournament successfully created");
+        return new TournamentResultModel(tournaments.getTournamentName(), tournamentCode, "Tournament successfully created");
     }
 
     @Override
@@ -242,11 +242,16 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Tournament not found");
 
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("A ground already exists in the given co-ordinates. Please enter different co-ordinates");
+            throw new NullPointerException("A ground already exists in the given co-ordinates");
 
-        jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
-                ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getGroundPhoto(),
-                ground.getLatitude(), ground.getLongitude(), "false");
+        jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
+                ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getLatitude(),
+                ground.getLongitude(), "false");
+        Grounds grounds = jdbcTemplate.query("select * from grounds order by groundId DESC limit 1",
+                new BeanPropertyRowMapper<>(Grounds.class)).get(0);
+        if (!groundPhoto.isEmpty())
+            for (String photo : groundPhoto)
+                jdbcTemplate.update("insert into groundPhotos values(?,?)", grounds.getGroundId(), photo);
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
                 ground.getTournamentId());
         return new SuccessResultModel("Ground added successfully");
@@ -269,8 +274,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("latitude and longitude already added");
         jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?," +
-                        " GroundPhoto = ? where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
-                ground.getLatitude(), ground.getLongitude(), ground.getGroundPhoto(), ground.getGroundId());
+                        " where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
+                ground.getLatitude(), ground.getLongitude(), ground.getGroundId());
         return new SuccessResultModel("Ground details updated successfully");
     }
 
@@ -349,13 +354,13 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public TeamResultModel registerTeam(Teams teams) throws Exception {
-        if(systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
-                && systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getNumberOfTeams()==2)
+        if (systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
+                && systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getNumberOfTeams() == 2)
             throw new Exception("Individual match should not contain more than two teams");
-        jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
-                teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), "false");
-        Teams team = jdbcTemplate.query("select *  from teams order by teamId desc",new BeanPropertyRowMapper<>(Teams.class)).get(0);
-        return new TeamResultModel(team.getTeamId(),team.getTeamName(),"Team created successfully");
+        jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
+                teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), null, "false");
+        Teams team = jdbcTemplate.query("select *  from teams order by teamId desc", new BeanPropertyRowMapper<>(Teams.class)).get(0);
+        return new TeamResultModel(team.getTeamId(), team.getTeamName(), "Team created successfully");
     }
 
     @Override
@@ -401,13 +406,13 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel registerPlayer(Players players) {
-        if(systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
+        if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
             throw new NullPointerException("tournament not found");
         jdbcTemplate.update("insert into players values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, players.getTournamentId(),
                 players.getTeamId(), players.getPlayerName(), players.getCity(), players.getPhoneNumber(), players.getProfilePhoto(),
                 players.getDesignation(), players.getExpertise(), players.getBattingStyle(), players.getBowlingStyle(),
                 players.getBowlingType(), 0, 0, 0, null, players.getPersonalId(), players.getPersonalIdName(), "false");
-        jdbcTemplate.update("update teams set numberOfPlayers = numberOfPlayers + 1 where teamId = ?",players.getTeamId());
+        jdbcTemplate.update("update teams set numberOfPlayers = numberOfPlayers + 1 where teamId = ?", players.getTeamId());
         return new SuccessResultModel("Player registered successfully.");
     }
 
