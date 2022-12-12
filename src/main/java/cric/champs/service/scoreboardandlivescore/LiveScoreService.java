@@ -56,19 +56,23 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-        if (setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId())) {
-            updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
-            updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
-        }
+        Long scoreBoardId = null;
+        if (liveScoreUpdateModel.getOver() == 0 && (liveScoreUpdateModel.getBall() == 1 || (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 0)))
+            scoreBoardId = setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), strikeTeam.get(0).getTeamName());
+        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel,scoreBoardId);
+        updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
         return null;
     }
 
-    private boolean setStatus(Long tournamentId, Long matchId) {
+    private Long setStatus(Long tournamentId, Long matchId, Long teamId, String teamName) {
         jdbcTemplate.update("update matches set matchStatus = ? where matchId = ? and tournamentId = ?", MatchStatus.LIVE.toString(),
                 matchId, tournamentId);
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?", TournamentStatus.PROGRESS.toString(),
                 tournamentId);
-        return true;
+        jdbcTemplate.update("insert into scoreBoard values(?,?,?,?,?,?,?,?,?)", null, tournamentId, matchId,
+                teamId, teamName, 0, 0, 0, 0);
+        return jdbcTemplate.query("select * from scoreBoard order by scoreBoardId DESC limit 1",
+                new BeanPropertyRowMapper<>(ScoreBoard.class)).get(0).getScoreBoardId();
     }
 
     private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
@@ -87,8 +91,9 @@ public class LiveScoreService implements LiveInterface {
 
     }
 
-    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
-
+    private void updateScoreBoard(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel,Long scoreBoardId) {
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
+            jdbcTemplate.update("insert into scoreBoard values(");
     }
 
     private double getBattingStrikeRate(int runsScored, int numberOfBallFaced) {
