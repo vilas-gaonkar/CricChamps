@@ -2,6 +2,7 @@ package cric.champs.service.user;
 
 import cric.champs.customexceptions.*;
 import cric.champs.entity.*;
+import cric.champs.model.GroundPhotos;
 import cric.champs.resultmodels.GroundResult;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.resultmodels.TeamResultModel;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -292,7 +294,11 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Invalid tournament details");
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
-        return new GroundResult();
+        List<GroundPhotos> groundPhotos = new ArrayList<>();
+        for(Grounds ground : grounds)
+            groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
+                    new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
+        return new GroundResult(grounds,groundPhotos);
     }
 
     @Override
@@ -301,7 +307,11 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Invalid tournament details");
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId);
-        return new GroundResult();
+        List<GroundPhotos> groundPhotos = new ArrayList<>();
+        for(Grounds ground : grounds)
+            groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
+                    new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
+        return new GroundResult(grounds,groundPhotos);
     }
 
     /**
