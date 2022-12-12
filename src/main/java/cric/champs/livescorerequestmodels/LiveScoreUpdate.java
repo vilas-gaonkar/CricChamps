@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LiveScoreUpdated {
+public class LiveScoreUpdate {
 
     private Long tournamentId;
 

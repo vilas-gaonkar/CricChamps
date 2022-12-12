@@ -200,6 +200,7 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for finals knockout
      */
+    @Override
     public boolean roundRobinGenerationForKnockoutNextMatches(Tournaments tournament) {
         long byeTeamId = 0;
         boolean isBye = false;
@@ -236,6 +237,8 @@ public class FixtureService implements FixtureGenerationInterface {
     /**
      * Fixture for finals league ***use***
      */
+
+    @Override
     public boolean roundRobinGenerationForKnockoutLeague(Tournaments tournament) {
         long[] teamsId = getTeamIdForLeague(tournament);
         int matchNumber = 1;
