@@ -29,6 +29,6 @@ public class ScoreBoard {
 
     private int score;
 
-    private int fallOfWickets;
+    private int totalWicketFall;
 
 }
