@@ -23,8 +23,6 @@ public class LiveScoreUpdate {
 
     private Long bowlerId;
 
-    private String bowlerName;
-
     private int over;
 
     private int ball;
