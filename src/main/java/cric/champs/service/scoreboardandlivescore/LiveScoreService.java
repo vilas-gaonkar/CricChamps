@@ -37,11 +37,11 @@ public class LiveScoreService implements LiveInterface {
         List<Matches> matches = systemInterface.verifyMatchId(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId());
         if (tournament.isEmpty() || matches.isEmpty())
             throw new LiveScoreUpdationException("Invalid Tournament Updation");
-        if (liveScoreUpdateModel.getBall() > 6)
+        if (liveScoreUpdateModel.getBall() > 6 && liveScoreUpdateModel.getBall() < 0)
             throw new LiveScoreUpdationException("Invalid ball");
-        if (liveScoreUpdateModel.getOver() > tournament.get(0).getNumberOfOvers())
+        if (liveScoreUpdateModel.getOver() > tournament.get(0).getNumberOfOvers() && liveScoreUpdateModel.getOver() < 0)
             throw new LiveScoreUpdationException("Inavlid over");
-        if (liveScoreUpdateModel.getRuns() > 7)
+        if (liveScoreUpdateModel.getRuns() > 7 && liveScoreUpdateModel.getRuns() < 0)
             throw new LiveScoreUpdationException("Invalid runs");
         List<Teams> strikeTeam = systemInterface.verifyTeamDetails(liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getTournamentId());
         List<Teams> nonStrikeTeam = jdbcTemplate.query("select * from teams where teamId in (select teamId from versus matchId = ? and teamId != ?)",
@@ -57,11 +57,16 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-
-        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
-        updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
+        if(setStatus(liveScoreUpdateModel.getTournamentId(),liveScoreUpdateModel.getMatchId())) {
+            updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
+            updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam, strikeTeam.get(0), liveScoreUpdateModel);
+        }
 
         return null;
+    }
+
+    private boolean setStatus(Long tournamentId, Long matchId) {
+        return true;
     }
 
     private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, List<Teams> matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
