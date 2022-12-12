@@ -1,5 +1,5 @@
 package cric.champs.service;
 
 public enum TeamStatus {
-    WIN,LOSS
+    WIN, LOSS
 }

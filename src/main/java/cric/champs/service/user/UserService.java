@@ -2,6 +2,7 @@ package cric.champs.service.user;
 
 import cric.champs.customexceptions.*;
 import cric.champs.entity.*;
+import cric.champs.resultmodels.GroundResult;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.resultmodels.TeamResultModel;
 import cric.champs.resultmodels.TournamentResultModel;
@@ -286,19 +287,21 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public List<Grounds> getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
+    public GroundResult getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
-        return jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
+        List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
+        return new GroundResult();
     }
 
     @Override
-    public Grounds getGround(long groundId, long tournamentId) {
+    public GroundResult getGround(long groundId, long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
-        return jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId).get(0);
+        List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId);
+        return new GroundResult();
     }
 
     /**

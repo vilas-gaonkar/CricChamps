@@ -17,17 +17,18 @@ public class ScoreBoard {
 
     private long matchId;
 
+    private long teamId;
+
     private String teamName;
+
+    private int overs;
+
+    private int ball;
 
     private String tossStatus;
 
-    private String tossDecision;
+    private int score;
 
-    private int currentScore;
+    private int fallOfWickets;
 
-    private int currentFallOfWickets;
-
-    private int currentOver;
-
-    private int currentBall;
 }
