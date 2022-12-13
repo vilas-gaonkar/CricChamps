@@ -83,6 +83,14 @@ public class LiveScoreService implements LiveInterface {
         return true;
     }
 
+    /**
+     *
+     * @param tournaments
+     * @param matches
+     * @param matchTeams
+     * @param teams
+     * @param liveScoreUpdateModel
+     */
     private void updateLiveScoreAndCommentry(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
         liveScoreModification(tournaments, matches, matchTeams, teams, liveScoreUpdateModel);
         partnershipScoreModification(tournaments, matches, matchTeams, teams, liveScoreUpdateModel);
@@ -219,7 +227,7 @@ public class LiveScoreService implements LiveInterface {
      * @param matches
      * @param nonStrikeTeam
      * @param strikeTeam
-     * @param liveScoreUpdateModel
+     * @param scoreboardUpdateModel
      */
     private void updateScoreBoard(Tournaments tournaments, Matches matches, Teams nonStrikeTeam, Teams strikeTeam, LiveScoreUpdate liveScoreUpdateModel) {
         Long scoreBoardId = getScoreBoardId(tournaments.getTournamentId(), matches.getMatchId(),
