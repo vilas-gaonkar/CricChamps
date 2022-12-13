@@ -19,7 +19,6 @@ public class Players {
 
     private long teamId;
 
-
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Player name should only contain alphabets")
     private String playerName;
 
@@ -44,6 +43,8 @@ public class Players {
     private int totalWickets;
 
     private int totalRuns;
+
+    private int numberOfTimeHeHasBeenOut;
 
     private String achievements;
 

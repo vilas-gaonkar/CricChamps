@@ -239,7 +239,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public SuccessResultModel setTournamentOver(long tournamentId, int numberOfOvers) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        jdbcTemplate.update("update tournaments set numberOfOvers = ? where tournamentId = ?",numberOfOvers,
+        jdbcTemplate.update("update tournaments set numberOfOvers = ? where tournamentId = ?", numberOfOvers,
                 tournamentId);
         return new SuccessResultModel("Overs updated successfully");
     }
@@ -436,10 +436,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public SuccessResultModel registerPlayer(Players players) {
         if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
             throw new NullPointerException("tournament not found");
-        jdbcTemplate.update("insert into players values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, players.getTournamentId(),
+        jdbcTemplate.update("insert into players values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, players.getTournamentId(),
                 players.getTeamId(), players.getPlayerName(), players.getCity(), players.getPhoneNumber(), players.getProfilePhoto(),
                 players.getDesignation(), players.getExpertise(), players.getBattingStyle(), players.getBowlingStyle(),
-                players.getBowlingType(), 0, 0, 0, null, players.getPersonalId(), players.getPersonalIdName(), "false");
+                players.getBowlingType(), 0, 0, 0, 0, null, players.getPersonalId(), players.getPersonalIdName(), "false");
         jdbcTemplate.update("update teams set numberOfPlayers = numberOfPlayers + 1 where teamId = ?", players.getTeamId());
         return new SuccessResultModel("Player registered successfully.");
     }
