@@ -25,7 +25,7 @@ public class Live {
 
     private double requiredRunRate;
 
-    private int run;
+    private int runs;
 
     private int wickets;
     
