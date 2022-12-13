@@ -192,7 +192,7 @@ public class LiveScoreService implements LiveInterface {
     private void insertIntoCommentary(LiveScoreUpdate liveScoreUpdateModel, List<Live> lives, String overStatus) {
         String ballStatus = liveScoreUpdateModel.getExtraModel().isExtraStatus() == true ?
                 liveScoreUpdateModel.getExtraModel().getExtraType() : String.valueOf(liveScoreUpdateModel.getRuns());
-        jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?)", lives.get(0).getLiveId(),
+        jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?)",null,lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
                 liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), ballStatus, overStatus, null);
     }

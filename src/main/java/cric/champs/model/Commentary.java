@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Commentary {
 
+    private long commentaryId;
+
     private  long liveId;
 
     private long tournamentId;

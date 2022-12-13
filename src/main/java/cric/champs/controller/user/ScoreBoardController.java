@@ -42,12 +42,12 @@ public class ScoreBoardController {
     }
 
     @PostMapping("/batsman-sb")
-    public ResponseEntity<BatsmanSB> viewBatsmanSB(@RequestBody ScoreBoardModel scoreBoardModel) {
+    public ResponseEntity<?> viewBatsmanSB(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewBatsmanSB(scoreBoardModel)));
     }
 
     @PostMapping("/bowler-sb")
-    public ResponseEntity<BowlerSB> viewBowlerSB(@RequestBody ScoreBoardModel scoreBoardModel) {
+    public ResponseEntity<?> viewBowlerSB(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewBowlerSB(scoreBoardModel)));
     }
 
@@ -57,7 +57,7 @@ public class ScoreBoardController {
     }
 
     @PostMapping("/fall-of-wicket")
-    public ResponseEntity<FallOfWicketSB> viewFallOfWicketSB(@RequestBody ScoreBoardModel scoreBoardModel) {
+    public ResponseEntity<?> viewFallOfWicketSB(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewFallOfWickets(scoreBoardModel)));
     }
 
