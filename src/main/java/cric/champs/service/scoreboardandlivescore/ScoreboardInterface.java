@@ -8,18 +8,20 @@ import cric.champs.model.ExtraRuns;
 import cric.champs.model.FallOfWicketSB;
 import cric.champs.resultmodels.ScoreBoardResult;
 
+import java.util.List;
+
 public interface ScoreboardInterface {
 
     ScoreBoardResult viewScoreBoardResults(ScoreBoardModel scoreBoardModel);
 
     ScoreBoard viewScoreBoard(ScoreBoardModel scoreBoardModel);
 
-    BatsmanSB viewBatsmanSB(ScoreBoardModel scoreBoardModel);
+    List<BatsmanSB> viewBatsmanSB(ScoreBoardModel scoreBoardModel);
 
-    BowlerSB viewBowlerSB(ScoreBoardModel scoreBoardModel);
+    List<BowlerSB> viewBowlerSB(ScoreBoardModel scoreBoardModel);
 
     ExtraRuns viewExtraRuns(ScoreBoardModel scoreBoardModel);
 
-    FallOfWicketSB viewFallOfWickets(ScoreBoardModel scoreBoardModel);
+    List<FallOfWicketSB> viewFallOfWickets(ScoreBoardModel scoreBoardModel);
 
 }
