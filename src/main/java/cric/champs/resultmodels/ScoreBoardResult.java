@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,10 +22,10 @@ public class ScoreBoardResult {
 
     private ExtraRuns extraRuns;
 
-    private BatsmanSB batsmanSB;
+    private List<BatsmanSB> batsmanSB;
 
-    private BowlerSB bowlerSB;
+    private List<BowlerSB> bowlerSB;
 
-    private FallOfWicketSB fallOfWicketSB;
+    private List<FallOfWicketSB> fallOfWicketSB;
 
 }
