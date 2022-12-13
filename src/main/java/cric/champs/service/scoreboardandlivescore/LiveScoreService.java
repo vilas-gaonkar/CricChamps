@@ -66,9 +66,9 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-//        if (liveScoreUpdateModel.getOver() == 0 && (liveScoreUpdateModel.getBall() == 1 || (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 0)))
-//            setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), strikeTeam.get(0).getTeamName());
-//        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
+        if (liveScoreUpdateModel.getOver() == 0 && (liveScoreUpdateModel.getBall() == 1 || (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 0)))
+            setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), strikeTeam.get(0).getTeamName());
+        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
         updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
         return new SuccessResultModel("Update successfull");
     }
@@ -104,7 +104,6 @@ public class LiveScoreService implements LiveInterface {
 
     private void liveScoreModification(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
-        DecimalFormat df = new DecimalFormat("#.##");
         if (lives.isEmpty()) {
             List<Live> fristInning = jdbcTemplate.query("select * from live where matchId = ? and tournamentId = ? and teamId in" +
                             "(select teamId from players where playerId = ?)", new BeanPropertyRowMapper<>(Live.class), liveScoreUpdateModel.getMatchId(),
@@ -131,7 +130,7 @@ public class LiveScoreService implements LiveInterface {
                 if (liveScoreUpdateModel.getBall() == 6)
                     updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, requiredRunRate, neededRuns);
                 else
-                    updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, requiredRunRate, neededRuns);
+                    updateIntoLive(liveScoreUpdateModel, newLive, newLive.get(0).getCurrentRunRate(), newLive.get(0).getRequiredRunRate(), neededRuns);
             }
         }
     }
@@ -179,7 +178,7 @@ public class LiveScoreService implements LiveInterface {
     }
 
     private void insertIntoParnership(LiveScoreUpdate liveScoreUpdateModel, int ball) {
-        jdbcTemplate.update("insert into partnership values(?,?,?,?,?,?,?)", liveScoreUpdateModel.getTournamentId(),
+        jdbcTemplate.update("insert into partnership values(?,?,?,?,?,?,?,?)", null,liveScoreUpdateModel.getTournamentId(),
                 liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getStrikeBatsmanId(),
                 liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getRuns(), ball);
     }

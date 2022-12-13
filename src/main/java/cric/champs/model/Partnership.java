@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Partnership {
 
+    private long partnershipId;
+
     private long tournamentId;
 
     private long matchId;
