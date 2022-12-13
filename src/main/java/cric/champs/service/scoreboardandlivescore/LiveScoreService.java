@@ -66,9 +66,9 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-        if (liveScoreUpdateModel.getOver() == 0 && (liveScoreUpdateModel.getBall() == 1 || (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 0)))
-            setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), strikeTeam.get(0).getTeamName());
-        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
+//        if (liveScoreUpdateModel.getOver() == 0 && (liveScoreUpdateModel.getBall() == 1 || (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 0)))
+//            setStatus(liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), strikeTeam.get(0).getTeamName());
+//        updateScoreBoard(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
         updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
         return new SuccessResultModel("Update successfull");
     }
@@ -84,7 +84,6 @@ public class LiveScoreService implements LiveInterface {
     }
 
     /**
-     *
      * @param tournaments
      * @param matches
      * @param matchTeams
@@ -111,14 +110,9 @@ public class LiveScoreService implements LiveInterface {
                             "(select teamId from players where playerId = ?)", new BeanPropertyRowMapper<>(Live.class), liveScoreUpdateModel.getMatchId(),
                     liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getBowlerId());
             if (fristInning.isEmpty())
-                jdbcTemplate.update("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?)", null, liveScoreUpdateModel.getTournamentId(),
-                        liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), teams.getTeamName(),
-                        0, 0, liveScoreUpdateModel.getRuns(), 0, liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), 0);
+                insertIntoLive(liveScoreUpdateModel, teams, 0);
             else
-                jdbcTemplate.update("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?)", null, liveScoreUpdateModel.getTournamentId(),
-                        liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), teams.getTeamName(),
-                        0, 0, liveScoreUpdateModel.getRuns(), 0, liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(),
-                        fristInning.get(0).getRuns() - liveScoreUpdateModel.getRuns());
+                insertIntoLive(liveScoreUpdateModel, teams, fristInning.get(0).getRuns() - liveScoreUpdateModel.getRuns());
         } else {
             List<Live> newLive = liveDetails(liveScoreUpdateModel);
             List<Live> fristInnings = jdbcTemplate.query("select * from live where matchId = ? and tournamentId = ? and teamId in" +
@@ -127,35 +121,34 @@ public class LiveScoreService implements LiveInterface {
             if (fristInnings.isEmpty()) {
                 if (liveScoreUpdateModel.getBall() == 6) {
                     double currentRunRate = currentRunRate(liveScoreUpdateModel.getOver() + 1, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns());
-                    jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
-                                    "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", df.format(currentRunRate),
-                            0, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets(), liveScoreUpdateModel.getOver(),
-                            liveScoreUpdateModel.getBall(), 0, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
-                            liveScoreUpdateModel.getTournamentId());
+                    updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, 0, 0);
                 } else
-                    jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
-                                    "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", newLive.get(0).getCurrentRunRate(),
-                            0, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets(), liveScoreUpdateModel.getOver(),
-                            liveScoreUpdateModel.getBall(), 0, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
-                            liveScoreUpdateModel.getTournamentId());
+                    updateIntoLive(liveScoreUpdateModel, newLive, newLive.get(0).getCurrentRunRate(), 0, 0);
             } else {
                 int neededRuns = fristInnings.get(0).getRuns() - newLive.get(0).getRuns() - liveScoreUpdateModel.getRuns();
-                if (liveScoreUpdateModel.getBall() == 6) {
-                    double currentRunRate = currentRunRate(liveScoreUpdateModel.getOver() + 1, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns());
-                    double requiredRunRate = requiredRunRate(newLive.get(0).getRunsNeeded(), tournaments.getNumberOfOvers() - liveScoreUpdateModel.getOver() + 1);
-                    jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
-                                    "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", df.format(currentRunRate),
-                            df.format(requiredRunRate), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets(), liveScoreUpdateModel.getOver(),
-                            liveScoreUpdateModel.getBall(), neededRuns, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
-                            liveScoreUpdateModel.getTournamentId());
-                } else
-                    jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
-                                    "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", newLive.get(0).getCurrentRunRate(),
-                            newLive.get(0).getRequiredRunRate(), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets(), liveScoreUpdateModel.getOver(),
-                            liveScoreUpdateModel.getBall(), neededRuns, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
-                            liveScoreUpdateModel.getTournamentId());
+                double currentRunRate = currentRunRate(liveScoreUpdateModel.getOver() + 1, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns());
+                double requiredRunRate = requiredRunRate(newLive.get(0).getRunsNeeded(), tournaments.getNumberOfOvers() - liveScoreUpdateModel.getOver() + 1);
+                if (liveScoreUpdateModel.getBall() == 6)
+                    updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, requiredRunRate, neededRuns);
+                else
+                    updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, requiredRunRate, neededRuns);
             }
         }
+    }
+
+    private void updateIntoLive(LiveScoreUpdate liveScoreUpdateModel, List<Live> newLive, double currentRunRate, double requiredRunRate, int neededRun) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
+                        "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", df.format(currentRunRate),
+                df.format(requiredRunRate), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets(), liveScoreUpdateModel.getOver(),
+                liveScoreUpdateModel.getBall(), neededRun, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
+                liveScoreUpdateModel.getTournamentId());
+    }
+
+    private void insertIntoLive(LiveScoreUpdate liveScoreUpdateModel, Teams teams, int neededRuns) {
+        jdbcTemplate.update("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?)", null, liveScoreUpdateModel.getTournamentId(),
+                liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), teams.getTeamName(),
+                0, 0, liveScoreUpdateModel.getRuns(), 0, liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), neededRuns);
     }
 
     private void partnershipScoreModification(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
@@ -165,16 +158,17 @@ public class LiveScoreService implements LiveInterface {
         } else {
             List<Partnership> newPartnership = partnershipDetails(liveScoreUpdateModel);
             if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
-                jdbcTemplate.update("update partnership set partnershipRuns = ?, totalPartnershipBalls = ? where teamId = ? and " +
-                                "playerOneId = ? and playerTwoId = ? and matchId = ?", newPartnership.get(0).getPartnershipRuns() + liveScoreUpdateModel.getRuns(),
-                        newPartnership.get(0).getTotalPartnershipBalls(), liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getStrikeBatsmanId(),
-                        liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getMatchId());
+                updateIntoPartnership(liveScoreUpdateModel, newPartnership, newPartnership.get(0).getTotalPartnershipBalls());
             else
-                jdbcTemplate.update("update partnership set partnershipRuns = ?, totalPartnershipBalls = ? where teamId = ? and " +
-                                "playerOneId = ? and playerTwoId = ? and matchId = ?", newPartnership.get(0).getPartnershipRuns() + liveScoreUpdateModel.getRuns(),
-                        newPartnership.get(0).getTotalPartnershipBalls() + 1, liveScoreUpdateModel.getBattingTeamId(),
-                        liveScoreUpdateModel.getStrikeBatsmanId(), liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getMatchId());
+                updateIntoPartnership(liveScoreUpdateModel, newPartnership, newPartnership.get(0).getTotalPartnershipBalls() + 1);
         }
+    }
+
+    private void updateIntoPartnership(LiveScoreUpdate liveScoreUpdateModel, List<Partnership> newPartnership, int numberOfBalls) {
+        jdbcTemplate.update("update partnership set partnershipRuns = ?, totalPartnershipBalls = ? where teamId = ? and " +
+                        "playerOneId = ? and playerTwoId = ? and matchId = ?", newPartnership.get(0).getPartnershipRuns() + liveScoreUpdateModel.getRuns(),
+                numberOfBalls, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getStrikeBatsmanId(),
+                liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getMatchId());
     }
 
     private void addPartnershipDetails(LiveScoreUpdate liveScoreUpdateModel) {
