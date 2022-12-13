@@ -66,9 +66,9 @@ public class LiveScoreService implements LiveInterface {
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         numberOfOversOfTournament = tournament.get(0).getNumberOfOvers();
-        if (liveScoreUpdateModel.getOver() == 0 && liveScoreUpdateModel.getBall() == 1)
-            setStatus(liveScoreUpdateModel, strikeTeam.get(0).getTeamName());
-        updateScoreBoard(tournament.get(0), matches.get(0), liveScoreUpdateModel);
+//        if (liveScoreUpdateModel.getOver() == 0 && liveScoreUpdateModel.getBall() == 1)
+//            setStatus(liveScoreUpdateModel, strikeTeam.get(0).getTeamName());
+//        updateScoreBoard(tournament.get(0), matches.get(0), liveScoreUpdateModel);
         updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
         return new SuccessResultModel("Update successfull");
     }
@@ -168,7 +168,7 @@ public class LiveScoreService implements LiveInterface {
     }
 
     private void insertIntoParnership(LiveScoreUpdate liveScoreUpdateModel, int ball) {
-        jdbcTemplate.update("insert into partnership values(?,?,?,?,?,?,?,?)", null,liveScoreUpdateModel.getTournamentId(),
+        jdbcTemplate.update("insert into partnership values(?,?,?,?,?,?,?,?)", null, liveScoreUpdateModel.getTournamentId(),
                 liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getStrikeBatsmanId(),
                 liveScoreUpdateModel.getNonStrikeBatsmanId(), liveScoreUpdateModel.getRuns(), ball);
     }
@@ -183,18 +183,24 @@ public class LiveScoreService implements LiveInterface {
 
     private void commentaryScoreModification(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
-        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() || liveScoreUpdateModel.getBall() != 6)
-            insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString());
-        else
-            insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString());
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() || liveScoreUpdateModel.getBall() != 6) {
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.wide.toString()) || liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.noBall.toString()))
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1);
+            else if (liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.legBye.toString()) || liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.bye.toString()))
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns());
+            else
+                insertIntoCommentary(liveScoreUpdateModel,lives,OverStatus.NOTCOMPLETED.toString(),liveScoreUpdateModel.getRuns());
+
+        } else
+            insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns());
     }
 
-    private void insertIntoCommentary(LiveScoreUpdate liveScoreUpdateModel, List<Live> lives, String overStatus) {
+    private void insertIntoCommentary(LiveScoreUpdate liveScoreUpdateModel, List<Live> lives, String overStatus, int extraRun) {
         String ballStatus = liveScoreUpdateModel.getExtraModel().isExtraStatus() == true ?
                 liveScoreUpdateModel.getExtraModel().getExtraType() : String.valueOf(liveScoreUpdateModel.getRuns());
-        jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?)",null,lives.get(0).getLiveId(),
+        jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
-                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), ballStatus, overStatus, null);
+                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, null);
     }
 
     private List<Commentary> commentaryDetails(LiveScoreUpdate liveScoreUpdateModel) {
