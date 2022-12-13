@@ -84,7 +84,7 @@ public class LiveScoreResultService implements LiveResultInterface {
     public List<Commentary> viewCommentary(LiveScoreModel liveScoreModel) {
         if (systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from commentary where matchId = ? and tournamentId = ?",
+        return jdbcTemplate.query("select * from commentary where matchId = ? and tournamentId = ? order by commentaryId DESC",
                 new BeanPropertyRowMapper<>(Commentary.class), liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
     }
 }
