@@ -206,11 +206,11 @@ public class LiveScoreService implements LiveInterface {
     private void commentaryScoreModification(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus() || liveScoreUpdateModel.getBall() != 6) {
-            if (liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.wide.toString()) ||
-                    liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.noBall.toString()))
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1);
-            else if (liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.legBye.toString()) ||
-                    liveScoreUpdateModel.getExtraModel().getExtraType().equalsIgnoreCase(ExtraRunsType.bye.toString()))
+            else if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns());
             else
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns());
