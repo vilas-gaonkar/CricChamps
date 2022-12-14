@@ -2,6 +2,7 @@ package cric.champs.service.user;
 
 import cric.champs.customexceptions.*;
 import cric.champs.entity.*;
+import cric.champs.livescorerequestmodels.SetDateTimeModel;
 import cric.champs.model.GroundPhotos;
 import cric.champs.resultmodels.GroundResult;
 import cric.champs.resultmodels.SuccessResultModel;
@@ -221,17 +222,20 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
+
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? where " +
                 "tournamentId = ? and isDeleted = 'false'", startTime, endTime, tournamentId);
         return new SuccessResultModel("Time updated successfully");
     }
 
     @Override
-    public SuccessResultModel setTournamentDateTime(long tournamentId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException {
-        if (!systemInterface.verifyTimeDurationGiven(tournamentId))
+    public SuccessResultModel setTournamentDateTimes(SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
+        if (!systemInterface.verifyTimeDurationGiven(setDateTimeModel))
             throw new FixtureGenerationException("Insufficient time for fixture generation");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
-                "tournamentEndDate = ? where tournamentId = ? and tournamentStatus = 'UPCOMING'", startTime, endTime, startDate, endDate, tournamentId);
+                "tournamentEndDate = ? where tournamentId = ? and isDeleted = 'false'", setDateTimeModel.getStartDate(),
+                setDateTimeModel.getEndDate(),setDateTimeModel.getStartTime(),setDateTimeModel.getEndTime(),
+                setDateTimeModel.getTournamentId());
         return new SuccessResultModel("Date and Time updated successfully");
     }
 

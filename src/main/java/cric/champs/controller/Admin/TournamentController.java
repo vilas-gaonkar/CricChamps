@@ -65,26 +65,17 @@ public class TournamentController {
     }
 
     @PatchMapping("/set-date")
-    public ResponseEntity<SuccessResultModel> setTournamentDate(@RequestPart long tournamentId,
-                                                                @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                                @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<SuccessResultModel> setTournamentDate(@RequestHeader long tournamentId,
+                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDate(tournamentId, startDate, endDate)));
     }
 
     @PatchMapping("/set-time")
-    public ResponseEntity<SuccessResultModel> setTournamentTime(@RequestPart long tournamentId,
-                                                                @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                                                @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+    public ResponseEntity<SuccessResultModel> setTournamentTime(@RequestHeader long tournamentId,
+                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
-    }
-
-    @PatchMapping("/set-date-time")
-    public ResponseEntity<SuccessResultModel> setTournamentDateTime(@RequestPart long tournamentId,
-                                                                    @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                                    @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                                                    @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                                                    @RequestPart @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) throws FixtureGenerationException {
-        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTime(tournamentId, startDate, endDate, startTime, endTime)));
     }
 
     @GetMapping("/get")
@@ -97,10 +88,8 @@ public class TournamentController {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentOver(tournamentId, numberOfOvers)));
     }
 
-    @PatchMapping("/set-dates-time")
-    public ResponseEntity<SuccessResultModel> setTournamentDateTimes(@ModelAttribute SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
-        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTime(setDateTimeModel.getTournamentId(),
-                setDateTimeModel.getStartDate(), setDateTimeModel.getEndDate(), setDateTimeModel.getStartTime(),
-                setDateTimeModel.getEndTime())));
+    @PatchMapping("/set-date-time")
+    public ResponseEntity<SuccessResultModel> setTournamentDateTimes(@RequestBody SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTimes(setDateTimeModel)));
     }
 }

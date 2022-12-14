@@ -3,6 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.customexceptions.OTPGenerateException;
 import cric.champs.entity.*;
+import cric.champs.livescorerequestmodels.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.MatchStatus;
@@ -185,30 +186,30 @@ public class SystemService implements SystemInterface {
     }
 
     @Override
-    public boolean verifyTimeDurationGiven(long tournamentId) {
-        List<Tournaments> tournament = verifyTournamentId(tournamentId);
+    public boolean verifyTimeDurationGiven(SetDateTimeModel setDateTimeModel) {
+        List<Tournaments> tournament = verifyTournamentId(setDateTimeModel.getTournamentId());
         if (tournament.isEmpty())
             throw new NullPointerException("Tournament not found");
         if (tournament.get(0).getNumberOfOvers() < 6)
-            return getDuration(tournament) == 1;
+            return getDurations(setDateTimeModel) == 1;
         else if (tournament.get(0).getNumberOfOvers() > 6 && tournament.get(0).getNumberOfOvers() < 16)
-            return getDuration(tournament) == 2;
+            return getDurations(setDateTimeModel) == 2;
         else if (tournament.get(0).getNumberOfOvers() > 16 && tournament.get(0).getNumberOfOvers() < 31)
-            return getDuration(tournament) == 3;
+            return getDurations(setDateTimeModel) == 3;
         else if (tournament.get(0).getNumberOfOvers() > 31 && tournament.get(0).getNumberOfOvers() < 41)
-            return getDuration(tournament) == 5;
+            return getDurations(setDateTimeModel) == 5;
         else
-            return getDuration(tournament) == 8;
+            return getDurations(setDateTimeModel) == 8;
+    }
+
+    public long getDurations(SetDateTimeModel setDateTimeModel) {
+        return Duration.between(setDateTimeModel.getStartTime(), setDateTimeModel.getEndTime()).toHours();
     }
 
     @Override
     public List<Matches> verifyMatchId(Long tournamentId, Long matchId) {
         return jdbcTemplate.query("select * from matches where matchId = ? and tournamentId = ?",
                 new BeanPropertyRowMapper<>(Matches.class),matchId,tournamentId);
-    }
-
-    private long getDuration(List<Tournaments> tournament) {
-        return Duration.between(tournament.get(0).getTournamentStartTime().toLocalTime(), tournament.get(0).getTournamentEndTime().toLocalTime()).toHours();
     }
 
     @Override

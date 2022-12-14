@@ -3,6 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.entity.*;
 import cric.champs.customexceptions.OTPGenerateException;
+import cric.champs.livescorerequestmodels.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 
@@ -53,7 +54,7 @@ public interface SystemInterface {
 
     List<Tournaments> verifyUserID();
 
-    boolean verifyTimeDurationGiven(long tournamentId);
+    boolean verifyTimeDurationGiven(SetDateTimeModel setDateTimeModel);
 
     List<Matches> verifyMatchId(Long tournamentId, Long matchId);
 
