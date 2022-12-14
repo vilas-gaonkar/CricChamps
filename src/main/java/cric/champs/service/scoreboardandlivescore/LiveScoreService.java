@@ -66,7 +66,11 @@ public class LiveScoreService implements LiveInterface {
             setStatus(liveScoreUpdateModel, strikeTeam.get(0).getTeamName());
         updateScoreBoard(tournament.get(0), matches.get(0), liveScoreUpdateModel);
         updateLiveScoreAndCommentry(tournament.get(0), matches.get(0), nonStrikeTeam.get(0), strikeTeam.get(0), liveScoreUpdateModel);
+        getResultModel(liveScoreUpdateModel);
         return new SuccessResultModel("Update successfull");
+    }
+
+    private void getResultModel(LiveScoreUpdate liveScoreUpdateModel) {
     }
 
     /**
