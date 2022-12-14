@@ -59,7 +59,7 @@ public class LiveScoreResultService implements LiveResultInterface {
         List<Teams> teams = jdbcTemplate.query("select * from teams where teamId in (select teamId from versus where " +
                         "matchId = ? and teamId != ?)", new BeanPropertyRowMapper<>(Teams.class), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
-        return jdbcTemplate.query("select * from bowlerSB where teamId = ? and matchId = ? and bowlerStatus = ?",
+        return jdbcTemplate.query("select * from bowlingSB where teamId = ? and matchId = ? and bowlerStatus = ?",
                 new BeanPropertyRowMapper<>(BowlerSB.class), teams.get(0).getTeamId(), liveScoreModel.getMatchId(),
                 BowlingStatus.BOWLING.toString()).get(0);
     }

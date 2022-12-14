@@ -152,8 +152,13 @@ public class LiveScoreService implements LiveInterface {
                 partnershipId = checkPartnership.get(0).getPartnershipId();
             List<Partnership> newPartnership = existingPartnershipDetails(partnershipId);
             if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
-                updateIntoPartnership(liveScoreUpdateModel, newPartnership, newPartnership.get(0).getTotalPartnershipBalls(),
-                        partnershipId);
+                if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                        liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.bye))
+                    updateIntoPartnership(liveScoreUpdateModel, newPartnership,
+                            newPartnership.get(0).getTotalPartnershipBalls() + 1, partnershipId);
+                else
+                    updateIntoPartnership(liveScoreUpdateModel, newPartnership, newPartnership.get(0).getTotalPartnershipBalls(),
+                            partnershipId);
             else
                 updateIntoPartnership(liveScoreUpdateModel, newPartnership,
                         newPartnership.get(0).getTotalPartnershipBalls() + 1, partnershipId);
@@ -172,11 +177,11 @@ public class LiveScoreService implements LiveInterface {
 
     private void addPartnershipDetails(LiveScoreUpdate liveScoreUpdateModel) {
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
-            if(liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
-            liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.bye))
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.bye))
                 insertIntoParnership(liveScoreUpdateModel, 1);
             else
-                insertIntoParnership(liveScoreUpdateModel,0);
+                insertIntoParnership(liveScoreUpdateModel, 0);
         else
             insertIntoParnership(liveScoreUpdateModel, 1);
     }
@@ -381,8 +386,9 @@ public class LiveScoreService implements LiveInterface {
         if (getBowlerSB(liveScoreUpdateModel.getBowlerId()).isEmpty())
             insertNewBowlerToScoreBoard(liveScoreUpdateModel, scoreBoardId);
         else
-            jdbcTemplate.update("update bowlingSB set runs = runs + ?,overs = overs + ? ,balls = 0 where playerId = ?",
-                    liveScoreUpdateModel.getRuns(), getOverCount(liveScoreUpdateModel.getBall()), liveScoreUpdateModel.getBowlerId());
+            jdbcTemplate.update("update bowlingSB set runs = runs + ?,overs = overs + ? ,balls = ? where playerId = ?",
+                    liveScoreUpdateModel.getRuns(), getOverCount(liveScoreUpdateModel.getBall()),
+                    liveScoreUpdateModel.getBall(), liveScoreUpdateModel.getBowlerId());
         if (liveScoreUpdateModel.getBall() == 6)
             updateEconomyRate(liveScoreUpdateModel.getBowlerId());
     }
