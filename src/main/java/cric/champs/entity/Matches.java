@@ -42,6 +42,8 @@ public class Matches {
 
     private Time matchEndTime;
 
+    private int totalNumberOfWicket;
+
     private String isCancelled;
 
     private String cancelledReason;
