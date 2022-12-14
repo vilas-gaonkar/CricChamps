@@ -75,7 +75,7 @@ public class ScoreBoardService implements ScoreboardInterface {
     public List<FallOfWicketSB> viewFallOfWickets(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from fallOfWicketSb where tournamentId = ? and matchId = ? and teamId = ?",
+        return jdbcTemplate.query("select * from fallOfWicketSB where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(FallOfWicketSB.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
     }
