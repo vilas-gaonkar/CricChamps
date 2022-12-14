@@ -297,7 +297,7 @@ public class LiveScoreService implements LiveInterface {
                 liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), liveScoreUpdateModel.getRuns(), scoreBoardId);
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             updateBowlerSBForExtra(liveScoreUpdateModel, scoreBoardId);
-            updateExtraRuns(liveScoreUpdateModel.getExtraModel().getExtraType(), liveScoreUpdateModel.getRuns(), scoreBoardId);
+            updateExtraRuns(liveScoreUpdateModel, scoreBoardId);
             if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
                 updateBatsmanSBForLegByeOrBye(liveScoreUpdateModel, scoreBoardId);
