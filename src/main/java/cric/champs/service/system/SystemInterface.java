@@ -7,6 +7,7 @@ import cric.champs.livescorerequestmodels.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -58,4 +59,5 @@ public interface SystemInterface {
 
     List<Matches> verifyMatchId(Long tournamentId, Long matchId);
 
+    boolean validateTime(LocalTime startTime, LocalTime endTime, int numberOfOvers);
 }

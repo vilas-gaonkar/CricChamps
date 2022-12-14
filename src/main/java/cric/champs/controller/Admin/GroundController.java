@@ -75,7 +75,7 @@ public class GroundController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<SuccessResultModel> delete(@RequestParam long groundId, @RequestParam long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestHeader long groundId, @RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(groundInterface.deleteGrounds(groundId, tournamentId)));
     }
 

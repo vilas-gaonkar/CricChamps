@@ -74,7 +74,7 @@ public class TournamentController {
     @PatchMapping("/set-time")
     public ResponseEntity<SuccessResultModel> setTournamentTime(@RequestHeader long tournamentId,
                                                                 @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+                                                                @RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) throws FixtureGenerationException {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
     }
 

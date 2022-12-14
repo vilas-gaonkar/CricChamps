@@ -25,7 +25,7 @@ public interface TournamentInterface {
 
     SuccessResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate);
 
-    SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime);
+    SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException;
 
     SuccessResultModel setTournamentDateTimes(SetDateTimeModel setDateTimeModel) throws FixtureGenerationException;
 

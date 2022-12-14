@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,15 +192,15 @@ public class SystemService implements SystemInterface {
         if (tournament.isEmpty())
             throw new NullPointerException("Tournament not found");
         if (tournament.get(0).getNumberOfOvers() < 6)
-            return getDurations(setDateTimeModel) == 1;
+            return getDurations(setDateTimeModel) >= 1;
         else if (tournament.get(0).getNumberOfOvers() > 6 && tournament.get(0).getNumberOfOvers() < 16)
-            return getDurations(setDateTimeModel) == 2;
+            return getDurations(setDateTimeModel) >= 2;
         else if (tournament.get(0).getNumberOfOvers() > 16 && tournament.get(0).getNumberOfOvers() < 31)
-            return getDurations(setDateTimeModel) == 3;
+            return getDurations(setDateTimeModel) >= 3;
         else if (tournament.get(0).getNumberOfOvers() > 31 && tournament.get(0).getNumberOfOvers() < 41)
-            return getDurations(setDateTimeModel) == 5;
+            return getDurations(setDateTimeModel) >= 5;
         else
-            return getDurations(setDateTimeModel) == 8;
+            return getDurations(setDateTimeModel) >= 8;
     }
 
     public long getDurations(SetDateTimeModel setDateTimeModel) {
@@ -209,7 +210,25 @@ public class SystemService implements SystemInterface {
     @Override
     public List<Matches> verifyMatchId(Long tournamentId, Long matchId) {
         return jdbcTemplate.query("select * from matches where matchId = ? and tournamentId = ?",
-                new BeanPropertyRowMapper<>(Matches.class),matchId,tournamentId);
+                new BeanPropertyRowMapper<>(Matches.class), matchId, tournamentId);
+    }
+
+    @Override
+    public boolean validateTime(LocalTime startTime, LocalTime endTime, int numberOfOvers) {
+        if (numberOfOvers < 6)
+            return getDuration(startTime, endTime) >= 1;
+        else if (numberOfOvers > 6 && numberOfOvers < 16)
+            return getDuration(startTime, endTime) >= 2;
+        else if (numberOfOvers > 16 && numberOfOvers < 31)
+            return getDuration(startTime, endTime) >= 3;
+        else if (numberOfOvers > 31 && numberOfOvers < 41)
+            return getDuration(startTime, endTime) >= 5;
+        else
+            return getDuration(startTime, endTime) >= 8;
+    }
+
+    private long getDuration(LocalTime startTime, LocalTime endTime) {
+        return Duration.between(startTime, endTime).toHours();
     }
 
     @Override
