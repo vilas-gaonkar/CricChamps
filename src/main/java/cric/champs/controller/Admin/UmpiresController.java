@@ -64,7 +64,7 @@ public class UmpiresController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<SuccessResultModel> delete(@RequestPart long umpireId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestHeader long umpireId, @RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(umpiresInterface.deleteUmpires(umpireId, tournamentId)));
     }
 
