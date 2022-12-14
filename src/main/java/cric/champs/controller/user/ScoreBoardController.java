@@ -37,7 +37,7 @@ public class ScoreBoardController {
 
     //split apis
     @PostMapping("/")
-    public ResponseEntity<ScoreBoard> viewScoreBoard(@RequestBody ScoreBoardModel scoreBoardModel) {
+    public ResponseEntity<?> viewScoreBoard(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoard(scoreBoardModel)));
     }
 
@@ -52,7 +52,7 @@ public class ScoreBoardController {
     }
 
     @PostMapping("/extra-sb")
-    public ResponseEntity<ExtraRuns> viewExtraRuns(@RequestBody ScoreBoardModel scoreBoardModel) {
+    public ResponseEntity<?> viewExtraRuns(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewExtraRuns(scoreBoardModel)));
     }
 
