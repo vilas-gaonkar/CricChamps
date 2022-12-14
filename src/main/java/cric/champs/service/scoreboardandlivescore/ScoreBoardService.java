@@ -26,21 +26,21 @@ public class ScoreBoardService implements ScoreboardInterface {
 
     @Override
     public ScoreBoardResult viewScoreBoardResults(ScoreBoardModel scoreBoardModel) {
-        ScoreBoard scoreBoard = viewScoreBoard(scoreBoardModel);
+        List<ScoreBoard> scoreBoard = viewScoreBoard(scoreBoardModel);
         List<BatsmanSB> batsmanSB = viewBatsmanSB(scoreBoardModel);
         List<BowlerSB> bowlerSB = viewBowlerSB(scoreBoardModel);
-        ExtraRuns extraRuns = viewExtraRuns(scoreBoardModel);
+        List<ExtraRuns> extraRuns = viewExtraRuns(scoreBoardModel);
         List<FallOfWicketSB> fallOfWicketSB = viewFallOfWickets(scoreBoardModel);
         return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB);
     }
 
     @Override
-    public ScoreBoard viewScoreBoard(ScoreBoardModel scoreBoardModel) {
+    public List<ScoreBoard> viewScoreBoard(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ScoreBoard.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
-                scoreBoardModel.getTeamId()).get(0);
+                scoreBoardModel.getTeamId());
     }
 
     @Override
@@ -56,25 +56,26 @@ public class ScoreBoardService implements ScoreboardInterface {
     public List<BowlerSB> viewBowlerSB(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from bowlerSB where tournamentId = ? and matchId = ? and teamId = ?",
+        return jdbcTemplate.query("select * from bowlingSB where tournamentId = ? and teamId in (" +
+                        "select teamId from versus where matchId = ? and teamId != ?)",
                 new BeanPropertyRowMapper<>(BowlerSB.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
     }
 
     @Override
-    public ExtraRuns viewExtraRuns(ScoreBoardModel scoreBoardModel) {
+    public List<ExtraRuns> viewExtraRuns(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from bowlerSB where tournamentId = ? and matchId = ? and teamId = ?",
+        return jdbcTemplate.query("select * from extraRuns where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ExtraRuns.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
-                scoreBoardModel.getTeamId()).get(0);
+                scoreBoardModel.getTeamId());
     }
 
     @Override
     public List<FallOfWicketSB> viewFallOfWickets(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from bowlerSB where tournamentId = ? and matchId = ? and teamId = ?",
+        return jdbcTemplate.query("select * from fallOfWicketSb where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(FallOfWicketSB.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
     }
