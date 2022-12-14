@@ -384,13 +384,37 @@ public class LiveScoreService implements LiveInterface {
             jdbcTemplate.update("update bowlingSB set runs = runs + ?,overs = overs + ? ,balls = 0 where playerId = ?",
                     liveScoreUpdateModel.getRuns(), getOverCount(liveScoreUpdateModel.getBall()), liveScoreUpdateModel.getBowlerId());
         if (liveScoreUpdateModel.getBall() == 6)
-            updateEconomyRate(liveScoreUpdateModel.getBowlerId());
+            updateEconomyRate(liveScoreUpdateModel);
     }
 
-    private void updateEconomyRate(Long bowlerId) {
-        BowlerSB bowlerSB = getBowlerSB(bowlerId).get(0);
+    private void updateEconomyRate(LiveScoreUpdate liveScoreUpdateModel) {
+        BowlerSB bowlerSB = getBowlerSB(liveScoreUpdateModel.getBowlerId()).get(0);
+        Teams team = getBowlingTeamId(liveScoreUpdateModel);
+        Players player = getPlayerDetail(liveScoreUpdateModel.getBowlerId());
         jdbcTemplate.update("update bowlingSB set economyRate = ? , bowlerStatus = ? where playerId = ?",
-                getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), BowlingStatus.DONE.toString(), bowlerId);
+                getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), BowlingStatus.DONE.toString(),
+                liveScoreUpdateModel.getBowlerId());
+        if (getPlayerStats(liveScoreUpdateModel.getBowlerId()).isEmpty())
+            jdbcTemplate.update("insert into playerStats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    liveScoreUpdateModel.getBowlerId(), liveScoreUpdateModel.getTournamentId(), team.getTeamId(),
+                    player.getPlayerName(), 0, 0, 0, 0, 0, 0, 0, 0, getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
+                    getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), getWicketHaul(bowlerSB));
+        else
+            jdbcTemplate.update("update playerStats set bestBowlingAverage = ? , bestBowlingEconomy = ? , " +
+                            "mostFiveWicketsHaul = mostFiveWicketsHaul + ? where playerId = ?",
+                    getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
+                    getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), getWicketHaul(bowlerSB),
+                    bowlerSB.getPlayerId());
+    }
+
+    private int getWicketHaul(BowlerSB bowlerSB) {
+        return bowlerSB.getWickets() == 5 ? 1 : 0;
+    }
+
+    private Teams getBowlingTeamId(LiveScoreUpdate liveScoreUpdateModel) {
+        return jdbcTemplate.query("select * from teams where teamId in (select teamId from versus where matchId = ? and teamId != ?)",
+                new BeanPropertyRowMapper<>(Teams.class), liveScoreUpdateModel.getMatchId(),
+                liveScoreUpdateModel.getBattingTeamId()).get(0);
     }
 
     private int getOverCount(int ball) {
@@ -406,8 +430,7 @@ public class LiveScoreService implements LiveInterface {
     }
 
     private void insertIntoPlayerStats(LiveScoreUpdate liveScoreUpdateModel, int currentRuns, int fourCount, int sixCount) {
-        List<PlayerStats> playerStat = jdbcTemplate.query("select * from playerStats where playerId = ?",
-                new BeanPropertyRowMapper<>(PlayerStats.class), liveScoreUpdateModel.getStrikeBatsmanId());
+        List<PlayerStats> playerStat = getPlayerStats(liveScoreUpdateModel.getStrikeBatsmanId());
         Players player = getPlayerDetail(liveScoreUpdateModel.getStrikeBatsmanId());
         if (playerStat.isEmpty())
             jdbcTemplate.update("insert into playerStats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -417,6 +440,11 @@ public class LiveScoreService implements LiveInterface {
         else
             jdbcTemplate.update("update playerStats set totalFours = totalFours + ? , totalSixes = totalSixes + ? " +
                     "where playerId = ?", fourCount, sixCount, player.getPlayerId());
+    }
+
+    private List<PlayerStats> getPlayerStats(Long playerId) {
+        return jdbcTemplate.query("select * from playerStats where playerId = ?",
+                new BeanPropertyRowMapper<>(PlayerStats.class), playerId);
     }
 
     private int isSix(int runs) {
@@ -486,16 +514,16 @@ public class LiveScoreService implements LiveInterface {
         return numberOfBallFaced == 0 ? 0 : runsScored / numberOfBallFaced * 100;
     }
 
+    private double getBattingAverage(int totalScoreOfBatsman, int numberOfTimesHeHasBeenOut) {
+        return numberOfTimesHeHasBeenOut == 0 ? totalScoreOfBatsman : totalScoreOfBatsman / numberOfTimesHeHasBeenOut;
+    }
+
     private double getBowlingStrikeRate(int numberBowledDeliveries, int numberOfWicketTaken) {
         return numberOfWicketTaken == 0 ? 0 : numberBowledDeliveries / numberOfWicketTaken;
     }
 
-    private double getBattingAverage(int totalScoreOfBatsman, int numberOfTimesHeHasBeenOut) {
-        return numberOfTimesHeHasBeenOut == 0 ? 0 : totalScoreOfBatsman / numberOfTimesHeHasBeenOut;
-    }
-
     private double getBowlingAverage(int numberOfRunsConceded, int numberOfWicketTaken) {
-        return numberOfWicketTaken == 0 ? 0 : numberOfRunsConceded / numberOfWicketTaken;
+        return numberOfWicketTaken == 0 ? numberOfRunsConceded : numberOfRunsConceded / numberOfWicketTaken;
     }
 
     private double getBowlingEconomy(int numberOfRunsConceded, int numberOfOverBowled) {
