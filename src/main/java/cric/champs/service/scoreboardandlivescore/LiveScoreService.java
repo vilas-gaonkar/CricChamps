@@ -266,8 +266,9 @@ public class LiveScoreService implements LiveInterface {
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             updateBowlerSBForExtra(liveScoreUpdateModel, scoreBoardId);
             updateExtraRuns(liveScoreUpdateModel.getExtraModel().getExtraType(), liveScoreUpdateModel.getRuns(), scoreBoardId);
-            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()))
-                updateBatsmanSBForLegBye(liveScoreUpdateModel, scoreBoardId);
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
+                updateBatsmanSBForLegByeOrBye(liveScoreUpdateModel, scoreBoardId);
             else
                 simplyRotateStrikeForExtra(liveScoreUpdateModel, scoreBoardId);
         } else {
@@ -306,16 +307,16 @@ public class LiveScoreService implements LiveInterface {
                 batsmanId).get(0);
     }
 
-    private void updateBatsmanSBForLegBye(LiveScoreUpdate liveScoreUpdateModel, Long scoreBoardId) {
+    private void updateBatsmanSBForLegByeOrBye(LiveScoreUpdate liveScoreUpdateModel, Long scoreBoardId) {
         String strikePosition = getStrikePositionForExtra(liveScoreUpdateModel.getRuns());
-        doStrikeRotationForLegBye(strikePosition, liveScoreUpdateModel.getStrikeBatsmanId(), scoreBoardId);
+        doStrikeRotationForLegByeOrBye(strikePosition, liveScoreUpdateModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
-            doStrikeRotationForLegBye(StrikePosition.NONSTRIKE.toString(), liveScoreUpdateModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationForLegByeOrBye(StrikePosition.NONSTRIKE.toString(), liveScoreUpdateModel.getNonStrikeBatsmanId(), scoreBoardId);
         else
-            doStrikeRotationForLegBye(StrikePosition.STRIKE.toString(), liveScoreUpdateModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationForLegByeOrBye(StrikePosition.STRIKE.toString(), liveScoreUpdateModel.getNonStrikeBatsmanId(), scoreBoardId);
     }
 
-    private void doStrikeRotationForLegBye(String strikePosition, Long batsmanId, Long scoreBoardId) {
+    private void doStrikeRotationForLegByeOrBye(String strikePosition, Long batsmanId, Long scoreBoardId) {
         jdbcTemplate.update("update batsmanSB set balls = balls + 1 , strikePosition = ? where scoreBoardId = ? " +
                 "and playerId = ?", strikePosition, scoreBoardId, batsmanId);
     }
