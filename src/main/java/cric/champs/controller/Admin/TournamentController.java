@@ -2,6 +2,7 @@ package cric.champs.controller.Admin;
 
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.customexceptions.FixtureGenerationException;
+import cric.champs.livescorerequestmodels.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.TournamentResultModel;
@@ -59,7 +60,7 @@ public class TournamentController {
     }
 
     @DeleteMapping("/cancel")
-    public ResponseEntity<SuccessResultModel> cancelTournament(@RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> cancelTournament(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.cancelTournament(tournamentId)));
     }
 
@@ -94,5 +95,12 @@ public class TournamentController {
     @PatchMapping("/set-overs")
     public ResponseEntity<SuccessResultModel> setTournamentOver(@RequestHeader long tournamentId, @RequestHeader int numberOfOvers) {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentOver(tournamentId, numberOfOvers)));
+    }
+
+    @PatchMapping("/set-dates-time")
+    public ResponseEntity<SuccessResultModel> setTournamentDateTimes(@ModelAttribute SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
+        return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTime(setDateTimeModel.getTournamentId(),
+                setDateTimeModel.getStartDate(), setDateTimeModel.getEndDate(), setDateTimeModel.getStartTime(),
+                setDateTimeModel.getEndTime())));
     }
 }

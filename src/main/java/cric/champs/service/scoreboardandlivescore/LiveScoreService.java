@@ -3,6 +3,7 @@ package cric.champs.service.scoreboardandlivescore;
 import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.entity.*;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
+import cric.champs.livescorerequestmodels.WicketModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.MatchStatus;
@@ -558,6 +559,18 @@ public class LiveScoreService implements LiveInterface {
 
     private double requiredRunRate(Integer runNeededToWin, Integer remainingOvers) {
         return runNeededToWin.doubleValue() / remainingOvers.doubleValue();
+    }
+
+    /**
+     * update wicket in match
+     * @param wicketModel
+     * @return
+     * @throws LiveScoreUpdationException
+     */
+
+    @Override
+    public SuccessResultModel updateWicket(WicketModel wicketModel) throws LiveScoreUpdationException {
+        return null;
     }
 
 }
