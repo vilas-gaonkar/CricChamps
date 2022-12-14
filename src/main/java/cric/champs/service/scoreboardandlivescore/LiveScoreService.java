@@ -172,11 +172,11 @@ public class LiveScoreService implements LiveInterface {
 
     private void addPartnershipDetails(LiveScoreUpdate liveScoreUpdateModel) {
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
-            if(liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
-            liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.bye))
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.bye))
                 insertIntoParnership(liveScoreUpdateModel, 1);
             else
-                insertIntoParnership(liveScoreUpdateModel,0);
+                insertIntoParnership(liveScoreUpdateModel, 0);
         else
             insertIntoParnership(liveScoreUpdateModel, 1);
     }
@@ -389,8 +389,8 @@ public class LiveScoreService implements LiveInterface {
 
     private void updateEconomyRate(Long bowlerId) {
         BowlerSB bowlerSB = getBowlerSB(bowlerId).get(0);
-        jdbcTemplate.update("update bowlingSB set economyRate = ? where playerId = ?",
-                getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), bowlerId);
+        jdbcTemplate.update("update bowlingSB set economyRate = ? , bowlerStatus = ? where playerId = ?",
+                getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), BowlingStatus.DONE.toString(), bowlerId);
     }
 
     private int getOverCount(int ball) {
