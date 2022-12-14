@@ -2,12 +2,10 @@ package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.Live;
 import cric.champs.livescorerequestmodels.LiveScoreModel;
-import cric.champs.livescorerequestmodels.ScoreBoardModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.LiveScoreResult;
-import cric.champs.resultmodels.LiveScoreUpdateResult;
+import cric.champs.resultmodels.SuccessResultModel;
 
-import javax.swing.*;
 import java.util.List;
 
 public interface LiveResultInterface {
@@ -26,5 +24,5 @@ public interface LiveResultInterface {
 
     List<Commentary> viewCommentary(LiveScoreModel liveScoreModel);
 
-
+    SuccessResultModel stopMatch(LiveScoreModel liveScoreModel, String reason);
 }

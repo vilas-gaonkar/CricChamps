@@ -5,8 +5,10 @@ import cric.champs.entity.Teams;
 import cric.champs.livescorerequestmodels.LiveScoreModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.LiveScoreResult;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.BatsmanStatus;
 import cric.champs.service.BowlingStatus;
+import cric.champs.service.MatchStatus;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -87,4 +89,12 @@ public class LiveScoreResultService implements LiveResultInterface {
         return jdbcTemplate.query("select * from commentary where matchId = ? and tournamentId = ? order by commentaryId DESC",
                 new BeanPropertyRowMapper<>(Commentary.class), liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
     }
+
+    @Override
+    public SuccessResultModel stopMatch(LiveScoreModel liveScoreModel, String reason) {
+        jdbcTemplate.update("update matches set matchStatus = ? , isCancelled = 'true' where tournamentId = ? and matchId = ?",
+                MatchStatus.ABANDONED.toString(), liveScoreModel.getTournamentId(), liveScoreModel.getMatchId());
+        return new SuccessResultModel("Match cancelled Successfully");
+    }
+
 }
