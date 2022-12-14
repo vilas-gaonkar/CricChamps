@@ -171,13 +171,17 @@ public class FixtureService implements FixtureGenerationInterface {
                 matchNumber++;
             }
             if (isBye) {
-                jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournament.getTournamentId(), null, null, null, null,
-                        round, matchNumber, MatchStatus.BYE.toString(), LocalDate.now(), DayOfWeek.from(LocalDate.now()).name(), LocalTime.now(), LocalTime.now(), "false", null);
+                jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
+                        tournament.getTournamentId(), null, null, null, null, round, matchNumber,
+                        MatchStatus.BYE.toString(), LocalDate.now(), DayOfWeek.from(LocalDate.now()).name(),
+                        LocalTime.now(), LocalTime.now(), 0, "false", null);
                 Matches matches = jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
                         new BeanPropertyRowMapper<>(Matches.class)).get(0);
-                jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matches.getMatchId(), byeTeamId, systemInterface.
-                        verifyTeamDetails(byeTeamId, tournament.getTournamentId()).get(0).getTeamName(), 0, 0, 0, 0, VersusStatus.WIN.toString(), "false");
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?", TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
+                jdbcTemplate.update("insert into versus values(?,?,?,?,?,?,?,?,?)", matches.getMatchId(),
+                        byeTeamId, systemInterface.verifyTeamDetails(byeTeamId, tournament.getTournamentId()).get(0).getTeamName(),
+                        0, 0, 0, 0, VersusStatus.WIN.toString(), "false");
+                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",
+                        TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
                 matchNumber++;
             }
             for (int teamIdIndex = 0; teamIdIndex < dummyMatch; teamIdIndex++) {
@@ -187,7 +191,8 @@ public class FixtureService implements FixtureGenerationInterface {
                     startDateTime = LocalDateTime.of(startDate, tournament.getTournamentStartTime().toLocalTime());
                     endDateTime = endDateTime.plusDays(1);
                 }
-                insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startDateTime.toLocalTime(), startDateTime.toLocalTime().plusHours(hour), startDate);
+                insertIntoMatchesOfLeague(tournament.getTournamentId(), round, matchNumber, startDateTime.toLocalTime(),
+                        startDateTime.toLocalTime().plusHours(hour), startDate);
                 startDateTime = startDateTime.plusHours(hour);
                 matchNumber++;
             }
@@ -502,8 +507,9 @@ public class FixtureService implements FixtureGenerationInterface {
      * add matches for tournament
      */
     private Matches insertIntoMatchesOfLeague(long tournamentId, int round, int matchNumber, LocalTime startTime, LocalTime endTime, LocalDate matchDate) {
-        jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournamentId, null, null, null, null,
-                round, matchNumber, MatchStatus.UPCOMING.toString(), matchDate, DayOfWeek.from(matchDate).name(), startTime, endTime, "false", null);
+        jdbcTemplate.update("insert into matches values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, tournamentId,
+                null, null, null, null, round, matchNumber, MatchStatus.UPCOMING.toString(), matchDate,
+                DayOfWeek.from(matchDate).name(), startTime, endTime, 0, "false", null);
         return jdbcTemplate.query("SELECT * FROM matches ORDER BY matchId DESC LIMIT 1",
                 new BeanPropertyRowMapper<>(Matches.class)).get(0);
     }
