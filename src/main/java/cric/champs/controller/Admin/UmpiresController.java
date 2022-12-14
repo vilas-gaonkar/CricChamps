@@ -36,7 +36,7 @@ public class UmpiresController {
         else if (profilePhoto.isEmpty())
             umpire.setUmpirePhoto(null);
         else
-            result = uploadImageTOCloud.uploadImage(profilePhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(profilePhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             umpire.setUmpirePhoto(result.get("url").toString());
@@ -51,7 +51,7 @@ public class UmpiresController {
         else if (profilePhoto.isEmpty())
             umpire.setUmpirePhoto(null);
         else
-            result = uploadImageTOCloud.uploadImage(profilePhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(profilePhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             umpire.setUmpirePhoto(result.get("url").toString());

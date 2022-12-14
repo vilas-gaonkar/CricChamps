@@ -34,7 +34,7 @@ public class PlayerController {
         else if (playerPhoto.isEmpty())
             player.setProfilePhoto(null);
         else
-            result = uploadImageTOCloud.uploadImage(playerPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(playerPhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             player.setProfilePhoto(result.get("url").toString());
@@ -50,7 +50,7 @@ public class PlayerController {
         else if (playerPhoto.isEmpty())
             player.setProfilePhoto(null);
         else
-            result = uploadImageTOCloud.uploadImage(playerPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(playerPhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             player.setProfilePhoto(result.get("url").toString());

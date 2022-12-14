@@ -41,7 +41,7 @@ public class TournamentController {
         else if (logo.isEmpty())
             tournament.setTournamentLogo(null);
         else
-            result = uploadImageTOCloud.uploadImage(logo.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(logo.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             tournament.setTournamentLogo(result.get("url").toString());

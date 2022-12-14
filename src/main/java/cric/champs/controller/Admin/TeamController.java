@@ -36,7 +36,7 @@ public class TeamController {
         else if (teamPhoto.isEmpty())
             team.setTeamLogo(null);
         else
-            result = uploadImageTOCloud.uploadImage(teamPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(teamPhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
 
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
@@ -51,7 +51,7 @@ public class TeamController {
         else if (teamPhoto.isEmpty())
             team.setTeamLogo(null);
         else
-            result = uploadImageTOCloud.uploadImage(teamPhoto.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+            result = uploadImageTOCloud.uploadImage(teamPhoto.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
         if (result != null)
             team.setTeamLogo(result.get("url").toString());
         return ResponseEntity.of(Optional.of(teamInterface.editTeam(team)));

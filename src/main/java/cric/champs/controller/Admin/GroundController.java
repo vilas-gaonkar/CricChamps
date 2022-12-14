@@ -40,7 +40,7 @@ public class GroundController {
             groundPhotos = new ArrayList<>();
         else
             for (MultipartFile file : groundPhoto) {
-                result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource type", "auto"));
+                result = uploadImageTOCloud.uploadImage(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
                 groundPhotos.add(result.get("url").toString());
             }
         return ResponseEntity.of(Optional.of(groundInterface.registerGrounds(ground, groundPhotos)));
