@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+@SuppressWarnings("rawtypes")
 @RestController
 @RequestMapping("/team")
 public class TeamController {

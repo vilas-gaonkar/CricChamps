@@ -1,13 +1,8 @@
 package cric.champs.controller.user;
 
 import cric.champs.customexceptions.LiveScoreUpdationException;
-import cric.champs.entity.ScoreBoard;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
 import cric.champs.livescorerequestmodels.ScoreBoardModel;
-import cric.champs.model.BatsmanSB;
-import cric.champs.model.BowlerSB;
-import cric.champs.model.ExtraRuns;
-import cric.champs.model.FallOfWicketSB;
 import cric.champs.resultmodels.ScoreBoardResult;
 import cric.champs.service.scoreboardandlivescore.LiveInterface;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
