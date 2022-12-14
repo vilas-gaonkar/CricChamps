@@ -18,9 +18,9 @@ import java.util.List;
 @NoArgsConstructor
 public class ScoreBoardResult {
 
-    private List<ScoreBoard> scoreBoard;
+    private ScoreBoard scoreBoard;
 
-    private List<ExtraRuns> extraRuns;
+    private ExtraRuns extraRuns;
 
     private List<BatsmanSB> batsmanSB;
 

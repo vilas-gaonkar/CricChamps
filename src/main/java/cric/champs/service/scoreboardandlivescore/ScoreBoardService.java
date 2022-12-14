@@ -26,21 +26,22 @@ public class ScoreBoardService implements ScoreboardInterface {
 
     @Override
     public ScoreBoardResult viewScoreBoardResults(ScoreBoardModel scoreBoardModel) {
-        List<ScoreBoard> scoreBoard = viewScoreBoard(scoreBoardModel);
+        ScoreBoard scoreBoard = viewScoreBoard(scoreBoardModel);
         List<BatsmanSB> batsmanSB = viewBatsmanSB(scoreBoardModel);
         List<BowlerSB> bowlerSB = viewBowlerSB(scoreBoardModel);
-        List<ExtraRuns> extraRuns = viewExtraRuns(scoreBoardModel);
+        ExtraRuns extraRuns = viewExtraRuns(scoreBoardModel);
         List<FallOfWicketSB> fallOfWicketSB = viewFallOfWickets(scoreBoardModel);
         return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB);
     }
 
     @Override
-    public List<ScoreBoard> viewScoreBoard(ScoreBoardModel scoreBoardModel) {
+    public ScoreBoard viewScoreBoard(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
+        List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ScoreBoard.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
+        return scoreBoard.isEmpty() ? null : scoreBoard.get(0);
     }
 
     @Override
@@ -63,12 +64,13 @@ public class ScoreBoardService implements ScoreboardInterface {
     }
 
     @Override
-    public List<ExtraRuns> viewExtraRuns(ScoreBoardModel scoreBoardModel) {
+    public ExtraRuns viewExtraRuns(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentId(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from extraRuns where tournamentId = ? and matchId = ? and teamId = ?",
+        List<ExtraRuns> extraRuns = jdbcTemplate.query("select * from extraRuns where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ExtraRuns.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
+        return extraRuns.isEmpty() ? null : extraRuns.get(0);
     }
 
     @Override
