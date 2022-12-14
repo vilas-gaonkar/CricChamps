@@ -261,7 +261,7 @@ public class LiveScoreService implements LiveInterface {
     private void updateScoreBoard(Tournaments tournaments, Matches matches, LiveScoreUpdate liveScoreUpdateModel) {
         Long scoreBoardId = getScoreBoardId(tournaments.getTournamentId(), matches.getMatchId(),
                 liveScoreUpdateModel.getBattingTeamId());
-        jdbcTemplate.update("update scoreBoard set over = ? , ball = ? , score = score + ? where scoreBoardId = ?",
+        jdbcTemplate.update("update scoreBoard set overs = ? , ball = ? , score = score + ? where scoreBoardId = ?",
                 liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), liveScoreUpdateModel.getRuns(), scoreBoardId);
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             updateBowlerSBForExtra(liveScoreUpdateModel, scoreBoardId);
@@ -348,6 +348,14 @@ public class LiveScoreService implements LiveInterface {
             insertNewBowlerToScoreBoard(liveScoreUpdateModel, scoreBoardId);
         jdbcTemplate.update("update bowlingSB set runs = runs + ?,overs = overs + ? ,balls = 0 where plaeryId = ?",
                 liveScoreUpdateModel.getRuns(), getOverCount(liveScoreUpdateModel.getBall()), liveScoreUpdateModel.getBowlerId());
+        if (liveScoreUpdateModel.getBall() == 6)
+            updateEconomyRate(liveScoreUpdateModel.getBowlerId());
+    }
+
+    private void updateEconomyRate(Long bowlerId) {
+        BowlerSB bowlerSB = getBowlerSB(bowlerId).get(0);
+        jdbcTemplate.update("update bowlingSB set economyRate = ? where plaeryId = ?",
+                getBowlingEconomy(bowlerSB.getRuns(),bowlerSB.getOvers()), bowlerId);
     }
 
     private int getOverCount(int ball) {
