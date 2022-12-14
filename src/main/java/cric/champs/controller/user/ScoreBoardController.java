@@ -8,10 +8,7 @@ import cric.champs.service.scoreboardandlivescore.LiveInterface;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -25,8 +22,8 @@ public class ScoreBoardController {
     @Autowired
     LiveInterface liveInterface;
 
-    @PostMapping("/view-all")
-    public ResponseEntity<ScoreBoardResult> scoreBoardResult(@RequestBody ScoreBoardModel scoreBoardModel) {
+    @GetMapping("/view-all")
+    public ResponseEntity<ScoreBoardResult> scoreBoardResult(@ModelAttribute ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoardResults(scoreBoardModel)));
     }
 
