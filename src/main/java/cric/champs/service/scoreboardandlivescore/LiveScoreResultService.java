@@ -1,7 +1,6 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.Live;
-import cric.champs.entity.Teams;
 import cric.champs.livescorerequestmodels.LiveScoreModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.LiveScoreResult;
@@ -58,11 +57,9 @@ public class LiveScoreResultService implements LiveResultInterface {
     public BowlerSB viewBowlerSB(LiveScoreModel liveScoreModel) {
         if (systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        List<Teams> teams = jdbcTemplate.query("select * from teams where teamId in (select teamId from versus where " +
-                        "matchId = ? and teamId != ?)", new BeanPropertyRowMapper<>(Teams.class), liveScoreModel.getMatchId(),
-                liveScoreModel.getBattingTeamId());
-        return jdbcTemplate.query("select * from bowlingSB where teamId = ? and matchId = ? and bowlerStatus = ?",
-                new BeanPropertyRowMapper<>(BowlerSB.class), teams.get(0).getTeamId(), liveScoreModel.getMatchId(),
+        return jdbcTemplate.query("select * from bowlingSB where teamId in (select teamId from versus where " +
+                        "teamId != ? ana matchId = ?) and bowlerStatus = ?",
+                new BeanPropertyRowMapper<>(BowlerSB.class), liveScoreModel.getBattingTeamId(), liveScoreModel.getMatchId(),
                 BowlingStatus.BOWLING.toString()).get(0);
     }
 
