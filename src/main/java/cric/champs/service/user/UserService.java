@@ -231,7 +231,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyTimeDurationGiven(tournamentId))
             throw new FixtureGenerationException("Insufficient time for fixture generation");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
-                "tournamentEndDate = ? where tournamentId = ? and isDeleted = 'false'", startTime, endTime, startDate, endDate, tournamentId);
+                "tournamentEndDate = ? where tournamentId = ? and tournamentStatus = 'UPCOMING'", startTime, endTime, startDate, endDate, tournamentId);
         return new SuccessResultModel("Date and Time updated successfully");
     }
 
