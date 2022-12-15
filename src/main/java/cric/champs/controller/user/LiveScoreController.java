@@ -17,7 +17,7 @@ public class LiveScoreController {
     @Autowired
     LiveResultInterface liveResultInterface;
 
-    @GetMapping("/view-all")
+    @PostMapping("/view-all")
     public ResponseEntity<LiveScoreResult> liveScoreResult(@ModelAttribute LiveScoreModel liveScoreModel) {
         return ResponseEntity.of(Optional.of(liveResultInterface.viewLiveScoreResult(liveScoreModel)));
     }

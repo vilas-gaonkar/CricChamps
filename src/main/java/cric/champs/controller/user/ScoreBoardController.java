@@ -22,7 +22,7 @@ public class ScoreBoardController {
     @Autowired
     LiveInterface liveInterface;
 
-    @GetMapping("/view-all")
+    @PostMapping("/view-all")
     public ResponseEntity<ScoreBoardResult> scoreBoardResult(@ModelAttribute ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoardResults(scoreBoardModel)));
     }
