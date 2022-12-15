@@ -14,7 +14,7 @@ public class Commentary {
 
     private int overs;
 
-    private String balls;
+    private int balls;
 
     private int runs;
 

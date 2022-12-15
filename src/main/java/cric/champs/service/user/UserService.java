@@ -392,7 +392,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new Exception("Individual match should not contain more than two teams");
         jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
                 teams.getTeamName(), null, teams.getCity(), 0, 0, 0, 0, 0, 0, 0, 0, teams.getTeamLogo(), null, "false");
-        Teams team = jdbcTemplate.query("select *  from teams order by teamId desc", new BeanPropertyRowMapper<>(Teams.class)).get(0);
+        jdbcTemplate.update("update tournaments set numberOfTeams = numberOfTeams + 1 where tournamentId = ?",
+                teams.getTournamentId());
+        Teams team = jdbcTemplate.query("select *  from teams order by teamId desc limit 1",
+                new BeanPropertyRowMapper<>(Teams.class)).get(0);
         return new TeamResultModel(team.getTeamId(), team.getTeamName(), "Team created successfully");
     }
 

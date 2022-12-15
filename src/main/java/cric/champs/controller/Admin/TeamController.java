@@ -9,6 +9,7 @@ import cric.champs.service.user.TeamInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ public class TeamController {
     private TeamInterface teamInterface;
 
     @PostMapping("/create")
-    public HttpEntity<TeamResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws Exception {
+    public HttpEntity<TeamResultModel> register(@ModelAttribute @Valid Teams team, @RequestPart @Nullable MultipartFile teamPhoto) throws Exception {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
@@ -44,7 +45,7 @@ public class TeamController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Teams team, @RequestPart MultipartFile teamPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Teams team, @RequestPart @Nullable MultipartFile teamPhoto) throws IOException {
         Map result = null;
         if (teamPhoto == null)
             team.setTeamLogo(null);
