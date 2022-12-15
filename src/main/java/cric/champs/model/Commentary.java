@@ -10,16 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Commentary {
-
-    private long commentaryId;
-
     private  long liveId;
-
-    private long tournamentId;
-
-    private long matchId;
-
-    private long teamId;
 
     private int overs;
 
