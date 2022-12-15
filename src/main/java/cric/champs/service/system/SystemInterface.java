@@ -60,4 +60,6 @@ public interface SystemInterface {
     List<Matches> verifyMatchId(Long tournamentId, Long matchId);
 
     boolean validateTime(LocalTime startTime, LocalTime endTime, int numberOfOvers);
+
+    List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId);
 }

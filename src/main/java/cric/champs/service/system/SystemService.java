@@ -270,4 +270,9 @@ public class SystemService implements SystemInterface {
                 new BeanPropertyRowMapper<>(Umpires.class), umpireId, tournamentId);
     }
 
+    @Override
+    public List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId) {
+        return jdbcTemplate.query("select * from tournaments where tournamentId = ? and tournamentStatus != ?",
+                new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, TournamentStatus.CANCELLED.toString());
+    }
 }
