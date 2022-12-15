@@ -214,17 +214,19 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         jdbcTemplate.update("update tournaments set tournamentStartDate = ? , tournamentEndDate = ? where " +
-                "tournamentId = ? and isDeleted = 'false'", startDate, endDate, tournamentId);
+                "tournamentId = ? and tournamentStatus = 'UPCOMING'", startDate, endDate, tournamentId);
         return new SuccessResultModel("date updated successfully");
     }
 
     @Override
-    public SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+    public SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException {
+        List<Tournaments> tournament = systemInterface.verifyTournamentId(tournamentId);
+        if (tournament.isEmpty())
             throw new NullPointerException("Tournament not found");
-
+        if (!systemInterface.validateTime(startTime, endTime, tournament.get(0).getNumberOfOvers()))
+            throw new FixtureGenerationException("Insufficient time to generate fixture");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? where " +
-                "tournamentId = ? and isDeleted = 'false'", startTime, endTime, tournamentId);
+                "tournamentId = ? and tournamentStatus = 'UPCOMING'", startTime, endTime, tournamentId);
         return new SuccessResultModel("Time updated successfully");
     }
 
@@ -233,8 +235,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (!systemInterface.verifyTimeDurationGiven(setDateTimeModel))
             throw new FixtureGenerationException("Insufficient time for fixture generation");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
-                "tournamentEndDate = ? where tournamentId = ? and isDeleted = 'false'", setDateTimeModel.getStartDate(),
-                setDateTimeModel.getEndDate(),setDateTimeModel.getStartTime(),setDateTimeModel.getEndTime(),
+                        "tournamentEndDate = ? where tournamentId = ? and tournamentStatus = 'UPCOMING'", setDateTimeModel.getStartTime(),
+                setDateTimeModel.getEndTime(), setDateTimeModel.getStartDate(), setDateTimeModel.getEndDate(),
                 setDateTimeModel.getTournamentId());
         return new SuccessResultModel("Date and Time updated successfully");
     }
@@ -278,8 +280,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         if (systemInterface.verifyGroundId(groundId, tournamentId).isEmpty())
             throw new NullPointerException("Ground not found");
         jdbcTemplate.update("update grounds set isDeleted = 'true' where groundId = ?", groundId);
-        jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId in" +
-                "(select tournamentId from grounds where groundId = ?)", groundId);
+        jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId = ?",
+                tournamentId);
         return new SuccessResultModel("Ground has been deleted");
     }
 
@@ -289,15 +291,13 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
             throw new NullPointerException("Invalid ground");
         if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
             throw new NullPointerException("latitude and longitude already added");
-        jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?," +
+        jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?" +
                         " where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
                 ground.getLatitude(), ground.getLongitude(), ground.getGroundId());
         jdbcTemplate.update("delete from groundPhotos where groundId = ?", ground.getGroundId());
         if (!groundPhoto.isEmpty())
             for (String photo : groundPhoto)
                 jdbcTemplate.update("insert into groundPhotos values(?,?)", ground.getGroundId(), photo);
-        jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds + 1 where tournamentId = ?",
-                ground.getTournamentId());
         return new SuccessResultModel("Ground details updated successfully");
     }
 
@@ -305,8 +305,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public GroundResult getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
-        List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
+        int offset = pageSize * (pageNumber - 1);
+        List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'" +
+                " limit ? offset ?", new BeanPropertyRowMapper<>(Grounds.class), tournamentId, pageSize, offset);
         List<GroundPhotos> groundPhotos = new ArrayList<>();
         for (Grounds ground : grounds)
             groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
