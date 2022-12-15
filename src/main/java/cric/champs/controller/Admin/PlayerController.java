@@ -43,7 +43,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PutMapping("/edit")
-    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Players player, @RequestPart MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> edit(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
