@@ -23,12 +23,12 @@ public class FixtureController {
     @Autowired
     SystemInterface systemInterface;
 
-    @PostMapping("/generate")
+    @GetMapping("/generate")
     public ResponseEntity<SuccessResultModel> generateFixture(@RequestHeader long tournamentId) throws Exception {
         return ResponseEntity.of(Optional.of(fixtureGenerationInterface.generateFixture(tournamentId)));
     }
 
-    @PostMapping("/final")
+    @GetMapping("/final")
     public ResponseEntity<Boolean> generateFix(@RequestHeader long tournamentId) {
         Tournaments tournaments = systemInterface.verifyTournamentId(tournamentId).get(0);
         return ResponseEntity.of(Optional.of(fixtureService.roundRobinGenerationForKnockoutNextMatches(tournaments)));
