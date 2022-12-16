@@ -37,7 +37,6 @@ public class LiveScoreUpdate
         if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus() == null &&
                 liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
             setStatus(liveScoreModel);
-
         if (liveScoreModel.getExtraModel().isExtraStatus())
             updateExtraRuns(liveScoreModel);
         insertNewBowlerToScoreboardOrUpdateExistingBowler(liveScoreModel);
@@ -71,6 +70,8 @@ public class LiveScoreUpdate
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
 
+        if(liveScoreModel.getMatchStatus().equals(MatchStatus.PAST.toString()))
+            throw new LiveScoreUpdationException("Match already completed");
     }
 
 
