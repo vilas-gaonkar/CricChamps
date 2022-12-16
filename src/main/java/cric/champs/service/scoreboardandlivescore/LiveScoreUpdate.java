@@ -351,7 +351,7 @@ public class LiveScoreUpdate
                     liveScoreModel.getBattingTeamId(), player.getPlayerName(), 0, 0, 0, 0, fourCount, sixCount,
                     0, 0, 0, 0, 0, 0);
         else
-            jdbcTemplate.update("update playerStats set totalFours = totalFours + ? , totalSixes = totalSixes + ? " +
+            jdbcTemplate.update("update playerStats set totalFours = totalFours + ? , totalSixes = totalSixes + ? , " +
                     "battingStrikeRate = ? where playerId = ?", fourCount, sixCount, getBattingStrikeRate(liveScoreModel.getRuns(),
                     liveScoreModel.getBall()), player.getPlayerId());
     }
