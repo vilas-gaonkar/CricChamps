@@ -9,11 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnotherLiveScoreModel {
+public class LiveScoreUpdateModel {
 
     private ExtraModel extraModel;
 
-    private AnotherWicketModel wicketModel;
+    private WicketModel wicketModel;
 
     private Long tournamentId;
 
@@ -34,8 +34,6 @@ public class AnotherLiveScoreModel {
     private int ball;
 
     private int runs;
-
-    private String overStatus;
 
     private String matchStatus;
 

@@ -1,20 +1,20 @@
-package cric.champs.livescorerequestmodels;
+package cric.champs.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerStatsModel {
+public class ScoreBoardModel {
 
     private Long tournamentId;
 
-    private Long teamId;
+    private Long matchId;
 
-    private Long playerId;
+    private Long teamId;
 
 }

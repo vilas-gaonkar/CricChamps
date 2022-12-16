@@ -2,7 +2,7 @@ package cric.champs.controller.Admin;
 
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.customexceptions.FixtureGenerationException;
-import cric.champs.livescorerequestmodels.SetDateTimeModel;
+import cric.champs.model.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.TournamentResultModel;

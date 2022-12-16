@@ -3,7 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.entity.*;
 import cric.champs.customexceptions.OTPGenerateException;
-import cric.champs.livescorerequestmodels.SetDateTimeModel;
+import cric.champs.model.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 
