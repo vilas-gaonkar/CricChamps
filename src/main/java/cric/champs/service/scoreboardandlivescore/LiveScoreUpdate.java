@@ -37,10 +37,14 @@ public class LiveScoreUpdate
         if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus() == null &&
                 liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
             setStatus(liveScoreModel);
+
         updateScoreBoard(liveScoreModel);
+
         if (liveScoreModel.getExtraModel().isExtraStatus())
             updateExtraRuns(liveScoreModel);
+
         insertNewBowlerToScoreboardOrUpdateExistingBowler(liveScoreModel);
+
         if (updateAll(liveScoreModel))
             return result(liveScoreModel);
         throw new LiveScoreUpdationException("Invalid data");
@@ -165,17 +169,21 @@ public class LiveScoreUpdate
     }
 
     /**
-     * insert new bowler into scoreboard
+     * insert new bowler into bowling scoreboard
      */
     private void insertNewBowlerToScoreboardOrUpdateExistingBowler(LiveScoreUpdateModel liveScoreModel) {
         if (getBowlerSB(liveScoreModel).isEmpty())
             insertNewBowlerToScoreBoard(liveScoreModel);
-        jdbcTemplate.update("update bowlingSB set runs = runs + ? , balls = ? , wickets = wickets + ? " +
+        jdbcTemplate.update("update bowlingSB set runs = runs + ? , balls = ? , overs = overs + ? , wickets = wickets + ? " +
                         "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
-                getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
+                getOverCounts(liveScoreModel), getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
                         liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
         if (liveScoreModel.getBall() == 5)
             updateEconomyRate(liveScoreModel);
+    }
+
+    private Object getOverCounts(LiveScoreUpdateModel liveScoreModel) {
+        return liveScoreModel.getExtraModel().isExtraStatus() ? 0 : liveScoreModel.getBall() == 5 ? 1 : 0;
     }
 
     private void updateEconomyRate(LiveScoreUpdateModel liveScoreModel) {
@@ -337,7 +345,7 @@ public class LiveScoreUpdate
 
     private void doStrikeRotationForNonStrikes(String strikePosition, Long batsmanId, long scoreBoardId) {
         jdbcTemplate.update("update batsmanSB set strikePosition = ? where scoreBoardId = ? and playerId = ?",
-                strikePosition, batsmanId, scoreBoardId);
+                strikePosition, scoreBoardId, batsmanId);
     }
 
     /**
@@ -396,7 +404,7 @@ public class LiveScoreUpdate
     }
 
     private String getStrikePosition(int runs, int currentBall) {
-        if (currentBall == 0)
+        if (currentBall == 5)
             if (runs % 2 == 0)
                 return StrikePosition.NONSTRIKE.toString();
             else
