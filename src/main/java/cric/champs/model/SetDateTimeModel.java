@@ -1,4 +1,4 @@
-package cric.champs.livescorerequestmodels;
+package cric.champs.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

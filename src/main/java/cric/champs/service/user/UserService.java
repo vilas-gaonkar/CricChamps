@@ -2,7 +2,7 @@ package cric.champs.service.user;
 
 import cric.champs.customexceptions.*;
 import cric.champs.entity.*;
-import cric.champs.livescorerequestmodels.SetDateTimeModel;
+import cric.champs.model.SetDateTimeModel;
 import cric.champs.model.GroundPhotos;
 import cric.champs.resultmodels.GroundResult;
 import cric.champs.resultmodels.SuccessResultModel;

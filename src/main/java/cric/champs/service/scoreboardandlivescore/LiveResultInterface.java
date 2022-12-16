@@ -1,7 +1,7 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.Live;
-import cric.champs.livescorerequestmodels.LiveScoreModel;
+import cric.champs.model.LiveScoreModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.LiveScoreResult;
 import cric.champs.resultmodels.SuccessResultModel;

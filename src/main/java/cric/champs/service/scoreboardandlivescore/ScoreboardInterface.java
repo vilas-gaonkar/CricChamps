@@ -1,7 +1,7 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.ScoreBoard;
-import cric.champs.livescorerequestmodels.ScoreBoardModel;
+import cric.champs.model.ScoreBoardModel;
 import cric.champs.model.BatsmanSB;
 import cric.champs.model.BowlerSB;
 import cric.champs.model.ExtraRuns;

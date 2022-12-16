@@ -1,10 +1,7 @@
 package cric.champs.controller.user;
 
-import cric.champs.customexceptions.LiveScoreUpdationException;
-import cric.champs.livescorerequestmodels.LiveScoreUpdate;
-import cric.champs.livescorerequestmodels.ScoreBoardModel;
+import cric.champs.model.ScoreBoardModel;
 import cric.champs.resultmodels.ScoreBoardResult;
-import cric.champs.service.scoreboardandlivescore.LiveScoreInterface;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +16,6 @@ public class ScoreBoardController {
     @Autowired
     private ScoreboardInterface scoreboardInterface;
 
-    @Autowired
-    LiveScoreInterface liveScoreInterface;
 
     @PostMapping("/view-all")
     public ResponseEntity<ScoreBoardResult> scoreBoardResult(@ModelAttribute ScoreBoardModel scoreBoardModel) {
@@ -51,11 +46,6 @@ public class ScoreBoardController {
     @PostMapping("/fall-of-wicket")
     public ResponseEntity<?> viewFallOfWicketSB(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewFallOfWickets(scoreBoardModel)));
-    }
-
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody LiveScoreUpdate liveScoreUpdate) throws LiveScoreUpdationException {
-        return ResponseEntity.of(Optional.of(liveScoreInterface.updateLiveScore(liveScoreUpdate)));
     }
 
 }

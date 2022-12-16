@@ -1,7 +1,7 @@
 package cric.champs.service.user;
 
 import cric.champs.customexceptions.FixtureGenerationException;
-import cric.champs.livescorerequestmodels.SetDateTimeModel;
+import cric.champs.model.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.TournamentResultModel;
@@ -9,7 +9,6 @@ import cric.champs.resultmodels.TournamentResultModel;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 public interface TournamentInterface {
 
