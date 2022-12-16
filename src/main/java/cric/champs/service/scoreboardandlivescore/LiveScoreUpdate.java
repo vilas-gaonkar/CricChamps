@@ -76,19 +76,27 @@ public class LiveScoreUpdate
 
 
     private void setStatus(LiveScoreUpdateModel liveScoreModel) {
-        jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? and tournamentId = ?",
-                MatchStatus.LIVE.toString(), getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
-                liveScoreModel.getTournamentId());
-        jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
-                TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
-        insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
-                liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
-        insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
-                liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
-        Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
-                liveScoreModel.getBattingTeamId());
-        insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId());
-        insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getNonStrikeBatsmanId());
+        if (getScoreBoard(liveScoreModel).isEmpty()) {
+            jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? and tournamentId = ?",
+                    MatchStatus.LIVE.toString(), getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
+                    liveScoreModel.getTournamentId());
+            jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
+                    TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
+            insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
+                    liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+            insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
+                    liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+            Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                    liveScoreModel.getBattingTeamId());
+            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId());
+            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getNonStrikeBatsmanId());
+        }
+    }
+
+    private List<ScoreBoard> getScoreBoard(LiveScoreUpdateModel liveScoreModel) {
+        return jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
+                new BeanPropertyRowMapper<>(ScoreBoard.class), liveScoreModel.getTournamentId(),
+                liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
     }
 
     private void insertIntoScoreBoardOfTeams(LiveScoreUpdateModel liveScoreModel, long teamId, String teamName) {
@@ -146,14 +154,19 @@ public class LiveScoreUpdate
      * insert new bowler into scoreboard
      */
     private void insertNewBowlerToScoreboardOrUpdateExistingBowler(LiveScoreUpdateModel liveScoreModel) {
-        Players player = getPlayerDetail(liveScoreModel.getBowlerId()).get(0);
         if (getBowlerSB(liveScoreModel).isEmpty())
             insertNewBowlerToScoreBoard(liveScoreModel);
         jdbcTemplate.update("update bowlingSB set runs = runs + ? , balls = ? , wickets = wickets + ? " +
                         "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
                 getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
                         liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
+        if (liveScoreModel.getBall() == 5)
+            updateEconomyRate(liveScoreModel);
+    }
+
+    private void updateEconomyRate(LiveScoreUpdateModel liveScoreModel) {
         BowlerSB bowlerSB = getBowlerSB(liveScoreModel).get(0);
+        Players player = getPlayerDetail(liveScoreModel.getBowlerId()).get(0);
         if (getPlayerStats(liveScoreModel.getBowlerId()).isEmpty())
             jdbcTemplate.update("insert into playerStats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     liveScoreModel.getBowlerId(), liveScoreModel.getTournamentId(), liveScoreModel.getBowlingTeamId(),
