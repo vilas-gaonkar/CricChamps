@@ -173,7 +173,7 @@ public class LiveScoreUpdate
 
     private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
-                liveScoreModel.getBattingTeamId());
+                liveScoreModel.getBowlingTeamId());
         jdbcTemplate.update("insert into bowlingSB values(?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreModel.getBowlingTeamId(), liveScoreModel.getBowlerId(),
                 getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), liveScoreModel.getRuns(), 0,
@@ -329,11 +329,8 @@ public class LiveScoreUpdate
     }
 
     private void doStrikeRotationAndUpdateScoreForCurrentStrikeBatsman(LiveScoreUpdateModel liveScoreModel, String strikePosition) {
-        jdbcTemplate.update("update batsmanSB set runs = runs + ? , fours  = fours + ? , sixes = sixes + ? , " +
-                        "strikeRate = ? , balls = balls + 1 , strikePosition = ?, battingStrikeRate = ? where playerId = ?",
-                liveScoreModel.getRuns(), isFour(liveScoreModel.getRuns()), isSix(liveScoreModel.getRuns()),
-                updatePlayerStats(liveScoreModel), strikePosition, getBattingStrikeRate(liveScoreModel.getRuns(),
-                        liveScoreModel.getBall()), liveScoreModel.getStrikeBatsmanId());
+        jdbcTemplate.update("update batsmanSB set runs = runs + ? ,balls = balls + 1 , strikePosition = ?, battingStrikeRate = ? where playerId = ?",
+                liveScoreModel.getRuns(), updatePlayerStats(liveScoreModel), strikePosition, liveScoreModel.getStrikeBatsmanId());
     }
 
     private double updatePlayerStats(LiveScoreUpdateModel liveScoreModel) {
