@@ -13,10 +13,10 @@ public class WicketModel {
 
     private boolean wicketStatus = false;
 
-    private String outType;
+    private String outType = null;
 
-    private Long fielderId;
+    private Long fielderId = null;
 
-    private Long newBatsmanId;
+    private Long newBatsmanId = null;
 
 }

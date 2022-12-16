@@ -13,6 +13,6 @@ public class ExtraModel {
 
     private boolean extraStatus = false;
 
-    private String extraType;
+    private String extraType = null;
 
 }

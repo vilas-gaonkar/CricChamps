@@ -34,7 +34,8 @@ public class LiveScoreUpdate
         checkValidationBeforeUpdate(liveScoreModel);
         numberOfOversOfTournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0).getNumberOfOvers();
 
-        if (liveScoreModel.getOver() == 0 && liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
+        if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus() == null &&
+                liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
             setStatus(liveScoreModel);
 
         if (liveScoreModel.getExtraModel().isExtraStatus())
@@ -81,8 +82,8 @@ public class LiveScoreUpdate
                 TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
         insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
                 liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
-
-
+        insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
+                liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
         Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
         insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId());

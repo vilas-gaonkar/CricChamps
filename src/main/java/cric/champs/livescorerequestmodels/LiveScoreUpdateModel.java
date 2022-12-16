@@ -35,6 +35,6 @@ public class LiveScoreUpdateModel {
 
     private int runs;
 
-    private String matchStatus;
+    private String matchStatus = null;
 
 }
