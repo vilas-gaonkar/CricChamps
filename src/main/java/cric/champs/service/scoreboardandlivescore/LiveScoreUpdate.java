@@ -147,7 +147,6 @@ public class LiveScoreUpdate
      * insert new bowler into scoreboard
      */
     private void insertNewBowlerToScoreboardOrUpdateExistingBowler(LiveScoreUpdateModel liveScoreModel) {
-        BowlerSB bowlerSB = getBowlerSB(liveScoreModel).get(0);
         Players player = getPlayerDetail(liveScoreModel.getBowlerId()).get(0);
         if (getBowlerSB(liveScoreModel).isEmpty())
             insertNewBowlerToScoreBoard(liveScoreModel);
@@ -155,6 +154,7 @@ public class LiveScoreUpdate
                         "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
                 getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
                         liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
+        BowlerSB bowlerSB = getBowlerSB(liveScoreModel).get(0);
         if (getPlayerStats(liveScoreModel.getBowlerId()).isEmpty())
             jdbcTemplate.update("insert into playerStats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     liveScoreModel.getBowlerId(), liveScoreModel.getTournamentId(), liveScoreModel.getBowlingTeamId(),
