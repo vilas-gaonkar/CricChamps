@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.List;
 
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-public class LiveScoreUpdateUpdate implements LiveScoreUpdateInterface {
+public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -426,8 +426,10 @@ public class LiveScoreUpdateUpdate implements LiveScoreUpdateInterface {
         else if (liveScoreModel.getBall() == 5)
             if (checkForMatchComplete(liveScoreModel)) {
                 updateBowlerStats(liveScoreModel);
-                setTotalRunsInVersus(liveScoreModel);
-                liveScoreModel.setMatchStatus(MatchStatus.PAST.toString());
+                if (setTotalRunsInVersus(liveScoreModel))
+                    liveScoreModel.setMatchStatus(MatchStatus.PAST.toString());
+                else
+                    liveScoreModel.setMatchStatus(MatchStatus.INNINGCOMPLETED.toString());
                 return liveScoreModel;
             } else {
                 rotateBatsmanInOverComplete(liveScoreModel);
@@ -466,7 +468,7 @@ public class LiveScoreUpdateUpdate implements LiveScoreUpdateInterface {
         }
     }
 
-    private void setTotalRunsInVersus(LiveScoreUpdateModel liveScoreModel) {
+    private boolean setTotalRunsInVersus(LiveScoreUpdateModel liveScoreModel) {
         ScoreBoard battingScoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ScoreBoard.class), liveScoreModel.getTournamentId(),
                 liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()).get(0);
@@ -477,11 +479,14 @@ public class LiveScoreUpdateUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getBattingTeamId());
         if (matchResult.equals(VersusStatus.WIN.toString())) {
             updateAnotherTeam(liveScoreModel, VersusStatus.LOSS.toString());
+            return true;
         } else if (matchResult.equals(VersusStatus.LOSS.toString())) {
             updateAnotherTeam(liveScoreModel, VersusStatus.WIN.toString());
+            return true;
         } else if (matchResult.equals(VersusStatus.DRAW.toString())) {
             updateAnotherTeam(liveScoreModel, VersusStatus.DRAW.toString());
-        }
+            return true;
+        } else return false;
     }
 
     private void updateAnotherTeam(LiveScoreUpdateModel liveScoreModel, String matchStatus) {
@@ -495,7 +500,6 @@ public class LiveScoreUpdateUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
         if (scoreBoard.isEmpty())
             return VersusStatus.INNINGCOMPLETE.toString();
-
         return scoreBoard.get(0).getScore() > battingTeam.getScore() ? VersusStatus.WIN.toString() :
                 scoreBoard.get(0).getScore() == battingTeam.getScore() ? VersusStatus.DRAW.toString() :
                         VersusStatus.LOSS.toString();
