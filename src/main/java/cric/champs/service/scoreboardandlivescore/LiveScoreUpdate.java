@@ -37,6 +37,7 @@ public class LiveScoreUpdate
         if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus() == null &&
                 liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
             setStatus(liveScoreModel);
+        updateScoreBoard(liveScoreModel);
         if (liveScoreModel.getExtraModel().isExtraStatus())
             updateExtraRuns(liveScoreModel);
         insertNewBowlerToScoreboardOrUpdateExistingBowler(liveScoreModel);
@@ -75,7 +76,6 @@ public class LiveScoreUpdate
     }
 
     /**
-     *
      * Setting Initial Status
      */
     private void setStatus(LiveScoreUpdateModel liveScoreModel) {
@@ -132,6 +132,17 @@ public class LiveScoreUpdate
     private List<Players> getPlayerDetail(Long playerId) {
         return jdbcTemplate.query("select * from players where playerId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), playerId);
+    }
+
+    /**
+     * update scoreBoard
+     */
+
+    private void updateScoreBoard(LiveScoreUpdateModel liveScoreModel) {
+        Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                liveScoreModel.getBattingTeamId());
+        jdbcTemplate.update("update scoreBoard set overs = ? , ball = ? , score = score + ? where scoreBoardId = ?",
+                liveScoreModel.getOver(), liveScoreModel.getBall(), liveScoreModel.getRuns(), scoreBoardId);
     }
 
     /**
