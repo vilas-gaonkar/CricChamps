@@ -329,8 +329,10 @@ public class LiveScoreUpdate
     }
 
     private void doStrikeRotationAndUpdateScoreForCurrentStrikeBatsman(LiveScoreUpdateModel liveScoreModel, String strikePosition) {
-        jdbcTemplate.update("update batsmanSB set runs = runs + ? ,balls = balls + 1 , strikePosition = ?, battingStrikeRate = ? where playerId = ?",
-                liveScoreModel.getRuns(), updatePlayerStats(liveScoreModel), strikePosition, liveScoreModel.getStrikeBatsmanId());
+        jdbcTemplate.update("update batsmanSB set runs = runs + ? , fours  = fours + ? , sixes = sixes + ? , " +
+                        "strikeRate = ? , balls = balls + 1 , strikePosition = ? where playerId = ?",
+                liveScoreModel.getRuns(), isFour(liveScoreModel.getRuns()), isSix(liveScoreModel.getRuns()),
+                updatePlayerStats(liveScoreModel), strikePosition, liveScoreModel.getStrikeBatsmanId());
     }
 
     private double updatePlayerStats(LiveScoreUpdateModel liveScoreModel) {
@@ -350,7 +352,8 @@ public class LiveScoreUpdate
                     0, 0, 0, 0, 0, 0);
         else
             jdbcTemplate.update("update playerStats set totalFours = totalFours + ? , totalSixes = totalSixes + ? " +
-                    "where playerId = ?", fourCount, sixCount, player.getPlayerId());
+                    "battingStrikeRate = ? where playerId = ?", fourCount, sixCount, getBattingStrikeRate(liveScoreModel.getRuns(),
+                    liveScoreModel.getBall()), player.getPlayerId());
     }
 
     private List<PlayerStats> getPlayerStats(Long playerId) {
