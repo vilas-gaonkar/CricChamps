@@ -377,7 +377,7 @@ public class FixtureService implements FixtureGenerationInterface {
      * assign umpires for all tournament matches
      */
     private void assignUmpiresToAllLeagueMatches(List<Umpires> umpires, List<Matches> matches, Tournaments tournament) {
-        int matchPerGround = matches.size() / tournament.getNumberOfUmpires();
+        int matchPerGround = tournament.getNumberOfUmpires() == 0 ? 0 : matches.size() / tournament.getNumberOfUmpires();
         int remainingMatches = matches.size() - tournament.getNumberOfUmpires() * matchPerGround;
         int matchCount = 0;
         for (Umpires umpire : umpires)
