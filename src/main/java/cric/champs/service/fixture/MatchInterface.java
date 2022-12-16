@@ -8,6 +8,4 @@ import java.util.List;
 public interface MatchInterface {
     List<Matches> viewAllMatches(long tournamentId);
 
-    List<Versus> viewMatchDetails(long tournamentId, long matchId);
-
 }

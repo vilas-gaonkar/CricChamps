@@ -1,11 +1,7 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.ScoreBoard;
-import cric.champs.model.ScoreBoardModel;
-import cric.champs.model.BatsmanSB;
-import cric.champs.model.BowlerSB;
-import cric.champs.model.ExtraRuns;
-import cric.champs.model.FallOfWicketSB;
+import cric.champs.model.*;
 import cric.champs.resultmodels.ScoreBoardResult;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +27,8 @@ public class ScoreBoardService implements ScoreboardInterface {
         List<BowlerSB> bowlerSB = viewBowlerSB(scoreBoardModel);
         ExtraRuns extraRuns = viewExtraRuns(scoreBoardModel);
         List<FallOfWicketSB> fallOfWicketSB = viewFallOfWickets(scoreBoardModel);
-        return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB);
+        List<Versus> versus = viewMatchDetails(scoreBoardModel.getTournamentId(),scoreBoardModel.getMatchId());
+        return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB,versus);
     }
 
     @Override
@@ -80,6 +77,14 @@ public class ScoreBoardService implements ScoreboardInterface {
         return jdbcTemplate.query("select * from fallOfWicketSB where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(FallOfWicketSB.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
+    }
+
+    @Override
+    public List<Versus> viewMatchDetails(long tournamentId, long matchId) {
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found");
+        return jdbcTemplate.query("select * from versus where matchId = ? ",
+                new BeanPropertyRowMapper<>(Versus.class), matchId);
     }
 
 }

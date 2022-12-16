@@ -1,10 +1,7 @@
 package cric.champs.resultmodels;
 
 import cric.champs.entity.ScoreBoard;
-import cric.champs.model.BatsmanSB;
-import cric.champs.model.BowlerSB;
-import cric.champs.model.ExtraRuns;
-import cric.champs.model.FallOfWicketSB;
+import cric.champs.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +24,7 @@ public class ScoreBoardResult {
     private List<BowlerSB> bowlerSB;
 
     private List<FallOfWicketSB> fallOfWicketSB;
+
+    private List<Versus> versus;
 
 }

@@ -1,12 +1,14 @@
 package cric.champs.controller.user;
 
 import cric.champs.model.ScoreBoardModel;
+import cric.champs.model.Versus;
 import cric.champs.resultmodels.ScoreBoardResult;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -46,6 +48,11 @@ public class ScoreBoardController {
     @PostMapping("/fall-of-wicket")
     public ResponseEntity<?> viewFallOfWicketSB(@RequestBody ScoreBoardModel scoreBoardModel) {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewFallOfWickets(scoreBoardModel)));
+    }
+
+    @GetMapping("/view-versus")
+    public ResponseEntity<List<Versus>> viewVersus(@RequestHeader long tournamentId, @RequestHeader long matchId) {
+        return ResponseEntity.of(Optional.of(scoreboardInterface.viewMatchDetails(tournamentId, matchId)));
     }
 
 }

@@ -27,11 +27,4 @@ public class MatchService implements MatchInterface {
                 new BeanPropertyRowMapper<>(Matches.class), tournamentId);
     }
 
-    @Override
-    public List<Versus> viewMatchDetails(long tournamentId, long matchId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from versus where matchId = ? ",
-                new BeanPropertyRowMapper<>(Versus.class), matchId);
-    }
 }

@@ -32,9 +32,4 @@ public class MatchController {
         return ResponseEntity.of(Optional.of(matchInterface.viewAllMatches(tournamentId)));
     }
 
-    @GetMapping("/view-versus")
-    public ResponseEntity<List<Versus>> viewVersus(@RequestHeader long tournamentId, @RequestHeader long matchId) {
-        return ResponseEntity.of(Optional.of(matchInterface.viewMatchDetails(tournamentId, matchId)));
-    }
-
 }
