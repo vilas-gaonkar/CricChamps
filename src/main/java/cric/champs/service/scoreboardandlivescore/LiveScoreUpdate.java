@@ -178,11 +178,11 @@ public class LiveScoreUpdate
                         "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
                 getOverCounts(liveScoreModel), getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
                         liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
-        if (liveScoreModel.getBall() == 5)
+        if (!liveScoreModel.getExtraModel().isExtraStatus() && liveScoreModel.getBall() == 5)
             updateEconomyRate(liveScoreModel);
     }
 
-    private Object getOverCounts(LiveScoreUpdateModel liveScoreModel) {
+    private int getOverCounts(LiveScoreUpdateModel liveScoreModel) {
         return liveScoreModel.getExtraModel().isExtraStatus() ? 0 : liveScoreModel.getBall() == 5 ? 1 : 0;
     }
 
@@ -216,7 +216,9 @@ public class LiveScoreUpdate
 
     private int getRunOutConfirm(LiveScoreUpdateModel liveScoreModel) {
         return liveScoreModel.getWicketModel().isWicketStatus() ?
-                liveScoreModel.getExtraModel().getExtraType().equals(WicketType.RUNOUT.toString()) ? 0 : 1 : 0;
+                liveScoreModel.getExtraModel().isExtraStatus() ?
+                        liveScoreModel.getExtraModel().getExtraType().equals(WicketType.RUNOUT.toString()) ?
+                                0 : 1 : 1 : 0;
     }
 
     private List<BowlerSB> getBowlerSB(LiveScoreUpdateModel liveScoreModel) {
@@ -250,18 +252,18 @@ public class LiveScoreUpdate
     private boolean updateExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
         if (liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                 liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
-            updateBatsmanOutStatusWithWicket(liveScoreModel, 1);
-        updateBatsmanOutStatusWithWicket(liveScoreModel, 0);
+            updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
+        updateBatsmanOutStatusWithWicket(liveScoreModel, 0, liveScoreModel.getRuns() - 1);
         return true;
     }
 
 
-    private void updateBatsmanOutStatusWithWicket(LiveScoreUpdateModel liveScoreModel, int ball) {
+    private void updateBatsmanOutStatusWithWicket(LiveScoreUpdateModel liveScoreModel, int ball, int runs) {
         jdbcTemplate.update("update batsmanSB set batsmanStatus = ? , outByStatus = ? , outByPlayer = ? ," +
                         " runs = runs + ? , balls = balls + ? where playerId = ?", BatsmanStatus.OUT.toString(),
                 liveScoreModel.getWicketModel().getOutType(),
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId()).get(0).getPlayerName(),
-                liveScoreModel.getRuns(), ball, liveScoreModel.getStrikeBatsmanId());
+                runs, ball, liveScoreModel.getStrikeBatsmanId());
         insertIntoPlayerStatsWithWicket(liveScoreModel);
     }
 
@@ -294,7 +296,7 @@ public class LiveScoreUpdate
      * update everything without Extra With Wicket
      */
     private boolean updateWithoutExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
-        updateBatsmanOutStatusWithWicket(liveScoreModel, 1);
+        updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
         return true;
     }
 
