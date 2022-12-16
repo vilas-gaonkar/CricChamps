@@ -14,10 +14,6 @@ public class ExtraRuns {
 
     private long scoreBoardId;
 
-    private long tournamentId;
-
-    private long matchId;
-
     private long teamId;
 
     private int noBall;

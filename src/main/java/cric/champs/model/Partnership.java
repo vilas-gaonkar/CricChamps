@@ -13,15 +13,7 @@ public class Partnership {
 
     private long partnershipId;
 
-    private long tournamentId;
-
-    private long matchId;
-
-    private long teamId;
-
-    private  long playerOneId;
-
-    private long playerTwoId;
+    private long liveId;
 
     private int partnershipRuns;
 
