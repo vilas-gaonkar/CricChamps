@@ -219,25 +219,56 @@ public class LiveScoreScoreService implements LiveScoreInterface {
 
     private void commentaryScoreModification(Tournaments tournaments, Matches matches, Teams matchTeams, Teams teams, LiveScoreUpdate liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
-        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() || liveScoreUpdateModel.getBall() != 6) {
+        String comment = getComment(liveScoreUpdateModel);
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() != 6) {
             if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
-                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1);
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1, comment);
             else if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
-                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns());
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
+        } else if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 6)
+            if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
             else
-                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns());
-        } else
-            insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns());
+                insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
     }
 
-    private void insertIntoCommentary(LiveScoreUpdate liveScoreUpdateModel, List<Live> lives, String overStatus, int extraRun) {
+    private String getComment(LiveScoreUpdate liveScoreUpdateModel) {
+        Players batsman = getPlayerDetail(liveScoreUpdateModel.getStrikeBatsmanId());
+        Players bowler = getPlayerDetail(liveScoreUpdateModel.getBowlerId());
+
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
+            if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
+                    && liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", Oh no! It's a " + liveScoreUpdateModel.getExtraModel().getExtraType();
+            } else if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()) ||
+                    liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()))
+                    && liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + liveScoreUpdateModel.getRuns() + " " + liveScoreUpdateModel.getExtraModel().getExtraType() + "(s)";
+            }
+
+        } else {
+            if (liveScoreUpdateModel.getRuns() > 0 && liveScoreUpdateModel.getRuns() < 4) {
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + liveScoreUpdateModel.getRuns() + " run(s),\nNicely swept";
+            } else if (liveScoreUpdateModel.getRuns() == 4) {
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \nLovely shot!";
+            } else if (liveScoreUpdateModel.getRuns() == 6) {
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \nWhat a shot! Bye bye ball!";
+            } else
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", no runs";
+        }
+        return "Oopsie";
+    }
+
+    private void insertIntoCommentary(LiveScoreUpdate liveScoreUpdateModel, List<Live> lives, String overStatus, int extraRun, String comment) {
         String ballStatus = liveScoreUpdateModel.getExtraModel().isExtraStatus() == true ?
                 liveScoreUpdateModel.getExtraModel().getExtraType() : String.valueOf(liveScoreUpdateModel.getRuns());
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
-                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, null);
+                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, comment);
     }
 
     private List<Commentary> commentaryDetails(LiveScoreUpdate liveScoreUpdateModel) {
