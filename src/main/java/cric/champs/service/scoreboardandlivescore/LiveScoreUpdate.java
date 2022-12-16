@@ -129,9 +129,8 @@ public class LiveScoreUpdate
     private void updateExtraRuns(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
         if (getExtraSB(scoreBoardId).isEmpty())
-            jdbcTemplate.update("insert into extraRuns values(?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
-                    liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId(),
-                    0, 0, 0, 0, 0, 0);
+            jdbcTemplate.update("insert into extraRuns values(?,?,?,?,?,?,?,?)", scoreBoardId,
+                    liveScoreModel.getBattingTeamId(), 0, 0, 0, 0, 0, 0);
         jdbcTemplate.update("update extraRuns set " + liveScoreModel.getExtraModel().getExtraType().strip() +
                         " = " + liveScoreModel.getExtraModel().getExtraType().strip().strip() + " + ? " +
                         ", totalExtraRuns = totalExtraRuns + ? where scoreBoardId = ? ", liveScoreModel.getRuns(),
