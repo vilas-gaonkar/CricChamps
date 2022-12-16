@@ -25,8 +25,6 @@ public class ScoreBoard {
 
     private int ball;
 
-    private String tossStatus;
-
     private int score;
 
     private int totalWicketFall;

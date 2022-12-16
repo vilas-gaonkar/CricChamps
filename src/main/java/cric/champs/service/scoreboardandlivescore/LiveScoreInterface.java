@@ -5,7 +5,7 @@ import cric.champs.livescorerequestmodels.LiveScoreUpdate;
 import cric.champs.livescorerequestmodels.WicketModel;
 import cric.champs.resultmodels.SuccessResultModel;
 
-public interface LiveInterface {
+public interface LiveScoreInterface {
     SuccessResultModel updateLiveScore(LiveScoreUpdate liveScoreUpdateModel) throws LiveScoreUpdationException;
 
     SuccessResultModel updateWicket(WicketModel wicketModel) throws LiveScoreUpdationException;

@@ -4,7 +4,7 @@ import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.livescorerequestmodels.LiveScoreUpdate;
 import cric.champs.livescorerequestmodels.ScoreBoardModel;
 import cric.champs.resultmodels.ScoreBoardResult;
-import cric.champs.service.scoreboardandlivescore.LiveInterface;
+import cric.champs.service.scoreboardandlivescore.LiveScoreInterface;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class ScoreBoardController {
     private ScoreboardInterface scoreboardInterface;
 
     @Autowired
-    LiveInterface liveInterface;
+    LiveScoreInterface liveScoreInterface;
 
     @PostMapping("/view-all")
     public ResponseEntity<ScoreBoardResult> scoreBoardResult(@ModelAttribute ScoreBoardModel scoreBoardModel) {
@@ -55,7 +55,7 @@ public class ScoreBoardController {
 
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody LiveScoreUpdate liveScoreUpdate) throws LiveScoreUpdationException {
-        return ResponseEntity.of(Optional.of(liveInterface.updateLiveScore(liveScoreUpdate)));
+        return ResponseEntity.of(Optional.of(liveScoreInterface.updateLiveScore(liveScoreUpdate)));
     }
 
 }

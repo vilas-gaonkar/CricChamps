@@ -9,34 +9,34 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WicketModel {
+public class AnotherLiveScoreModel {
 
-    private boolean wicketStatus = false;
-    
+    private ExtraModel extraModel;
+
+    private AnotherWicketModel wicketModel;
+
     private Long tournamentId;
 
     private Long matchId;
 
-    private Long teamId;
+    private Long battingTeamId;
 
-    private String outType;
+    private Long bowlingTeamId;
 
-    private Long batsmanId;
+    private Long strikeBatsmanId;
 
     private Long nonStrikeBatsmanId;
 
     private Long bowlerId;
 
-    private Long fielderId;
+    private int over;
+
+    private int ball;
 
     private int runs;
 
-    private int over;
+    private String overStatus;
 
-    private  int ball;
-
-    private Long newBatsmanId;
-
-    private ExtraModel extraModel;
+    private String matchStatus;
 
 }

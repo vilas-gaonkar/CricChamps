@@ -1,5 +1,5 @@
 package cric.champs.service;
 
 public enum VersusStatus {
-    WIN, LOSS, DRAW, CANCELLED
+    WIN, LOSS, DRAW, CANCELLED,INNINGCOMPLETE
 }

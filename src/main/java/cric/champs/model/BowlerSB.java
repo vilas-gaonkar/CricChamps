@@ -15,10 +15,6 @@ public class BowlerSB {
 
     private long scoreBoardId;
 
-    private long tournamentId;
-
-    private long matchId;
-
     private long teamId;
 
     private long playerId;
