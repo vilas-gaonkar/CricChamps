@@ -325,10 +325,10 @@ public class LiveScoreUpdate
      */
     private boolean updateWithoutExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
-        String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
         updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
         if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString())) {
             liveScoreModel.setRuns(liveScoreModel.getRuns() + 1);
+            String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
             if (strikePosition.equals(StrikePosition.STRIKE.toString()))
                 doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
@@ -336,8 +336,16 @@ public class LiveScoreUpdate
             else
                 doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                         liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
+            setNewBatsmanPosition(batsmanSB.getStrikePosition(),scoreBoardId,liveScoreModel.getWicketModel().getNewBatsmanId());
+            setNewBatsmanPosition(null,scoreBoardId,liveScoreModel.getWicketModel().getOutPlayerId());
         }
         return true;
+    }
+
+    private void setNewBatsmanPosition(String strikePosition, long scoreBoardId, Long newBatsmanId) {
+        jdbcTemplate.update("update batsmanSB set strikePosition = ? where scoreBoardId = ? and playerId = ?",
+                strikePosition,scoreBoardId,newBatsmanId);
     }
 
     private void doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(String strikePosition, Long batsmanId, long scoreBoardId) {
@@ -508,10 +516,6 @@ public class LiveScoreUpdate
      */
     private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) {
         if (liveScoreModel.getWicketModel().isWicketStatus()) {
-            BatsmanSB batsmanSB = jdbcTemplate.query("select * from batsmanSB where scoreBoardId = ? and playerId = ?",
-                    new BeanPropertyRowMapper<>(BatsmanSB.class), getScoreBoard(liveScoreModel),
-                    liveScoreModel.getWicketModel().getOutPlayerId()).get(0);
-
             if (Objects.equals(liveScoreModel.getWicketModel().getOutPlayerId(), liveScoreModel.getStrikeBatsmanId()))
                 liveScoreModel.setStrikeBatsmanId(liveScoreModel.getWicketModel().getNewBatsmanId());
             else
@@ -519,6 +523,7 @@ public class LiveScoreUpdate
         }
         if (liveScoreModel.getExtraModel().isExtraStatus())
             return resultForExtra(liveScoreModel);
+        //need to be verified
         else if (liveScoreModel.getBall() == 5)
             if (checkForMatchComplete(liveScoreModel)) {
                 updateBowlerStats(liveScoreModel);
@@ -528,13 +533,31 @@ public class LiveScoreUpdate
                     liveScoreModel.setMatchStatus(MatchStatus.INNINGCOMPLETED.toString());
                 return liveScoreModel;
             } else {
-                rotateBatsmanInOverComplete(liveScoreModel);
+                if (liveScoreModel.getRuns() % 2 == 0) {
+                    long temp = liveScoreModel.getStrikeBatsmanId();
+                    liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+                    liveScoreModel.setNonStrikeBatsmanId(temp);
+                }
                 liveScoreModel.setOver(liveScoreModel.getOver() + 1);
                 liveScoreModel.setBall(0);
                 return liveScoreModel;
             }
+            //verified
         else {
-            rotateBatsman(liveScoreModel);
+            if(liveScoreModel.getWicketModel().isWicketStatus()) {
+                if ((liveScoreModel.getRuns() + 1) % 2 == 1) {
+                    long temp = liveScoreModel.getStrikeBatsmanId();
+                    liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+                    liveScoreModel.setNonStrikeBatsmanId(temp);
+                }
+            }
+            else {
+                if (liveScoreModel.getRuns() % 2 == 1) {
+                    long temp = liveScoreModel.getStrikeBatsmanId();
+                    liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+                    liveScoreModel.setNonStrikeBatsmanId(temp);
+                }
+            }
             liveScoreModel.setBall(liveScoreModel.getBall() + 1);
             return liveScoreModel;
         }
@@ -555,22 +578,6 @@ public class LiveScoreUpdate
             liveScoreModel.setNonStrikeBatsmanId(temp);
         }
         return liveScoreModel;
-    }
-
-    private void rotateBatsmanInOverComplete(LiveScoreUpdateModel liveScoreModel) {
-        if (liveScoreModel.getRuns() % 2 == 0) {
-            long temp = liveScoreModel.getStrikeBatsmanId();
-            liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
-            liveScoreModel.setNonStrikeBatsmanId(temp);
-        }
-    }
-
-    private void rotateBatsman(LiveScoreUpdateModel liveScoreModel) {
-        if (liveScoreModel.getRuns() % 2 == 1) {
-            long temp = liveScoreModel.getStrikeBatsmanId();
-            liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
-            liveScoreModel.setNonStrikeBatsmanId(temp);
-        }
     }
 
     private boolean setTotalRunsInVersus(LiveScoreUpdateModel liveScoreModel) {
