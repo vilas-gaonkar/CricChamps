@@ -175,7 +175,7 @@ public class LiveScoreUpdate
                 liveScoreModel.getBowlingTeamId());
         jdbcTemplate.update("insert into bowlingSB values(?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreModel.getBowlingTeamId(), liveScoreModel.getBowlerId(),
-                getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), liveScoreModel.getRuns(), 0,
+                getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), 0, 0,
                 liveScoreModel.getBall(), 0, 0, 0, BowlingStatus.BOWLING.toString());
     }
 
