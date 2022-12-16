@@ -15,6 +15,8 @@ public class WicketModel {
 
     private String outType = null;
 
+    private Long outPlayerId = null;
+
     private Long fielderId = null;
 
     private Long newBatsmanId = null;

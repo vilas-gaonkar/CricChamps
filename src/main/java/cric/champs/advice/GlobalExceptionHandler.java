@@ -214,7 +214,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SignupException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public Map<String, String> handleSignupException(SignupException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());

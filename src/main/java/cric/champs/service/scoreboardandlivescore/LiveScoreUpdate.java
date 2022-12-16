@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
 @Service
@@ -29,14 +30,21 @@ public class LiveScoreUpdate
 
     private int numberOfOversOfTournament;
 
+    private String outPlayerPosition;
+
     @Override
     public LiveScoreUpdateModel updateLiveScore(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
         checkValidationBeforeUpdate(liveScoreModel);
         numberOfOversOfTournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0).getNumberOfOvers();
 
-        if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus() == null &&
+        if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus().equals("FIRSTINNING") &&
                 liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
             setStatus(liveScoreModel);
+
+        if (liveScoreModel.getMatchStatus().equals("SECONDINNING"))
+            jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? and tournamentId = ?",
+                    MatchStatus.LIVE.toString(), getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
+                    liveScoreModel.getTournamentId());
 
         updateScoreBoard(liveScoreModel);
 
@@ -147,6 +155,20 @@ public class LiveScoreUpdate
                 liveScoreModel.getBattingTeamId());
         jdbcTemplate.update("update scoreBoard set overs = ? , ball = ? , score = score + ? where scoreBoardId = ?",
                 liveScoreModel.getOver(), liveScoreModel.getBall(), liveScoreModel.getRuns(), scoreBoardId);
+        if (liveScoreModel.getWicketModel().isWicketStatus())
+            updateWicketToScoreBoardAndFallOfWicket(liveScoreModel, scoreBoardId);
+    }
+
+    private void updateWicketToScoreBoardAndFallOfWicket(LiveScoreUpdateModel liveScoreModel, Long scoreBoardId) {
+        jdbcTemplate.update("update scoreBoard set totalWicketFall = totalWicketFall + 1 where scoreBoardId = ?",
+                scoreBoardId);
+        jdbcTemplate.update("update matches set totalNumberOfWicket = totalNumberOfWicket -1 where matchId = ?",
+                liveScoreModel.getMatchId());
+        ScoreBoard scoreBoard = getScoreBoard(liveScoreModel).get(0);
+        jdbcTemplate.update("insert into fallOfWicketSB values(?,?,?,?,?,?,?,?)", scoreBoardId,
+                liveScoreModel.getBattingTeamId(), liveScoreModel.getWicketModel().getOutPlayerId(),
+                getPlayerDetail(liveScoreModel.getWicketModel().getOutPlayerId()), scoreBoard.getScore(),
+                scoreBoard.getTotalWicketFall(), scoreBoard.getOvers(), scoreBoard.getBall());
     }
 
     /**
@@ -172,12 +194,16 @@ public class LiveScoreUpdate
      * insert new bowler into bowling scoreboard
      */
     private void insertNewBowlerToScoreboardOrUpdateExistingBowler(LiveScoreUpdateModel liveScoreModel) {
+        Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(),
+                liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
+        if (liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
+            jdbcTemplate.update("update bowlingSB set bowlerStatus = ? where scoreBoardId = ? and  bowlerStatus = 'DONE'",
+                    null, scoreBoardId);
         if (getBowlerSB(liveScoreModel).isEmpty())
             insertNewBowlerToScoreBoard(liveScoreModel);
         jdbcTemplate.update("update bowlingSB set runs = runs + ? , balls = ? , overs = overs + ? , wickets = wickets + ? " +
                         "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
-                getOverCounts(liveScoreModel), getRunOutConfirm(liveScoreModel), getScoreBoardId(liveScoreModel.getTournamentId(),
-                        liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
+                getOverCounts(liveScoreModel), getRunOutConfirm(liveScoreModel), scoreBoardId, liveScoreModel.getBowlerId());
         if (!liveScoreModel.getExtraModel().isExtraStatus() && liveScoreModel.getBall() == 5)
             updateEconomyRate(liveScoreModel);
     }
@@ -198,11 +224,11 @@ public class LiveScoreUpdate
                     getWicketHaul(bowlerSB));
         else
             jdbcTemplate.update("update playerStats set bestBowlingAverage = ? , bestBowlingEconomy = ? , " +
-                            "mostFiveWicketsHaul = mostFiveWicketsHaul + ?, bestBowlingStrikeRate = ? where playerId = ?",
-                    getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
+                            "mostFiveWicketsHaul = mostFiveWicketsHaul + ?, bestBowlingStrikeRate = ? , bowlerStatus = ? " +
+                            "where playerId = ?", getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
                     getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), getWicketHaul(bowlerSB),
                     getBowlingStrikeRate(bowlerSB.getOvers() + 6, bowlerSB.getWickets()),
-                    bowlerSB.getPlayerId());
+                    OverStatus.DONE.toString(), bowlerSB.getPlayerId());
     }
 
     private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel) {
@@ -260,10 +286,10 @@ public class LiveScoreUpdate
 
     private void updateBatsmanOutStatusWithWicket(LiveScoreUpdateModel liveScoreModel, int ball, int runs) {
         jdbcTemplate.update("update batsmanSB set batsmanStatus = ? , outByStatus = ? , outByPlayer = ? ," +
-                        " runs = runs + ? , balls = balls + ? where playerId = ?", BatsmanStatus.OUT.toString(),
+                        " runs = runs + ? , balls = balls + ? , strikePosition = ? where playerId = ?", BatsmanStatus.OUT.toString(),
                 liveScoreModel.getWicketModel().getOutType(),
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId()).get(0).getPlayerName(),
-                runs, ball, liveScoreModel.getStrikeBatsmanId());
+                runs, ball, null, liveScoreModel.getWicketModel().getOutPlayerId());
         insertIntoPlayerStatsWithWicket(liveScoreModel);
     }
 
@@ -274,8 +300,9 @@ public class LiveScoreUpdate
                 getBattingStrikeRate(batsmanSB.getRuns(), batsmanSB.getBalls()), liveScoreModel.getStrikeBatsmanId());
         jdbcTemplate.update("update players set numberOfTimeHeHasBeenOut = numberOfTimeHeHasBeenOut + 1 ," +
                         "matchesPlayed = matchesPlayed + 1 , totalRuns = totalRuns + ? where playerId = ? ",
-                batsmanSB.getRuns(), liveScoreModel.getStrikeBatsmanId());
-
+                batsmanSB.getRuns(), liveScoreModel.getWicketModel().getOutPlayerId());
+        insertNewBatsmanToScoreboard(liveScoreModel, batsmanSB.getScoreBoardId(),
+                liveScoreModel.getWicketModel().getNewBatsmanId());
     }
 
     private int getTotalHundreds(BatsmanSB batsmanSB) {
@@ -289,15 +316,33 @@ public class LiveScoreUpdate
     private BatsmanSB getBatsmanSB(LiveScoreUpdateModel liveScoreModel) {
         return jdbcTemplate.query("select * from batsmanSB where scoreBoardId = ? and playerId = ?",
                 new BeanPropertyRowMapper<>(BatsmanSB.class), getScoreBoardId(liveScoreModel.getTournamentId(),
-                        liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()), liveScoreModel.getStrikeBatsmanId()).get(0);
+                        liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()),
+                liveScoreModel.getWicketModel().getOutPlayerId()).get(0);
     }
 
     /**
      * update everything without Extra With Wicket
      */
     private boolean updateWithoutExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
+        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
+        String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
         updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
+        if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString())) {
+            liveScoreModel.setRuns(liveScoreModel.getRuns() + 1);
+            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
+            if (strikePosition.equals(StrikePosition.STRIKE.toString()))
+                doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
+                        liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            else
+                doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
+                        liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        }
         return true;
+    }
+
+    private void doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(String strikePosition, Long batsmanId, long scoreBoardId) {
+        jdbcTemplate.update("update batsmanSB set strikePosition = ? where scoreBoardId = ? and playerId = ?",
+                strikePosition, scoreBoardId, batsmanId);
     }
 
     /**
@@ -314,12 +359,14 @@ public class LiveScoreUpdate
 
     private void updateBatsmanSBForLegByeOrBye(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
-        String strikePosition = getStrikePositionForExtra(liveScoreModel.getRuns());
+        String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
         doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
-            doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, StrikePosition.NONSTRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, StrikePosition.NONSTRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
         else
-            doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, StrikePosition.STRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, StrikePosition.STRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
     }
 
     private void doStrikeRotationAndUpdateScoreForLegByeOrBye(LiveScoreUpdateModel liveScoreModel, String strikePosition, Long batsmanId, Long scoreBoardId) {
@@ -329,13 +376,16 @@ public class LiveScoreUpdate
     }
 
     private void simplyRotateStrikeForExtra(LiveScoreUpdateModel liveScoreModel) {
-        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
+        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                liveScoreModel.getBattingTeamId());
         String strikePosition = getStrikePositionForExtra(liveScoreModel.getRuns() - 1);
         doStrikeRotationForNonStrikes(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
-            doStrikeRotationForNonStrikes(StrikePosition.NONSTRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationForNonStrikes(StrikePosition.NONSTRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(),
+                    scoreBoardId);
         else
-            doStrikeRotationForNonStrikes(StrikePosition.STRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+            doStrikeRotationForNonStrikes(StrikePosition.STRIKE.toString(), liveScoreModel.getNonStrikeBatsmanId(),
+                    scoreBoardId);
     }
 
     private String getStrikePositionForExtra(int runs) {
@@ -445,16 +495,8 @@ public class LiveScoreUpdate
         return totalRuns.doubleValue() / numberOfOver.doubleValue();
     }
 
-    private double netRunRatePlayed(int totalScoreInEveryMatch) {
+    private double netRunRate(int totalScoreInEveryMatch) {
         return totalScoreInEveryMatch / numberOfOversOfTournament;
-    }
-
-    private double netRunRateGiven(int totalScoreConceded) {
-        return totalScoreConceded / numberOfOversOfTournament;
-    }
-
-    private double netRunRate(int totalScoreInEveryMatch, int totalScoreConceded) {
-        return netRunRatePlayed(totalScoreInEveryMatch) - netRunRateGiven(totalScoreConceded);
     }
 
     private double requiredRunRate(Integer runNeededToWin, Integer remainingOvers) {
@@ -465,11 +507,18 @@ public class LiveScoreUpdate
      * result formation
      */
     private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) {
-        if (liveScoreModel.getExtraModel().isExtraStatus() &&
-                liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
-                liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
-            return liveScoreModel;
+        if (liveScoreModel.getWicketModel().isWicketStatus()) {
+            BatsmanSB batsmanSB = jdbcTemplate.query("select * from batsmanSB where scoreBoardId = ? and playerId = ?",
+                    new BeanPropertyRowMapper<>(BatsmanSB.class), getScoreBoard(liveScoreModel),
+                    liveScoreModel.getWicketModel().getOutPlayerId()).get(0);
 
+            if (Objects.equals(liveScoreModel.getWicketModel().getOutPlayerId(), liveScoreModel.getStrikeBatsmanId()))
+                liveScoreModel.setStrikeBatsmanId(liveScoreModel.getWicketModel().getNewBatsmanId());
+            else
+                liveScoreModel.setNonStrikeBatsmanId(liveScoreModel.getWicketModel().getNewBatsmanId());
+        }
+        if (liveScoreModel.getExtraModel().isExtraStatus())
+            return resultForExtra(liveScoreModel);
         else if (liveScoreModel.getBall() == 5)
             if (checkForMatchComplete(liveScoreModel)) {
                 updateBowlerStats(liveScoreModel);
@@ -491,16 +540,25 @@ public class LiveScoreUpdate
         }
     }
 
-    private void rotateBatsmanInOverComplete(LiveScoreUpdateModel liveScoreModel) {
-        if (liveScoreModel.getExtraModel().isExtraStatus() &&
-                liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
+    private LiveScoreUpdateModel resultForExtra(LiveScoreUpdateModel liveScoreModel) {
+        if (liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                 liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString())) {
-            if ((liveScoreModel.getRuns() - 1) % 2 == 0) {
+            if ((liveScoreModel.getRuns() - 1) % 2 != 0) {
                 long temp = liveScoreModel.getStrikeBatsmanId();
                 liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
                 liveScoreModel.setNonStrikeBatsmanId(temp);
             }
-        } else if (liveScoreModel.getRuns() % 2 == 0) {
+            return liveScoreModel;
+        } else if ((liveScoreModel.getRuns()) % 2 != 0) {
+            long temp = liveScoreModel.getStrikeBatsmanId();
+            liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+            liveScoreModel.setNonStrikeBatsmanId(temp);
+        }
+        return liveScoreModel;
+    }
+
+    private void rotateBatsmanInOverComplete(LiveScoreUpdateModel liveScoreModel) {
+        if (liveScoreModel.getRuns() % 2 == 0) {
             long temp = liveScoreModel.getStrikeBatsmanId();
             liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
             liveScoreModel.setNonStrikeBatsmanId(temp);
