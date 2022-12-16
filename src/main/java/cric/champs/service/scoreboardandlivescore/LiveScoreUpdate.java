@@ -70,7 +70,7 @@ public class LiveScoreUpdate
         if (strikePlayer.isEmpty() || nonStrikePlayer.isEmpty() || bowlingPlayer.isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
 
-        if(liveScoreModel.getMatchStatus().equals(MatchStatus.PAST.toString()))
+        if (liveScoreModel.getMatchStatus() != null && liveScoreModel.getMatchStatus().equals(MatchStatus.PAST.toString()))
             throw new LiveScoreUpdationException("Match already completed");
     }
 
