@@ -228,10 +228,10 @@ public class LiveScoreUpdate
                 liveScoreModel.getWicketModel().getOutType(),
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId()).get(0).getPlayerName(),
                 liveScoreModel.getRuns(), ball, liveScoreModel.getStrikeBatsmanId());
-        insertIntoPlayerStatWithWicket(liveScoreModel);
+        insertIntoPlayerStatsWithWicket(liveScoreModel);
     }
 
-    private void insertIntoPlayerStatWithWicket(LiveScoreUpdateModel liveScoreModel) {
+    private void insertIntoPlayerStatsWithWicket(LiveScoreUpdateModel liveScoreModel) {
         BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
         jdbcTemplate.update("update playerStats set totalFifties = totalFifties + ? , totalHundreds = totalHundreds + ?," +
                         " battingStrikeRate = ? where playerId = ?", getTotalFifties(batsmanSB), getTotalHundreds(batsmanSB),
@@ -287,7 +287,7 @@ public class LiveScoreUpdate
     }
 
     private void doStrikeRotationAndUpdateScoreForLegByeOrBye(LiveScoreUpdateModel liveScoreModel, String strikePosition, Long batsmanId, Long scoreBoardId) {
-        jdbcTemplate.update("update batsmanSB set balls = balls + 1 ,battingStrikeRate = ?, strikePosition = ? where scoreBoardId = ? " +
+        jdbcTemplate.update("update batsmanSB set balls = balls + 1 , strikeRate = ?, strikePosition = ? where scoreBoardId = ? " +
                         "and playerId = ?", getBattingStrikeRate(liveScoreModel.getRuns(), liveScoreModel.getBall()),
                 strikePosition, scoreBoardId, batsmanId);
     }
