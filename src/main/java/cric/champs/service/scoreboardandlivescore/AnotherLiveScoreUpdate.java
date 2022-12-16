@@ -468,17 +468,23 @@ public class AnotherLiveScoreUpdate implements AnotherLiveScoreInterface {
         ScoreBoard battingScoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ScoreBoard.class), liveScoreModel.getTournamentId(),
                 liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()).get(0);
+        String matchResult = getMatchResult(liveScoreModel, battingScoreBoard);
         jdbcTemplate.update("update versus set totalScore = ? , totalWickets = ? , totalOverPlayed = ? , totalballsPlayed = ?," +
                         " matchResult = ? where matchId = ? and teamId = ?", battingScoreBoard.getScore(), battingScoreBoard.getTotalWicketFall(),
-                battingScoreBoard.getOvers(), battingScoreBoard.getBall(), getMatchResult(liveScoreModel, battingScoreBoard), liveScoreModel.getMatchId(),
+                battingScoreBoard.getOvers(), battingScoreBoard.getBall(), matchResult, liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
-        ScoreBoard bowlingScoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
-                new BeanPropertyRowMapper<>(ScoreBoard.class), liveScoreModel.getTournamentId(),
-                liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()).get(0);
-        jdbcTemplate.update("update versus set totalScore = ? , totalWickets = ? , totalOverPlayed = ? , totalballsPlayed = ?," +
-                        " matchResult = ? where matchId = ? and teamId = ?", bowlingScoreBoard.getScore(), bowlingScoreBoard.getTotalWicketFall(),
-                bowlingScoreBoard.getOvers(), bowlingScoreBoard.getBall(), getMatchResult(liveScoreModel, bowlingScoreBoard), liveScoreModel.getMatchId(),
-                liveScoreModel.getBowlingTeamId());
+        if (matchResult.equals(VersusStatus.WIN.toString())) {
+            updateAnotherTeam(liveScoreModel, VersusStatus.LOSS.toString());
+        } else if (matchResult.equals(VersusStatus.LOSS.toString())) {
+            updateAnotherTeam(liveScoreModel, VersusStatus.WIN.toString());
+        } else if (matchResult.equals(VersusStatus.DRAW.toString())) {
+            updateAnotherTeam(liveScoreModel, VersusStatus.DRAW.toString());
+        }
+    }
+
+    private void updateAnotherTeam(AnotherLiveScoreModel liveScoreModel, String matchStatus) {
+        jdbcTemplate.update("update versus set matchResult = ? where matchId = ? and teamId = ?", matchStatus,
+                liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
     }
 
     private String getMatchResult(AnotherLiveScoreModel liveScoreModel, ScoreBoard battingTeam) {
