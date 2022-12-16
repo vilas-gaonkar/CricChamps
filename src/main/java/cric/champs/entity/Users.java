@@ -1,15 +1,12 @@
 package cric.champs.entity;
 
 import cric.champs.customannotations.Gender;
-import cric.champs.customannotations.PhoneNumber;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 @Setter
@@ -30,7 +27,6 @@ public class Users {
     @Email(message = "Invalid Email. Please provide valid Email")
     private String email;
 
-    @PhoneNumber
     private String phoneNumber;
 
     private String city;

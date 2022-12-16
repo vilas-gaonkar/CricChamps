@@ -18,7 +18,8 @@ import java.util.List;
 
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
 @Service
-public class LiveScoreUpdate implements LiveScoreUpdateInterface {
+public class LiveScoreUpdate
+        implements LiveScoreUpdateInterface {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -34,7 +35,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         numberOfOversOfTournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0).getNumberOfOvers();
 
         if (liveScoreModel.getOver() == 0 && liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)
-            setStatus(liveScoreModel, systemInterface.verifyTeamDetails(liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+            setStatus(liveScoreModel);
 
         if (liveScoreModel.getExtraModel().isExtraStatus())
             updateExtraRuns(liveScoreModel);
@@ -72,19 +73,25 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
 
-    private void setStatus(LiveScoreUpdateModel liveScoreModel, String teamName) {
+    private void setStatus(LiveScoreUpdateModel liveScoreModel) {
         jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? and tournamentId = ?",
                 MatchStatus.LIVE.toString(), getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
                 liveScoreModel.getTournamentId());
         jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
                 TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
-        jdbcTemplate.update("insert into scoreBoard values(?,?,?,?,?,?,?,?,?)", null,
-                liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId(),
-                teamName, 0, 0, 0, 0);
+        insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
+                liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+
+
         Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
         insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId());
         insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getNonStrikeBatsmanId());
+    }
+
+    private void insertIntoScoreBoardOfTeams(LiveScoreUpdateModel liveScoreModel, long teamId, String teamName) {
+        jdbcTemplate.update("insert into scoreBoard values(?,?,?,?,?,?,?,?,?)", null,
+                liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), teamId, teamName, 0, 0, 0, 0);
     }
 
     //get total number of players should play in match
