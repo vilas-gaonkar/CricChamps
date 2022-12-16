@@ -74,7 +74,10 @@ public class LiveScoreUpdate
             throw new LiveScoreUpdationException("Match already completed");
     }
 
-
+    /**
+     *
+     * Setting Initial Status
+     */
     private void setStatus(LiveScoreUpdateModel liveScoreModel) {
         if (getScoreBoard(liveScoreModel).isEmpty()) {
             jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? and tournamentId = ?",
