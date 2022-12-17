@@ -29,4 +29,5 @@ public class ScoreBoard {
 
     private int totalWicketFall;
 
+    private String matchStatus;
 }
