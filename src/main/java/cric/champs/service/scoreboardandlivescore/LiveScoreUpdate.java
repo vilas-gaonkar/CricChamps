@@ -308,10 +308,10 @@ public class LiveScoreUpdate
 
     private void updateBatsmanOutStatusWithWicket(LiveScoreUpdateModel liveScoreModel, int ball, int runs) {
         jdbcTemplate.update("update batsmanSB set batsmanStatus = ? , outByStatus = ? , outByPlayer = ? ," +
-                        " runs = runs + ? , balls = balls + ? , strikePosition = ? where playerId = ?", BatsmanStatus.OUT.toString(),
+                        " runs = runs + ? , balls = balls + ? , where playerId = ?", BatsmanStatus.OUT.toString(),
                 liveScoreModel.getWicketModel().getOutType(),
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId()).get(0).getPlayerName(),
-                runs, ball, null, liveScoreModel.getWicketModel().getOutPlayerId());
+                runs, ball, liveScoreModel.getWicketModel().getOutPlayerId());
         insertIntoPlayerStatsWithWicket(liveScoreModel);
     }
 
