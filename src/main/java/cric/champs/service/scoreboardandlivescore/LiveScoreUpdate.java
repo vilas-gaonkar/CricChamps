@@ -280,10 +280,11 @@ public class LiveScoreUpdate
             updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
             if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
                 liveScoreModel.setRuns(liveScoreModel.getRuns() + 1);
-        } else {
-            updateBatsmanOutStatusWithWicket(liveScoreModel, 0, liveScoreModel.getRuns() - 1);
-            if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
-                liveScoreModel.setRuns(liveScoreModel.getRuns());
+            else {
+                updateBatsmanOutStatusWithWicket(liveScoreModel, 0, liveScoreModel.getRuns() - 1);
+                if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
+                    liveScoreModel.setRuns(liveScoreModel.getRuns());
+            }
         }
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
