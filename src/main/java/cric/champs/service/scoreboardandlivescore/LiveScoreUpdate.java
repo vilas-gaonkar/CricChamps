@@ -674,7 +674,37 @@ public class LiveScoreUpdate
     private void setTeamInfo(LiveScoreUpdateModel liveScoreModel) {
         List<Versus> versus = jdbcTemplate.query("select * from versus where matchId = ? ",
                 new BeanPropertyRowMapper<>(Versus.class), liveScoreModel.getMatchId());
-     }
+        if (versus.get(0).getMatchResult().equals(VersusStatus.WIN.toString()))
+            updatePointsInTeamTable(versus.get(0), versus.get(1), liveScoreModel);
+        else if (versus.get(1).getMatchResult().equals(VersusStatus.WIN.toString()))
+            updatePointsInTeamTable(versus.get(1), versus.get(0), liveScoreModel);
+        else {
+            updatePointsForDraw(versus.get(0), liveScoreModel);
+            updatePointsForDraw(versus.get(1), liveScoreModel);
+        }
+    }
+
+    private void updatePointsInTeamTable(Versus winTeam, Versus loseTeam, LiveScoreUpdateModel liveScoreModel) {
+        jdbcTemplate.update("update teams set points = points + 2 , totalMatchesPlayed = totalMatchesPlayed" +
+                        "  + 1 , totalWins = totalWins + 1 , teamHighestScore = ? , netRunRate = ? where teamId = ? ",
+                getHighestScore(winTeam, liveScoreModel.getTournamentId()), netRunRate(winTeam.getTotalScore()),
+                winTeam.getTeamId());
+        jdbcTemplate.update("update teams set totalMatchesPlayed = totalMatchesPlayed + 1 , totalLosses = " +
+                "totalLosses + 1 ,teamHighestScore = ? , netRunRate = ? where teamId = ? ", getHighestScore(loseTeam,
+                liveScoreModel.getTournamentId()), netRunRate(loseTeam.getTotalScore()), loseTeam.getTeamId());
+    }
+
+    private void updatePointsForDraw(Versus drawTeam, LiveScoreUpdateModel liveScoreModel) {
+        jdbcTemplate.update("update teams set points = points + 1 , totalMatchesPlayed = totalMatchesPlayed" +
+                "  + 1 , totalDrawsOrCancelledOrNoResult  = totalDrawsOrCancelledOrNoResult + 1 , " +
+                "teamHighestScore = ? , netRunRate = ? where teamId = ? ", getHighestScore(drawTeam,
+                liveScoreModel.getTournamentId()), netRunRate(drawTeam.getTotalScore()), drawTeam.getTeamId());
+    }
+
+    private int getHighestScore(Versus versus, Long tournamentId) {
+        int pastScore = systemInterface.verifyTeamDetails(versus.getTeamId(), tournamentId).get(0).getTeamHighestScore();
+        return Math.max(pastScore, versus.getTotalScore());
+    }
 
     private void updateAnotherTeam(LiveScoreUpdateModel liveScoreModel, String matchStatus) {
         jdbcTemplate.update("update versus set matchResult = ? where matchId = ? and teamId = ?", matchStatus,
