@@ -166,8 +166,8 @@ public class LiveScoreUpdate
         ScoreBoard scoreBoard = getScoreBoard(liveScoreModel).get(0);
         jdbcTemplate.update("insert into fallOfWicketSB values(?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreModel.getBattingTeamId(), liveScoreModel.getWicketModel().getOutPlayerId(),
-                getPlayerDetail(liveScoreModel.getWicketModel().getOutPlayerId()), scoreBoard.getScore(),
-                scoreBoard.getTotalWicketFall(), scoreBoard.getOvers(), scoreBoard.getBall());
+                getPlayerDetail(liveScoreModel.getWicketModel().getOutPlayerId()).get(0).getPlayerName(),
+                scoreBoard.getScore(), scoreBoard.getTotalWicketFall(), scoreBoard.getOvers(), scoreBoard.getBall());
     }
 
     /**
