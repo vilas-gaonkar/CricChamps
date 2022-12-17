@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
 @Service
@@ -277,9 +276,28 @@ public class LiveScoreUpdate
      */
     private boolean updateExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
         if (liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
-                liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
+                liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString())) {
             updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
-        updateBatsmanOutStatusWithWicket(liveScoreModel, 0, liveScoreModel.getRuns() - 1);
+            if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
+                liveScoreModel.setRuns(liveScoreModel.getRuns() + 1);
+        } else {
+            updateBatsmanOutStatusWithWicket(liveScoreModel, 0, liveScoreModel.getRuns() - 1);
+            if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
+                liveScoreModel.setRuns(liveScoreModel.getRuns());
+        }
+        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                liveScoreModel.getBattingTeamId());
+        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
+        String strikePosition = getStrikePosition(liveScoreModel.getRuns(), liveScoreModel.getBall());
+        doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
+        if (strikePosition.equals(StrikePosition.STRIKE.toString()))
+            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        else
+            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
+        setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         return true;
     }
 
@@ -324,28 +342,29 @@ public class LiveScoreUpdate
      * update everything without Extra With Wicket
      */
     private boolean updateWithoutExtraWithWicket(LiveScoreUpdateModel liveScoreModel) {
-        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
         updateBatsmanOutStatusWithWicket(liveScoreModel, 1, liveScoreModel.getRuns());
         if (liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString())) {
             liveScoreModel.setRuns(liveScoreModel.getRuns() + 1);
-            String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
-            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
-            if (strikePosition.equals(StrikePosition.STRIKE.toString()))
-                doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
-                        liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-            else
-                doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
-                        liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-            BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
-            setNewBatsmanPosition(batsmanSB.getStrikePosition(),scoreBoardId,liveScoreModel.getWicketModel().getNewBatsmanId());
-            setNewBatsmanPosition(null,scoreBoardId,liveScoreModel.getWicketModel().getOutPlayerId());
         }
+        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                liveScoreModel.getBattingTeamId());
+        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
+        String strikePosition = getStrikePosition(liveScoreModel.getRuns(), liveScoreModel.getBall());
+        doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
+        if (strikePosition.equals(StrikePosition.STRIKE.toString()))
+            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        else
+            doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
+                    liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
+        setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         return true;
     }
 
     private void setNewBatsmanPosition(String strikePosition, long scoreBoardId, Long newBatsmanId) {
         jdbcTemplate.update("update batsmanSB set strikePosition = ? where scoreBoardId = ? and playerId = ?",
-                strikePosition,scoreBoardId,newBatsmanId);
+                strikePosition, scoreBoardId, newBatsmanId);
     }
 
     private void doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(String strikePosition, Long batsmanId, long scoreBoardId) {
@@ -367,7 +386,7 @@ public class LiveScoreUpdate
 
     private void updateBatsmanSBForLegByeOrBye(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
-        String strikePosition = getStrikePosition(liveScoreModel.getRuns(),liveScoreModel.getBall());
+        String strikePosition = getStrikePosition(liveScoreModel.getRuns(), liveScoreModel.getBall());
         doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
             doStrikeRotationAndUpdateScoreForLegByeOrBye(liveScoreModel, StrikePosition.NONSTRIKE.toString(),
@@ -515,15 +534,9 @@ public class LiveScoreUpdate
      * result formation
      */
     private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) {
-        if (liveScoreModel.getWicketModel().isWicketStatus()) {
-            if (Objects.equals(liveScoreModel.getWicketModel().getOutPlayerId(), liveScoreModel.getStrikeBatsmanId()))
-                liveScoreModel.setStrikeBatsmanId(liveScoreModel.getWicketModel().getNewBatsmanId());
-            else
-                liveScoreModel.setNonStrikeBatsmanId(liveScoreModel.getWicketModel().getNewBatsmanId());
-        }
         if (liveScoreModel.getExtraModel().isExtraStatus())
             return resultForExtra(liveScoreModel);
-        //need to be verified
+            //need to be verified
         else if (liveScoreModel.getBall() == 5)
             if (checkForMatchComplete(liveScoreModel)) {
                 updateBowlerStats(liveScoreModel);
@@ -544,14 +557,13 @@ public class LiveScoreUpdate
             }
             //verified
         else {
-            if(liveScoreModel.getWicketModel().isWicketStatus()) {
+            if (liveScoreModel.getWicketModel().isWicketStatus()) {
                 if ((liveScoreModel.getRuns() + 1) % 2 == 1) {
                     long temp = liveScoreModel.getStrikeBatsmanId();
                     liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
                     liveScoreModel.setNonStrikeBatsmanId(temp);
                 }
-            }
-            else {
+            } else {
                 if (liveScoreModel.getRuns() % 2 == 1) {
                     long temp = liveScoreModel.getStrikeBatsmanId();
                     liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
