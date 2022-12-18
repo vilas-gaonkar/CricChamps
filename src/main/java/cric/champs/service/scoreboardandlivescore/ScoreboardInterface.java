@@ -10,7 +10,7 @@ public interface ScoreboardInterface {
 
     ScoreBoardResult viewScoreBoardResults(ScoreBoardModel scoreBoardModel);
 
-    ScoreBoard viewScoreBoard(ScoreBoardModel scoreBoardModel);
+    List<ScoreBoard> viewScoreBoard(ScoreBoardModel scoreBoardModel);
 
     List<BatsmanSB> viewBatsmanSB(ScoreBoardModel scoreBoardModel);
 

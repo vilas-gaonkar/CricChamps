@@ -22,7 +22,7 @@ public class ScoreBoardService implements ScoreboardInterface {
 
     @Override
     public ScoreBoardResult viewScoreBoardResults(ScoreBoardModel scoreBoardModel) {
-        ScoreBoard scoreBoard = viewScoreBoard(scoreBoardModel);
+        List<ScoreBoard> scoreBoard = viewScoreBoard(scoreBoardModel);
         List<BatsmanSB> batsmanSB = viewBatsmanSB(scoreBoardModel);
         List<BowlerSB> bowlerSB = viewBowlerSB(scoreBoardModel);
         ExtraRuns extraRuns = viewExtraRuns(scoreBoardModel);
@@ -32,13 +32,13 @@ public class ScoreBoardService implements ScoreboardInterface {
     }
 
     @Override
-    public ScoreBoard viewScoreBoard(ScoreBoardModel scoreBoardModel) {
+    public List<ScoreBoard> viewScoreBoard(ScoreBoardModel scoreBoardModel) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(scoreBoardModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
         List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(ScoreBoard.class), scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(),
                 scoreBoardModel.getTeamId());
-        return scoreBoard.isEmpty() ? null : scoreBoard.get(0);
+        return scoreBoard.isEmpty() ? null : scoreBoard;
     }
 
     @Override

@@ -914,7 +914,18 @@ public class LiveScoreUpdate
         Players bowler = getPlayerDetail(liveScoreUpdateModel.getBowlerId()).get(0);
 
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
-            return "It's a wicket";
+            if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.BOWLED.toString()))
+                return "It's a wicket";
+            else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.LBW.toString()))
+                return "";
+            else if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
+                return "";
+            else if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.CAUGHT.toString()))
+                return "";
+            else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
+                return "";
+            else
+                return "";
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
