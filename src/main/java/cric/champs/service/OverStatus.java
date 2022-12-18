@@ -1,5 +1,5 @@
 package cric.champs.service;
 
 public enum OverStatus {
-    DONE
+    DONE,COMPLETED,NOTCOMPLETED
 }
