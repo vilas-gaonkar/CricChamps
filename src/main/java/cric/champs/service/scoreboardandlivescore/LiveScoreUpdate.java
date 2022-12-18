@@ -925,7 +925,7 @@ public class LiveScoreUpdate
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
                 return "";
             else
-                return "";
+                return ""; 
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
