@@ -956,9 +956,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         String ballStatus = liveScoreUpdateModel.getWicketModel().isWicketStatus() ? "WICKET" :
                 liveScoreUpdateModel.getExtraModel().isExtraStatus() ? liveScoreUpdateModel.getExtraModel().getExtraType() :
                         String.valueOf(liveScoreUpdateModel.getRuns());
+        int ball = 1;
+        if(liveScoreUpdateModel.getExtraModel().isExtraStatus())
+            ball = 0;
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
-                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, comment);
+                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall()+ball, extraRun, ballStatus, overStatus, comment);
     }
 
     /**
