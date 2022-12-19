@@ -1,8 +1,9 @@
-package cric.champs.controller.Admin;
+package cric.champs.controller.user;
 
 import cric.champs.entity.Matches;
 import cric.champs.model.LiveScoreModel;
 import cric.champs.model.Versus;
+import cric.champs.resultmodels.MatchResult;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.fixture.MatchInterface;
 import cric.champs.service.scoreboardandlivescore.LiveResultInterface;
@@ -23,9 +24,6 @@ public class MatchController {
     @Autowired
     private MatchInterface matchInterface;
 
-    @Autowired
-    private ScoreboardInterface scoreboardInterface;
-
     @GetMapping("/view")
     public ResponseEntity<List<Matches>> viewMatches(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(matchInterface.viewAllMatches(tournamentId)));
@@ -33,7 +31,17 @@ public class MatchController {
 
     @GetMapping("/view-versus")
     public ResponseEntity<List<Versus>> viewVersus(@RequestHeader long tournamentId, @RequestHeader long matchId) {
-        return ResponseEntity.of(Optional.of(scoreboardInterface.viewMatchDetails(tournamentId, matchId)));
+        return ResponseEntity.of(Optional.of(matchInterface.viewMatchDetails(tournamentId, matchId)));
+    }
+
+    @GetMapping("/view-info")
+    public ResponseEntity<MatchResult> viewMatchesInfo(@RequestHeader long tournamentId, @RequestHeader long matchId) {
+        return ResponseEntity.of(Optional.of(matchInterface.matchInfo(tournamentId, matchId)));
+    }
+
+    @GetMapping("/view-all")
+    public ResponseEntity<List<MatchResult>> viewMatchInfo(@RequestHeader long tournamentId) {
+        return ResponseEntity.of(Optional.of(matchInterface.viewMatch(tournamentId)));
     }
 
 }

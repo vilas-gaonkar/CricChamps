@@ -24,7 +24,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostRuns(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by mostRuns DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -32,7 +32,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewBestBattingAverage(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by battingAverage DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -40,7 +40,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewBattingStrikeRate(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by battingStrikeRate DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -48,7 +48,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostHundreds(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by totalHundreds DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -56,7 +56,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostFifties(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by totalFifties DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -64,7 +64,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostFours(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by totalFours DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -72,7 +72,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostSixes(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by totalSixes DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -80,7 +80,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostWicket(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by mostWickets DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -88,7 +88,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewBestBowlingAverage(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by bestBowlingAverage DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -96,7 +96,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewMostFiveWicket(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by mostFiveWicketsHaul DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -104,7 +104,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewBestEconomy(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by bestBowlingEconomy DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -112,7 +112,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewBestBowlingStrikeRate(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by bestBowlingStrikeRate DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -120,7 +120,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewHighestScoreTeam(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from teams where tournamentId = ? order by teamHighestScore DESC limit ?",
                 new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
@@ -128,7 +128,7 @@ public class PlayerStatsService implements PlayerStatsInterface {
 
     @Override
     public List<PlayerStats> viewPlayerStats(String playerStatsField, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         if (EnumUtils.isValidEnum(PlayerStatsEnum.class, playerStatsField))
             return jdbcTemplate.query("select * from playerStats where tournamentId = ? order by ? DESC limit ?",

@@ -20,6 +20,4 @@ public interface ScoreboardInterface {
 
     List<FallOfWicketSB> viewFallOfWickets(ScoreBoardModel scoreBoardModel);
 
-    List<Versus> viewMatchDetails(long tournamentId, long matchId);
-
 }
