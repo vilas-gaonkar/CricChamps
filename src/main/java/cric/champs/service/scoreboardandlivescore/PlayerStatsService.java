@@ -1,5 +1,6 @@
 package cric.champs.service.scoreboardandlivescore;
 
+import cric.champs.entity.Teams;
 import cric.champs.model.PlayerStats;
 import cric.champs.service.PlayerStatsEnum;
 import cric.champs.service.system.SystemInterface;
@@ -119,11 +120,11 @@ public class PlayerStatsService implements PlayerStatsInterface {
     }
 
     @Override
-    public List<PlayerStats> viewHighestScoreTeam(long tournamentId) {
+    public List<Teams> viewHighestScoreTeam(long tournamentId) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from teams where tournamentId = ? order by teamHighestScore DESC limit ?",
-                new BeanPropertyRowMapper<>(PlayerStats.class), tournamentId, limit);
+                new BeanPropertyRowMapper<>(Teams.class), tournamentId, limit);
     }
 
     @Override

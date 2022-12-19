@@ -1,5 +1,6 @@
 package cric.champs.service.scoreboardandlivescore;
 
+import cric.champs.entity.Teams;
 import cric.champs.model.PlayerStats;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public interface PlayerStatsInterface {
 
     List<PlayerStats> viewBestBowlingStrikeRate(long tournamentId);
 
-    List<PlayerStats> viewHighestScoreTeam(long tournamentId);
+    List<Teams> viewHighestScoreTeam(long tournamentId);
 
     List<PlayerStats> viewPlayerStats(String playerStatsField, long tournamentId);
 

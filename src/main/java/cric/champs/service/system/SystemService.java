@@ -279,8 +279,9 @@ public class SystemService implements SystemInterface {
 
     @Override
     public Long getScoreBoardId(ScoreBoardModel scoreBoardModel) {
-        return jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
-                new BeanPropertyRowMapper<>(ScoreBoard.class), scoreBoardModel.getTournamentId(),
-                scoreBoardModel.getMatchId(), scoreBoardModel.getTeamId()).get(0).getScoreBoardId();
+        List<ScoreBoard> scoreBoards = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and " +
+                        "matchId = ? and teamId = ?", new BeanPropertyRowMapper<>(ScoreBoard.class),
+                scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(), scoreBoardModel.getTeamId());
+        return scoreBoards.isEmpty() ? null : scoreBoards.get(0).getScoreBoardId();
     }
 }
