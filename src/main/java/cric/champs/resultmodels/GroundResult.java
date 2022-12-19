@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class GroundResult {
 
-    List<Grounds> grounds;
+    Grounds grounds;
 
     List<GroundPhotos> groundPhotos;
 
