@@ -881,7 +881,7 @@ public class LiveScoreUpdate
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
             else
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
-        } else if (liveScoreUpdateModel.getWicketModel().isWicketStatus() && liveScoreUpdateModel.getBall() == 6) {
+        } else if (liveScoreUpdateModel.getWicketModel().isWicketStatus()) {
             if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString())))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
@@ -894,7 +894,7 @@ public class LiveScoreUpdate
             else if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
-        } else if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() == 6) {
+        } else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
