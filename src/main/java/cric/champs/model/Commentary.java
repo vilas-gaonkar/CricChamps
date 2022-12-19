@@ -20,5 +20,7 @@ public class Commentary {
 
     private String ballStatus;
 
+    private String overStatus;
+
     private String comment;
 }

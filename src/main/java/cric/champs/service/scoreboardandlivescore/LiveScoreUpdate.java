@@ -915,17 +915,17 @@ public class LiveScoreUpdate
 
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
             if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.BOWLED.toString()))
-                return "It's a wicket";
+                return "It's a bowled";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.LBW.toString()))
-                return "";
+                return "It's a LBW";
             else if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
-                return "";
+                return "It's a runout";
             else if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.CAUGHT.toString()))
-                return "";
+                return "It's a catch out";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
-                return "";
+                return "It's a hit wicket";
             else
-                return ""; 
+                return "It's a stumped";
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))

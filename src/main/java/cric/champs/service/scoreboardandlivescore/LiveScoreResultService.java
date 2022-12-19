@@ -48,8 +48,8 @@ public class LiveScoreResultService implements LiveResultInterface {
     public List<BatsmanSB> viewBatsmanSB(LiveScoreModel liveScoreModel) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from batsmanSB where teamId = ? and matchId = ? and batsmanStatus = ?",
-                new BeanPropertyRowMapper<>(BatsmanSB.class), liveScoreModel.getBattingTeamId(), liveScoreModel.getMatchId(),
+        return jdbcTemplate.query("select * from batsmanSB where teamId = ? and batsmanStatus = ?",
+                new BeanPropertyRowMapper<>(BatsmanSB.class), liveScoreModel.getMatchId(),
                 BatsmanStatus.NOTOUT.toString());
     }
 
@@ -68,8 +68,8 @@ public class LiveScoreResultService implements LiveResultInterface {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
         List<FallOfWicketSB> fallOfWicketSB = jdbcTemplate.query("select * from fallOfWicketSB where teamId = ?" +
-                        " and matchId = ? order by wicketNumber DESC", new BeanPropertyRowMapper<>(FallOfWicketSB.class),
-                liveScoreModel.getBattingTeamId(), liveScoreModel.getMatchId());
+                        "  order by wicketNumber DESC", new BeanPropertyRowMapper<>(FallOfWicketSB.class),
+                liveScoreModel.getBattingTeamId());
         return fallOfWicketSB.isEmpty() ? null : fallOfWicketSB.get(0);
     }
 
