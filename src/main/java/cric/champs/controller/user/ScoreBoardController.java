@@ -50,9 +50,4 @@ public class ScoreBoardController {
         return ResponseEntity.of(Optional.of(scoreboardInterface.viewFallOfWickets(scoreBoardModel)));
     }
 
-    @GetMapping("/view-versus")
-    public ResponseEntity<List<Versus>> viewVersus(@RequestHeader long tournamentId, @RequestHeader long matchId) {
-        return ResponseEntity.of(Optional.of(scoreboardInterface.viewMatchDetails(tournamentId, matchId)));
-    }
-
 }
