@@ -23,7 +23,8 @@ public class MatchService implements MatchInterface {
     public List<Matches> viewAllMatches(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from matches where tournamentId = ? and isCancelled = 'false'",
+        return jdbcTemplate.query("select * from matches where tournamentId = ? and isCancelled = 'false' order by " +
+                        "matchDate",
                 new BeanPropertyRowMapper<>(Matches.class), tournamentId);
     }
 

@@ -53,6 +53,7 @@ public class GlobalExceptionHandler {
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
     }
+
     @ExceptionHandler(CommandAcceptanceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleCommandAcceptanceException(CommandAcceptanceException exception) {
@@ -81,7 +82,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleBindException(BindException exception) {
         Map<String, Object> errorMessage = new HashMap<>();
-        errorMessage.put("Error Message",exception.getMessage());
+        errorMessage.put("Error Message", exception.getMessage());
         return errorMessage;
     }
 
@@ -208,6 +209,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LoginFailedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleLoginFailedException(LoginFailedException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(InvalidFieldException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidFieldException(InvalidFieldException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;

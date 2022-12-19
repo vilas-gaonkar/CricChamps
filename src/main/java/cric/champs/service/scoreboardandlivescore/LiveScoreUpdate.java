@@ -4,6 +4,7 @@ import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.entity.*;
 import cric.champs.livescorerequestmodels.LiveScoreUpdateModel;
 import cric.champs.model.*;
+import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.*;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,7 @@ import java.util.List;
 
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
 @Service
-public class LiveScoreUpdate
-        implements LiveScoreUpdateInterface {
+public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -958,6 +958,19 @@ public class LiveScoreUpdate
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
                 liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, comment);
+    }
+
+    /**
+     *
+     * Stop match
+     */
+    @Override
+    public SuccessResultModel stopMatch(LiveScoreModel liveScoreModel, String reason) {
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
+            throw new NullPointerException("Invalid tournament");
+        jdbcTemplate.update("update matches set matchStatus = ? , isCancelled = 'true' where tournamentId = ? and matchId = ?",
+                MatchStatus.ABANDONED.toString(), liveScoreModel.getTournamentId(), liveScoreModel.getMatchId());
+        return new SuccessResultModel("Match cancelled Successfully");
     }
 
 }

@@ -1,6 +1,7 @@
 package cric.champs.controller.Admin;
 
 import com.cloudinary.utils.ObjectUtils;
+import cric.champs.customexceptions.InvalidFieldException;
 import cric.champs.entity.Players;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.cloud.UploadImageTOCloud;
@@ -27,7 +28,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException, InvalidFieldException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
@@ -58,7 +59,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<SuccessResultModel> delete(@RequestPart long playerId, @RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestHeader long playerId, @RequestHeader long teamId, @RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(playerInterface.deletePlayer(playerId, teamId, tournamentId)));
     }
 

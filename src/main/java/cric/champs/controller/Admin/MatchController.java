@@ -22,11 +22,6 @@ public class MatchController {
     @Autowired
     private MatchInterface matchInterface;
 
-    @PostMapping("/stop-match")
-    public ResponseEntity<SuccessResultModel> stopModel(@ModelAttribute LiveScoreModel liveScoreModel, @RequestPart String reason) {
-        return ResponseEntity.of(Optional.of(liveResultInterface.stopMatch(liveScoreModel, reason)));
-    }
-
     @GetMapping("/view")
     public ResponseEntity<List<Matches>> viewMatches(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(matchInterface.viewAllMatches(tournamentId)));

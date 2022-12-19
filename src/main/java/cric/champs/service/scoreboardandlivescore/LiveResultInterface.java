@@ -24,5 +24,4 @@ public interface LiveResultInterface {
 
     List<Commentary> viewCommentary(LiveScoreModel liveScoreModel);
 
-    SuccessResultModel stopMatch(LiveScoreModel liveScoreModel, String reason);
 }

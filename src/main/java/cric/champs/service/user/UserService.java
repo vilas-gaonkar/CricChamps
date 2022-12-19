@@ -11,10 +11,12 @@ import cric.champs.resultmodels.TournamentResultModel;
 import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
 import cric.champs.service.AccountStatus;
+import cric.champs.service.PlayerDesignation;
 import cric.champs.service.TournamentStatus;
 import cric.champs.service.TournamentTypes;
 import cric.champs.service.system.SystemInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -441,13 +443,20 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
      */
 
     @Override
-    public SuccessResultModel registerPlayer(Players players) {
+    public SuccessResultModel
+    registerPlayer(Players players) throws InvalidFieldException {
         if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
             throw new NullPointerException("tournament not found");
+        if (players.getDesignation() != null && !EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation()))
+            throw new InvalidFieldException("Incorrect designation");
+        if (EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation()))
+            jdbcTemplate.update("update teams set captainName = ? where teamId = ?", players.getPlayerName(),
+                    players.getTeamId());
         jdbcTemplate.update("insert into players values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, players.getTournamentId(),
                 players.getTeamId(), players.getPlayerName(), players.getCity(), players.getPhoneNumber(), players.getProfilePhoto(),
                 players.getDesignation(), players.getExpertise(), players.getBattingStyle(), players.getBowlingStyle(),
                 players.getBowlingType(), 0, 0, 0, 0, null, players.getPersonalId(), players.getPersonalIdName(), "false");
+
         jdbcTemplate.update("update teams set numberOfPlayers = numberOfPlayers + 1 where teamId = ?", players.getTeamId());
         return new SuccessResultModel("Player registered successfully.");
     }

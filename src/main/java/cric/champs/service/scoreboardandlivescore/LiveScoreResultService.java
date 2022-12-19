@@ -89,13 +89,4 @@ public class LiveScoreResultService implements LiveResultInterface {
                 new BeanPropertyRowMapper<>(Commentary.class), liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
     }
 
-    @Override
-    public SuccessResultModel stopMatch(LiveScoreModel liveScoreModel, String reason) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
-            throw new NullPointerException("Invalid tournament");
-        jdbcTemplate.update("update matches set matchStatus = ? , isCancelled = 'true' where tournamentId = ? and matchId = ?",
-                MatchStatus.ABANDONED.toString(), liveScoreModel.getTournamentId(), liveScoreModel.getMatchId());
-        return new SuccessResultModel("Match cancelled Successfully");
-    }
-
 }

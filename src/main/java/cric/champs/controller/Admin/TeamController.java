@@ -59,7 +59,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<SuccessResultModel> delete(@RequestPart long teamId, @RequestPart long tournamentId) {
+    public ResponseEntity<SuccessResultModel> delete(@RequestHeader long teamId, @RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(teamInterface.deleteTeam(teamId, tournamentId)));
     }
 
@@ -74,6 +74,5 @@ public class TeamController {
 
         return ResponseEntity.of(Optional.of(teamInterface.getTeam(teamId, tournamentId)));
     }
-
 
 }
