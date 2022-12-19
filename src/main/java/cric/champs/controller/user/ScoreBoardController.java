@@ -4,6 +4,7 @@ import cric.champs.model.ScoreBoardModel;
 import cric.champs.model.Versus;
 import cric.champs.resultmodels.ScoreBoardResult;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
+import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ public class ScoreBoardController {
 
     @Autowired
     private ScoreboardInterface scoreboardInterface;
-
 
     @PostMapping("/view-all")
     public ResponseEntity<ScoreBoardResult> scoreBoardResult(@ModelAttribute ScoreBoardModel scoreBoardModel) {

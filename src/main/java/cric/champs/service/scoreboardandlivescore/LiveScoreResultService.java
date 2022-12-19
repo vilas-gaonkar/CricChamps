@@ -40,7 +40,7 @@ public class LiveScoreResultService implements LiveResultInterface {
     public List<Live> viewLiveScore(LiveScoreModel liveScoreModel) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select * from live where matchId = ? and tournamentId = ?",
+        return jdbcTemplate.query("select * from live where matchId = ? and tournamentId = ? order by liveId DESC",
                 new BeanPropertyRowMapper<>(Live.class), liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
     }
 

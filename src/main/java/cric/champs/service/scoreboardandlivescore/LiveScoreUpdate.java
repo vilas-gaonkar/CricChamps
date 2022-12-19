@@ -948,8 +948,9 @@ public class LiveScoreUpdate
     }
 
     private void insertIntoCommentary(LiveScoreUpdateModel liveScoreUpdateModel, List<Live> lives, String overStatus, int extraRun, String comment) {
-        String ballStatus = liveScoreUpdateModel.getExtraModel().isExtraStatus() ?
-                liveScoreUpdateModel.getExtraModel().getExtraType() : String.valueOf(liveScoreUpdateModel.getRuns());
+        String ballStatus = liveScoreUpdateModel.getWicketModel().isWicketStatus() ? "WICKET" :
+                liveScoreUpdateModel.getExtraModel().isExtraStatus() ? liveScoreUpdateModel.getExtraModel().getExtraType() :
+                        String.valueOf(liveScoreUpdateModel.getRuns());
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
                 liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall(), extraRun, ballStatus, overStatus, comment);

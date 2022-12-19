@@ -3,6 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.entity.*;
 import cric.champs.customexceptions.OTPGenerateException;
+import cric.champs.model.ScoreBoardModel;
 import cric.champs.model.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -62,4 +63,6 @@ public interface SystemInterface {
     boolean validateTime(LocalTime startTime, LocalTime endTime, int numberOfOvers);
 
     List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId);
+
+    Long getScoreBoardId(ScoreBoardModel scoreBoardModel);
 }
