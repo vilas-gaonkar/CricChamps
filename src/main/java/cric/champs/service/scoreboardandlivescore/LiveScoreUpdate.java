@@ -916,17 +916,17 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
             if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.BOWLED.toString()))
-                return "It's a bowled";
+                return "Direct Hit! WHAT A WICKET!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.LBW.toString()))
-                return "It's a LBW";
+                return "An appeal for LBW, and the Umpire says YES!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
-                return "It's a runout";
+                return "Lovely throw, that's a run-out";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.CAUGHT.toString()))
-                return "It's a catch out";
+                return "In the air, fielder coming underneath and taken!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
-                return "It's a hit wicket";
+                return "That's a hit wicket";
             else
-                return "It's a stumped";
+                return "Stumped and he's gone!";
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
@@ -941,13 +941,13 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         } else {
             if (liveScoreUpdateModel.getRuns() > 0 && liveScoreUpdateModel.getRuns() < 4)
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " +
-                        liveScoreUpdateModel.getRuns() + " run(s),\nNicely swept";
+                        liveScoreUpdateModel.getRuns() + " run(s),\nStraight down the ground.";
             else if (liveScoreUpdateModel.getRuns() == 4)
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \nLovely shot!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \nAll the way to the boundary off the bat!";
             else if (liveScoreUpdateModel.getRuns() == 6)
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \nWhat a shot! Bye bye ball!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \nTHAT'S a HUGE HIT!";
             else
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", no runs";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ",  No run. Well bowled.";
         }
         return "Oops!... something went wrong ";
     }
