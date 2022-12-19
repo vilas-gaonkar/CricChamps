@@ -304,30 +304,30 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public GroundResult getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
+    public List<GroundResult> getAllGrounds(long tournamentId, int pageSize, int pageNumber) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
+        List<GroundResult> results = new ArrayList<>();
         int offset = pageSize * (pageNumber - 1);
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'" +
                 " limit ? offset ?", new BeanPropertyRowMapper<>(Grounds.class), tournamentId, pageSize, offset);
-        List<GroundPhotos> groundPhotos = new ArrayList<>();
         for (Grounds ground : grounds)
-            groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
-                    new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
-        return new GroundResult(grounds, groundPhotos);
+            results.add(new GroundResult(ground, getGroundPics(ground.getGroundId())));
+        return results;
+    }
+
+    private List<GroundPhotos> getGroundPics(long groundId) {
+        return jdbcTemplate.query("select * from groundPhotos where groundId = ?",
+                new BeanPropertyRowMapper<>(GroundPhotos.class), groundId);
     }
 
     @Override
     public GroundResult getGround(long groundId, long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
-        List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
-                new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId);
-        List<GroundPhotos> groundPhotos = new ArrayList<>();
-        for (Grounds ground : grounds)
-            groundPhotos.addAll(jdbcTemplate.query("select * from groundPhotos where groundId = ?",
-                    new BeanPropertyRowMapper<>(GroundPhotos.class), ground.getGroundId()));
-        return new GroundResult(grounds, groundPhotos);
+        Grounds ground = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId).get(0);
+        return new GroundResult(ground, getGroundPics(groundId));
     }
 
     /**
