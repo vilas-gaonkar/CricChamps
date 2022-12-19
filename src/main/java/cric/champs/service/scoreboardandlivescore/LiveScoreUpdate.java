@@ -925,22 +925,23 @@ public class LiveScoreUpdate
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
-                    && liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", Oh no! It's a " + liveScoreUpdateModel.getExtraModel().getExtraType();
-            } else if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()) ||
+                    && liveScoreUpdateModel.getExtraModel().isExtraStatus())
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", Oh no! It's a " +
+                        liveScoreUpdateModel.getExtraModel().getExtraType();
+            else if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()))
-                    && liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + liveScoreUpdateModel.getRuns() + " " + liveScoreUpdateModel.getExtraModel().getExtraType() + "(s)";
-            }
-
+                    && liveScoreUpdateModel.getExtraModel().isExtraStatus())
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " +
+                        liveScoreUpdateModel.getRuns() + " " + liveScoreUpdateModel.getExtraModel().getExtraType() + "(s)";
         } else {
-            if (liveScoreUpdateModel.getRuns() > 0 && liveScoreUpdateModel.getRuns() < 4) {
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + liveScoreUpdateModel.getRuns() + " run(s),\nNicely swept";
-            } else if (liveScoreUpdateModel.getRuns() == 4) {
+            if (liveScoreUpdateModel.getRuns() > 0 && liveScoreUpdateModel.getRuns() < 4)
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " +
+                        liveScoreUpdateModel.getRuns() + " run(s),\nNicely swept";
+            else if (liveScoreUpdateModel.getRuns() == 4)
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \nLovely shot!";
-            } else if (liveScoreUpdateModel.getRuns() == 6) {
+            else if (liveScoreUpdateModel.getRuns() == 6)
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \nWhat a shot! Bye bye ball!";
-            } else
+            else
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", no runs";
         }
         return "Oops!... something went wrong ";
