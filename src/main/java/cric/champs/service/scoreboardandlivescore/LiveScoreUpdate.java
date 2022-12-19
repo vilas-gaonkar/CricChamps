@@ -25,7 +25,7 @@ public class LiveScoreUpdate
     @Autowired
     private SystemInterface systemInterface;
 
-    private int numberOfOversOfTournament;
+    private Integer numberOfOversOfTournament;
 
     @Override
     public LiveScoreUpdateModel updateLiveScore(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
@@ -513,32 +513,32 @@ public class LiveScoreUpdate
      * player stats
      */
 
-    private double getBattingStrikeRate(int runsScored, int numberOfBallFaced) {
-        return numberOfBallFaced == 0 ? 0 : runsScored / numberOfBallFaced * 100;
+    private double getBattingStrikeRate(Integer runsScored, Integer numberOfBallFaced) {
+        return numberOfBallFaced == 0 ? 0 : runsScored.doubleValue() / numberOfBallFaced.doubleValue() * 100;
     }
 
-    private double getBattingAverage(int totalScoreOfBatsman, int numberOfTimesHeHasBeenOut) {
-        return numberOfTimesHeHasBeenOut == 0 ? totalScoreOfBatsman : totalScoreOfBatsman / numberOfTimesHeHasBeenOut;
+    private double getBattingAverage(Integer totalScoreOfBatsman, Integer numberOfTimesHeHasBeenOut) {
+        return numberOfTimesHeHasBeenOut == 0 ? totalScoreOfBatsman : totalScoreOfBatsman.doubleValue() / numberOfTimesHeHasBeenOut.doubleValue();
     }
 
-    private double getBowlingStrikeRate(int numberBowledDeliveries, int numberOfWicketTaken) {
-        return numberOfWicketTaken == 0 ? 0 : numberBowledDeliveries / numberOfWicketTaken;
+    private double getBowlingStrikeRate(Integer numberBowledDeliveries, Integer numberOfWicketTaken) {
+        return numberOfWicketTaken == 0 ? 0 : numberBowledDeliveries.doubleValue() / numberOfWicketTaken.doubleValue();
     }
 
-    private double getBowlingAverage(int numberOfRunsConceded, int numberOfWicketTaken) {
-        return numberOfWicketTaken == 0 ? numberOfRunsConceded : numberOfRunsConceded / numberOfWicketTaken;
+    private double getBowlingAverage(Integer numberOfRunsConceded, Integer numberOfWicketTaken) {
+        return numberOfWicketTaken == 0 ? numberOfRunsConceded : numberOfRunsConceded.doubleValue() / numberOfWicketTaken.doubleValue();
     }
 
-    private double getBowlingEconomy(int numberOfRunsConceded, int numberOfOverBowled) {
-        return numberOfOverBowled == 0 ? 0 : numberOfRunsConceded / numberOfOverBowled;
+    private double getBowlingEconomy(Integer numberOfRunsConceded, Integer numberOfOverBowled) {
+        return numberOfOverBowled == 0 ? 0 : numberOfRunsConceded.doubleValue() / numberOfOverBowled.doubleValue();
     }
 
     private double currentRunRate(Integer numberOfOver, Integer totalRuns) {
         return totalRuns.doubleValue() / numberOfOver.doubleValue();
     }
 
-    private double netRunRate(int totalScoreInEveryMatch) {
-        return totalScoreInEveryMatch / numberOfOversOfTournament;
+    private double netRunRate(Integer totalScoreInEveryMatch) {
+        return totalScoreInEveryMatch.doubleValue() / numberOfOversOfTournament.doubleValue();
     }
 
     private double requiredRunRate(Integer runNeededToWin, Integer remainingOvers) {
