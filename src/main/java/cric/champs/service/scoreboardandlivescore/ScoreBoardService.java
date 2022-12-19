@@ -27,8 +27,7 @@ public class ScoreBoardService implements ScoreboardInterface {
         List<BowlerSB> bowlerSB = viewBowlerSB(scoreBoardModel);
         ExtraRuns extraRuns = viewExtraRuns(scoreBoardModel);
         List<FallOfWicketSB> fallOfWicketSB = viewFallOfWickets(scoreBoardModel);
-        List<Versus> versus = viewMatchDetails(scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId());
-        return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB, versus);
+        return new ScoreBoardResult(scoreBoard, extraRuns, batsmanSB, bowlerSB, fallOfWicketSB);
     }
 
     @Override
@@ -77,14 +76,6 @@ public class ScoreBoardService implements ScoreboardInterface {
         return jdbcTemplate.query("select * from fallOfWicketSB where scoreBoardId = ? and teamId = ?",
                 new BeanPropertyRowMapper<>(FallOfWicketSB.class), systemInterface.getScoreBoardId(scoreBoardModel),
                 scoreBoardModel.getTeamId());
-    }
-
-    @Override
-    public List<Versus> viewMatchDetails(long tournamentId, long matchId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from versus where matchId = ? ",
-                new BeanPropertyRowMapper<>(Versus.class), matchId);
     }
 
 }

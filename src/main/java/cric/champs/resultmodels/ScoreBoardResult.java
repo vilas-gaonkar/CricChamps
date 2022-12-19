@@ -25,6 +25,4 @@ public class ScoreBoardResult {
 
     private List<FallOfWicketSB> fallOfWicketSB;
 
-    private List<Versus> versus;
-
 }
