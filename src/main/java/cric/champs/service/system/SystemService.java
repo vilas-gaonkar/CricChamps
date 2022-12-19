@@ -3,6 +3,7 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.customexceptions.OTPGenerateException;
 import cric.champs.entity.*;
+import cric.champs.model.ScoreBoardModel;
 import cric.champs.model.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.AccountStatus;
@@ -274,5 +275,12 @@ public class SystemService implements SystemInterface {
     public List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId) {
         return jdbcTemplate.query("select * from tournaments where tournamentId = ? and tournamentStatus != ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), tournamentId, TournamentStatus.CANCELLED.toString());
+    }
+
+    @Override
+    public Long getScoreBoardId(ScoreBoardModel scoreBoardModel) {
+        return jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ?",
+                new BeanPropertyRowMapper<>(ScoreBoard.class), scoreBoardModel.getTournamentId(),
+                scoreBoardModel.getMatchId(), scoreBoardModel.getTeamId()).get(0).getScoreBoardId();
     }
 }
