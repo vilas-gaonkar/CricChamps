@@ -23,6 +23,9 @@ public class MatchController {
     @Autowired
     private MatchInterface matchInterface;
 
+    @Autowired
+    private ScoreboardInterface scoreboardInterface;
+
     @GetMapping("/view")
     public ResponseEntity<List<Matches>> viewMatches(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(matchInterface.viewAllMatches(tournamentId)));
