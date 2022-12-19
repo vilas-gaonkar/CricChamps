@@ -90,6 +90,11 @@ public class LiveScoreUpdate
                 getScoreBoard(liveScoreModel).get(0).getMatchStatus().equals(MatchStatus.INNINGCOMPLETED.toString()) ||
                 getScoreBoard(liveScoreModel).get(0).getMatchStatus().equals(MatchStatus.COMPLETED.toString()))
             throw new LiveScoreUpdationException("Inning completed or match completed");
+        List<Matches> match = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
+                new BeanPropertyRowMapper<>(Matches.class), liveScoreModel.getTournamentId(),
+                MatchStatus.CANCELLED.toString());
+        if (!match.isEmpty())
+            throw new LiveScoreUpdationException("All matches does not have ground so you cannot start tournament");
     }
 
     /**
