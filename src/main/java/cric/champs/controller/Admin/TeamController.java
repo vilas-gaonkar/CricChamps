@@ -64,9 +64,9 @@ public class TeamController {
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<?> getAllTeams(@RequestHeader long tournamentId, @RequestParam int pageSize, @RequestParam int pageNumber) {
+    public ResponseEntity<?> getAllTeams(@RequestHeader long tournamentId) {
 
-        return ResponseEntity.of(Optional.of(teamInterface.getAllTeams(tournamentId, pageSize, pageNumber)));
+        return ResponseEntity.of(Optional.of(teamInterface.getAllTeams(tournamentId)));
     }
 
     @GetMapping("/view")

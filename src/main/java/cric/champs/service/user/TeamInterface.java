@@ -14,7 +14,7 @@ public interface TeamInterface {
 
     SuccessResultModel editTeam(Teams teams);
 
-    List<Teams> getAllTeams(long tournamentId, int pageSize, int pageNumber);
+    List<Teams> getAllTeams(long tournamentId);
 
     Teams getTeam(long teamId, long tournamentId);
 }
