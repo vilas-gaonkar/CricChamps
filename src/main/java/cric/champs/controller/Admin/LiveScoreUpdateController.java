@@ -23,8 +23,8 @@ public class LiveScoreUpdateController {
         return ResponseEntity.of(Optional.of(liveScoreUpdateInterface.updateLiveScore(liveScoreUpdateModel)));
     }
 
-    @PostMapping("/stop-match")
-    public ResponseEntity<SuccessResultModel> stopModel(@ModelAttribute LiveScoreModel liveScoreModel, @RequestPart String reason) {
-        return ResponseEntity.of(Optional.of(liveScoreUpdateInterface.stopMatch(liveScoreModel, reason)));
+    @DeleteMapping("/stop-match")
+    public ResponseEntity<SuccessResultModel> stopModel(@RequestHeader long matchId, @RequestHeader long tournamentId, @RequestHeader String reason) {
+        return ResponseEntity.of(Optional.of(liveScoreUpdateInterface.stopMatch(matchId,tournamentId, reason)));
     }
 }

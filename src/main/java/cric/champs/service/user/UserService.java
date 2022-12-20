@@ -422,7 +422,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     @Override
     public List<Teams> getAllTeams(long tournamentId, int pageSize, int pageNumber) {
         int offSet = pageSize * (pageNumber - 1);
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted='false' limit ? offset ?",
                 new BeanPropertyRowMapper<>(Teams.class), tournamentId, pageSize, offSet);
