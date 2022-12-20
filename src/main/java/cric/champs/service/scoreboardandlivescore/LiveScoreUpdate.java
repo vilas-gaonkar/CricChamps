@@ -33,6 +33,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
         doInitialConditions(liveScoreModel);
 
+        if (!liveScoreModel.getExtraModel().isExtraStatus() && liveScoreModel.getBall() == 5)
+            liveScoreModel.setOverStatus(OverStatus.COMPLETED.toString());
+
         if (liveScoreModel.getWicketModel().isWicketStatus() &&
                 !liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
             liveScoreModel.setRuns(0);
@@ -169,9 +172,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private void updateScoreBoard(LiveScoreUpdateModel liveScoreModel) {
         Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
-        if (!liveScoreModel.getExtraModel().isExtraStatus())
+        if (!liveScoreModel.getExtraModel().isExtraStatus() && liveScoreModel.getBall() < 5)
             jdbcTemplate.update("update scoreBoard set overs = ? , ball = ? , score = score + ? where scoreBoardId = ?",
                     liveScoreModel.getOver(), liveScoreModel.getBall() + 1, liveScoreModel.getRuns(), scoreBoardId);
+        else if (!liveScoreModel.getExtraModel().isExtraStatus() && liveScoreModel.getBall() == 5)
+            jdbcTemplate.update("update scoreBoard set overs = ? , ball = 0 , score = score + ? where scoreBoardId = ?",
+                    liveScoreModel.getOver() + 1, liveScoreModel.getRuns(), scoreBoardId);
         else
             jdbcTemplate.update("update scoreBoard set score = score + ? where scoreBoardId = ?",
                     liveScoreModel.getRuns(), scoreBoardId);
@@ -238,7 +244,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void updateEconomyRate(LiveScoreUpdateModel liveScoreModel) {
-        long scoreBoardId = getScoreBoard(liveScoreModel).get(0).getScoreBoardId();
+        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
+                liveScoreModel.getBowlingTeamId());
         BowlerSB bowlerSB = getBowlerSB(liveScoreModel).get(0);
         Players player = getPlayerDetail(liveScoreModel.getBowlerId()).get(0);
         if (getPlayerStats(liveScoreModel.getBowlerId()).isEmpty())
@@ -246,17 +253,17 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                     liveScoreModel.getBowlerId(), liveScoreModel.getTournamentId(), liveScoreModel.getBowlingTeamId(),
                     player.getPlayerName(), 0, 0, 0, 0, 0, 0, 0, 0, getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
                     getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()),
-                    getBowlingStrikeRate(bowlerSB.getOvers() + 6, bowlerSB.getWickets()),
+                    getBowlingStrikeRate(bowlerSB.getOvers() * 6, bowlerSB.getWickets()),
                     getWicketHaul(bowlerSB));
         else
             jdbcTemplate.update("update playerStats set bestBowlingAverage = ? , bestBowlingEconomy = ? , " +
                             "mostFiveWicketsHaul = mostFiveWicketsHaul + ?, bestBowlingStrikeRate = ?  " +
                             "where playerId = ?", getBowlingAverage(bowlerSB.getRuns(), bowlerSB.getWickets()),
                     getBowlingEconomy(bowlerSB.getRuns(), bowlerSB.getOvers()), getWicketHaul(bowlerSB),
-                    getBowlingStrikeRate(bowlerSB.getOvers() + 6, bowlerSB.getWickets()),
+                    getBowlingStrikeRate(bowlerSB.getOvers() * 6, bowlerSB.getWickets()),
                     bowlerSB.getPlayerId());
-        jdbcTemplate.update("update bowlingSB set bowlerStatus = ? where scoreBoardId = ? and playerId = ?",
-                OverStatus.DONE.toString(), scoreBoardId, liveScoreModel.getBowlingTeamId());
+        jdbcTemplate.update("update bowlingSB set bowlerStatus = ? , balls = 0 where scoreBoardId = ? and playerId = ?",
+                OverStatus.DONE.toString(), scoreBoardId, liveScoreModel.getBowlerId());
     }
 
     private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel) {
