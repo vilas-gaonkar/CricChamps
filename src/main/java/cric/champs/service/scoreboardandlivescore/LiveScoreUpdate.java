@@ -268,7 +268,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel) {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
-                liveScoreModel.getBowlingTeamId());
+                liveScoreModel.getBattingTeamId());
         if (liveScoreModel.getExtraModel().isExtraStatus())
             insertTOBowlerSb(liveScoreModel, scoreBoardId, 0);
         else
