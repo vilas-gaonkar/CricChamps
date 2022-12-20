@@ -230,7 +230,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
      */
     private void insertNewBowlerToScoreboardOrUpdateExistingBowler(LiveScoreUpdateModel liveScoreModel) {
         Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(),
-                liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
+                liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
         if (liveScoreModel.getBall() == 1 && !liveScoreModel.getExtraModel().isExtraStatus())
             jdbcTemplate.update("update bowlingSB set bowlerStatus = ? where scoreBoardId = ? and  bowlerStatus = 'DONE'",
                     null, scoreBoardId);
