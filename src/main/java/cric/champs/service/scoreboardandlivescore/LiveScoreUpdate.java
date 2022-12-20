@@ -285,7 +285,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private void insertTOBowlerSb(LiveScoreUpdateModel liveScoreModel, long scoreBoardId, int ball) {
         jdbcTemplate.update("insert into bowlingSB values(?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreModel.getBowlingTeamId(), liveScoreModel.getBowlerId(),
-                getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), liveScoreModel.getRuns(), 0,
+                getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), 0, 0,
                 ball, 0, 0, 0, BowlingStatus.BOWLING.toString());
     }
 
