@@ -10,6 +10,6 @@ public interface PopUpInterface {
 
     List<PlayersResult> remainingBowlers(long tournamentId,long matchId ,long teamId);
 
-    List<PlayersResult> Fielders(long tournamentId,long matchId ,long teamId);
+    List<PlayersResult> fielders(long tournamentId, long matchId , long teamId);
 
 }
