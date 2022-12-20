@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.util.List;
 
-@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 @Service
 public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
@@ -45,6 +44,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
+
+        if (liveScoreModel.getWicketModel().isWicketStatus() &&
+                !liveScoreModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
+            liveScoreModel.setRuns(0);
 
         updateScoreBoard(liveScoreModel);
         updateLiveScoreAndCommentary(liveScoreModel);
@@ -311,8 +314,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
-        setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
+        if (liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+            setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
+            setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
+        }
         return true;
     }
 
@@ -372,8 +377,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
-        setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
+        if (liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+            setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
+            setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
+        }
         return true;
     }
 
@@ -957,15 +964,14 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreUpdateModel.getExtraModel().isExtraStatus() ? liveScoreUpdateModel.getExtraModel().getExtraType() :
                         String.valueOf(liveScoreUpdateModel.getRuns());
         int ball = 1;
-        if(liveScoreUpdateModel.getExtraModel().isExtraStatus())
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
             ball = 0;
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
-                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall()+ball, extraRun, ballStatus, overStatus, comment);
+                liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall() + ball, extraRun, ballStatus, overStatus, comment);
     }
 
     /**
-     *
      * Stop match
      */
     @Override
