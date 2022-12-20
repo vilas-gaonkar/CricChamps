@@ -39,7 +39,7 @@ public class PopUpService implements PopUpInterface {
     }
 
     @Override
-    public List<PlayersResult> Fielders(long tournamentId, long matchId, long teamId) {
+    public List<PlayersResult> fielders(long tournamentId, long matchId, long teamId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select playerId, playerName from players where teamId = ?",
