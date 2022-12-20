@@ -186,6 +186,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             jdbcTemplate.update("update scoreBoard set score = score + ? where scoreBoardId = ?",
                     liveScoreModel.getRuns(), scoreBoardId);
+        ScoreBoard scoreBoard = getScoreBoard(liveScoreModel).get(0);
+        jdbcTemplate.update("update set totalScore = ? , totalWickets = ? , totalOverPlayed = ? , totalballsPlayed = ?" +
+                        " where matchId = ? and teamId = ?", scoreBoard.getScore(), scoreBoard.getTotalWicketFall(),
+                scoreBoard.getOvers(), scoreBoard.getBall(), scoreBoard.getMatchId(), scoreBoard.getTeamId());
         if (liveScoreModel.getWicketModel().isWicketStatus())
             updateWicketToScoreBoardAndFallOfWicket(liveScoreModel, scoreBoardId);
     }
