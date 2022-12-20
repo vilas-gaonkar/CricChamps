@@ -829,11 +829,18 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             wicket = 1;
         if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
             ball = 0;
-        jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
+        if(liveScoreUpdateModel.getBall()+1==6 && !liveScoreUpdateModel.getExtraModel().isExtraStatus())
+            jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
                         "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", df.format(currentRunRate),
-                df.format(requiredRunRate), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets() + wicket, liveScoreUpdateModel.getOver(),
-                liveScoreUpdateModel.getBall() + ball, neededRun, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
+                df.format(requiredRunRate), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets() + wicket, liveScoreUpdateModel.getOver()+1,
+                0, neededRun, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
                 liveScoreUpdateModel.getTournamentId());
+        else
+            jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
+                            "balls = ?, runsNeeded = ? where teamId = ? and matchId = ? and tournamentId = ?", df.format(currentRunRate),
+                    df.format(requiredRunRate), newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns(), newLive.get(0).getWickets() + wicket, liveScoreUpdateModel.getOver(),
+                    liveScoreUpdateModel.getBall() + ball, neededRun, liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(),
+                    liveScoreUpdateModel.getTournamentId());
     }
 
     private void insertIntoLive(LiveScoreUpdateModel liveScoreUpdateModel, Teams teams, int neededRuns) {
