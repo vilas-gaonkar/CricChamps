@@ -187,9 +187,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             jdbcTemplate.update("update scoreBoard set score = score + ? where scoreBoardId = ?",
                     liveScoreModel.getRuns(), scoreBoardId);
         ScoreBoard scoreBoard = getScoreBoard(liveScoreModel).get(0);
-        jdbcTemplate.update("update versus set totalScore = ? , totalWickets = ? , totalOverPlayed = ? , totalballsPlayed = ?" +
-                        " where matchId = ? and teamId = ?", scoreBoard.getScore(), scoreBoard.getTotalWicketFall(),
-                scoreBoard.getOvers(), scoreBoard.getBall(), scoreBoard.getMatchId(), scoreBoard.getTeamId());
+        jdbcTemplate.update("update versus set totalScore = ? , totalOverPlayed = ? , totalballsPlayed = ?" +
+                        " where matchId = ? and teamId = ?", scoreBoard.getScore(), scoreBoard.getOvers(),
+                scoreBoard.getBall(), scoreBoard.getMatchId(), scoreBoard.getTeamId());
         if (liveScoreModel.getWicketModel().isWicketStatus())
             updateWicketToScoreBoardAndFallOfWicket(liveScoreModel, scoreBoardId);
     }
@@ -204,6 +204,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getBattingTeamId(), liveScoreModel.getWicketModel().getOutPlayerId(),
                 getPlayerDetail(liveScoreModel.getWicketModel().getOutPlayerId()).get(0).getPlayerName(),
                 scoreBoard.getScore(), scoreBoard.getTotalWicketFall(), scoreBoard.getOvers(), scoreBoard.getBall());
+        jdbcTemplate.update("update versus set totalWickets = ? where matchId = ? and teamId = ?",
+                scoreBoard.getTotalWicketFall(), scoreBoard.getMatchId(), scoreBoard.getTeamId());
     }
 
     /**
@@ -235,7 +237,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             jdbcTemplate.update("update bowlingSB set bowlerStatus = ? where scoreBoardId = ? and  bowlerStatus = 'DONE'",
                     null, scoreBoardId);
         if (getBowlerSB(liveScoreModel).isEmpty())
-            insertNewBowlerToScoreBoard(liveScoreModel,scoreBoardId);
+            insertNewBowlerToScoreBoard(liveScoreModel, scoreBoardId);
         if (liveScoreModel.getExtraModel().isExtraStatus())
             jdbcTemplate.update("update bowlingSB set runs = runs + ? , balls = ? , overs = overs + ? , wickets = wickets + ? " +
                             "where scoreBoardId = ? and playerId = ?", liveScoreModel.getRuns(), liveScoreModel.getBall(),
@@ -273,7 +275,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 OverStatus.DONE.toString(), bowlerSB.getScoreBoardId(), liveScoreModel.getBowlerId());
     }
 
-    private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel,long scoreBoardId) {
+    private void insertNewBowlerToScoreBoard(LiveScoreUpdateModel liveScoreModel, long scoreBoardId) {
         if (liveScoreModel.getExtraModel().isExtraStatus())
             insertTOBowlerSb(liveScoreModel, scoreBoardId, 0);
         else
@@ -663,7 +665,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     private void insertIntoVersus(LiveScoreUpdateModel liveScoreModel) {
         ScoreBoard battingScoreBoard = getScoreBoard(liveScoreModel).get(0);
-        jdbcTemplate.update("update versus set totalScore = ? , totalWickets = ? , totalOverPlayed = ? , totalballsPlayed = ?," +
+        jdbcTemplate.update("update versus set totalScore = ? , totalOverPlayed = ? , totalballsPlayed = ?," +
                         " matchResult = ? where matchId = ? and teamId = ?", battingScoreBoard.getScore(),
                 battingScoreBoard.getTotalWicketFall(), battingScoreBoard.getOvers() + 1, battingScoreBoard.getBall(),
                 VersusStatus.INNINGCOMPLETE.toString(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
