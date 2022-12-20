@@ -301,7 +301,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private List<BowlerSB> getBowlerSB(LiveScoreUpdateModel liveScoreModel) {
         return jdbcTemplate.query("Select * from bowlingSB where scoreBoardId = ? and playerId = ?",
                 new BeanPropertyRowMapper<>(BowlerSB.class), getScoreBoardId(liveScoreModel.getTournamentId(),
-                        liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId()), liveScoreModel.getBowlerId());
+                        liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId()), liveScoreModel.getBowlerId());
     }
 
     private int getWicketHaul(BowlerSB bowlerSB) {
