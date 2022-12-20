@@ -12,6 +12,8 @@ import lombok.Setter;
 public class TournamentResultModel {
     private String tournamentName;
 
+    private long tournamentId;
+
     private String tournamentCode;
 
     private String message;

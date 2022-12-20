@@ -175,7 +175,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
                 systemInterface.getUserId(), tournaments.getTournamentName(), tournaments.getTournamentType(),
                 tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0,
                 TournamentStatus.UPCOMING.toString());
-        return new TournamentResultModel(tournaments.getTournamentName(), tournamentCode, "Tournament successfully created");
+        return new TournamentResultModel(tournaments.getTournamentName(),
+                getDetailsByTournamentCode(tournamentCode).getTournamentId(),
+                tournamentCode, "Tournament successfully created");
     }
 
     @Override
