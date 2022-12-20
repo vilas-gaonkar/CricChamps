@@ -805,7 +805,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                         "(select teamId from players where playerId = ?)", new BeanPropertyRowMapper<>(Live.class), liveScoreUpdateModel.getMatchId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getBowlerId());
         if (firstInnings.isEmpty()) {
-            if (liveScoreUpdateModel.getBall() == 6) {
+            if (liveScoreUpdateModel.getBall()+1 == 6) {
                 double currentRunRate = currentRunRate(liveScoreUpdateModel.getOver() + 1, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns());
                 updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, 0, 0);
             } else
@@ -814,7 +814,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             int neededRuns = firstInnings.get(0).getRuns() - newLive.get(0).getRuns() - liveScoreUpdateModel.getRuns();
             double currentRunRate = currentRunRate(liveScoreUpdateModel.getOver() + 1, newLive.get(0).getRuns() + liveScoreUpdateModel.getRuns());
             double requiredRunRate = requiredRunRate(newLive.get(0).getRunsNeeded(), tournaments.getNumberOfOvers() - liveScoreUpdateModel.getOver() + 1);
-            if (liveScoreUpdateModel.getBall() == 6)
+            if (liveScoreUpdateModel.getBall()+1 == 6)
                 updateIntoLive(liveScoreUpdateModel, newLive, currentRunRate, requiredRunRate, neededRuns);
             else
                 updateIntoLive(liveScoreUpdateModel, newLive, newLive.get(0).getCurrentRunRate(), newLive.get(0).getRequiredRunRate(), neededRuns);
@@ -920,7 +920,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private void commentaryScoreModification(LiveScoreUpdateModel liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
         String comment = getComment(liveScoreUpdateModel);
-        if (liveScoreUpdateModel.getWicketModel().isWicketStatus() && liveScoreUpdateModel.getBall() != 6) {
+        if (liveScoreUpdateModel.getWicketModel().isWicketStatus() && liveScoreUpdateModel.getBall()+1 != 6) {
             if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString())))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1, comment);
@@ -935,7 +935,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
             else
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
-        } else if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall() != 6) {
+        } else if (liveScoreUpdateModel.getExtraModel().isExtraStatus() && liveScoreUpdateModel.getBall()+1 != 6) {
             if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns() - 1, comment);
@@ -946,7 +946,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             if (liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.legBye.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.bye.toString()))
                 insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
-        } else if (liveScoreUpdateModel.getBall() == 6)
+        } else if (liveScoreUpdateModel.getBall()+1 == 6)
             insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.COMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
         else
             insertIntoCommentary(liveScoreUpdateModel, lives, OverStatus.NOTCOMPLETED.toString(), liveScoreUpdateModel.getRuns(), comment);
