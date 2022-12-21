@@ -125,7 +125,8 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric champs registration OTP");
         email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
         javaMailSender.send(email);
-        return new SuccessResultModel("OTP has been sent to your email");
+        return new SuccessResultModel("If the mail address entered matches your account," +
+                "you will receive an email with a link to reset your password");
     }
 
     @Override

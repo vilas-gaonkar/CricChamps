@@ -90,21 +90,21 @@ public class LoginController {
 
     @PatchMapping("/forgot-password")
     public ResponseEntity<SuccessResultModel> forgotPassword(@RequestHeader @Email(message = "enter valid email") String email)
-            throws UsernameNotFoundException, OTPGenerateException {
+            throws UsernameNotFoundExceptions, OTPGenerateException {
         return ResponseEntity.of(Optional.of(loginInterface.forgotPassword(email)));
     }
 
     @PatchMapping("/reset")
-    public ResponseEntity<String> verifyOTP(@RequestParam @Min(value = 100000, message = "enter valid otp")
-                                            @Max(value = 999999, message = "enter valid otp") int otp,
-                                            @RequestHeader @Email(message = "enter valid email") String email) {
+    public ResponseEntity<Map<String, String>> verifyOTP(@RequestHeader @Min(value = 100000, message = "enter valid otp")
+                                                         @Max(value = 999999, message = "enter valid otp") int otp,
+                                                         @RequestHeader @Email(message = "enter valid email") String email) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (loginInterface.resetPassword(otp, email)) {
             responseHeaders.set("isVerified", "true");
-            return ResponseEntity.ok().headers(responseHeaders).body("Verified successfully");
+            return ResponseEntity.ok().headers(responseHeaders).body(Collections.singletonMap("message", "Verified successfully"));
         }
         responseHeaders.set("isVerified", "false");
-        return ResponseEntity.ok().headers(responseHeaders).body("Invalid OTP");
+        return ResponseEntity.badRequest().headers(responseHeaders).body(Collections.singletonMap("message", "Invalid OTP"));
     }
 
     @PostMapping("/send-otp")
@@ -113,7 +113,7 @@ public class LoginController {
     }
 
     @PatchMapping("/verify")
-    public ResponseEntity<SuccessResultModel> verifyEmail(@RequestParam int otp, @RequestHeader String email) throws Exception {
+    public ResponseEntity<SuccessResultModel> verifyEmail(@RequestHeader int otp, @RequestHeader String email) throws Exception {
         return ResponseEntity.of(Optional.of(systemInterface.verifyUserAccount(otp, email)));
     }
 
@@ -139,12 +139,12 @@ public class LoginController {
         return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword)));
     }
 
-    @DeleteMapping("/user/remove/profile-photo")
+    @DeleteMapping("/user/remove")
     public ResponseEntity<SuccessResultModel> removeProfilePhoto() {
         return ResponseEntity.of(Optional.of(loginInterface.deleteOldProfilePhoto()));
     }
 
-    @GetMapping("/user/details")
+    @GetMapping("/user")
     public ResponseEntity<?> getUserDetails() {
         return ResponseEntity.of(Optional.of(loginInterface.getUserDetails()));
     }

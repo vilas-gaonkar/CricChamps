@@ -103,9 +103,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public SuccessResultModel forgotPassword(String email) throws UsernameNotFoundException, OTPGenerateException {
+    public SuccessResultModel forgotPassword(String email) throws UsernameNotFoundExceptions, OTPGenerateException {
         if (systemInterface.verifyEmail(email))
-            throw new UsernameNotFoundException("Invalid email");
+            throw new UsernameNotFoundExceptions("Invalid email");
         return systemInterface.forgetOtp(email);
     }
 

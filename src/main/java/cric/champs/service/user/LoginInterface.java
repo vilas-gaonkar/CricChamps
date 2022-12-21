@@ -14,7 +14,7 @@ public interface LoginInterface {
 
     SuccessResultModel signUp(Users user) throws SignupException;
 
-    SuccessResultModel forgotPassword(String username) throws UsernameNotFoundException, OTPGenerateException;
+    SuccessResultModel forgotPassword(String username) throws UsernameNotFoundExceptions, OTPGenerateException;
 
     boolean resetPassword(int otp, String email);
 
