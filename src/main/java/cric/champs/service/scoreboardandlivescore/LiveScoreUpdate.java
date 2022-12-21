@@ -127,8 +127,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                     liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
             Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                     liveScoreModel.getBattingTeamId());
-            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId());
-            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getNonStrikeBatsmanId());
+            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId(),
+                    StrikePosition.STRIKE.toString());
+            insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getNonStrikeBatsmanId(),
+                    StrikePosition.NONSTRIKE.toString());
         }
     }
 
@@ -159,10 +161,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(ScoreBoard.class), tournamentId, matchId, teamId).get(0).getScoreBoardId();
     }
 
-    private void insertNewBatsmanToScoreboard(LiveScoreUpdateModel liveScoreUpdateModel, Long scoreBoardId, Long playerId) {
+    private void insertNewBatsmanToScoreboard(LiveScoreUpdateModel liveScoreUpdateModel, Long scoreBoardId, Long playerId , String strikePosition) {
         jdbcTemplate.update("insert into batsmanSB values(?,?,?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreUpdateModel.getBattingTeamId(), playerId, getPlayerDetail(playerId).get(0).getPlayerName(), 0, 0,
-                0, 0, 0, BatsmanStatus.NOTOUT.toString(), null, null, null);
+                0, 0, 0, BatsmanStatus.NOTOUT.toString(), strikePosition, null, null);
     }
 
     private List<Players> getPlayerDetail(Long playerId) {
@@ -376,7 +378,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                         "matchesPlayed = matchesPlayed + 1 , totalRuns = totalRuns + ?  where playerId = ? ",
                 batsmanSB.getRuns(), liveScoreModel.getWicketModel().getOutPlayerId());
         insertNewBatsmanToScoreboard(liveScoreModel, batsmanSB.getScoreBoardId(),
-                liveScoreModel.getWicketModel().getNewBatsmanId());
+                liveScoreModel.getWicketModel().getNewBatsmanId(),batsmanSB.getStrikePosition());
     }
 
     private int getTotalHundreds(BatsmanSB batsmanSB) {
