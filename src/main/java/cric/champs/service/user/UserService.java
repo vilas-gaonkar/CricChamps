@@ -367,12 +367,11 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public List<Umpires> getUmpireDetails(long tournamentId, int pageSize, int pageNumber) {
-        int offset = pageSize * (pageNumber - 1);
+    public List<Umpires> getUmpireDetails(long tournamentId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
-        return jdbcTemplate.query("select * from umpires where tournamentId = ? and isDeleted = 'false' limit ? offset ?",
-                new BeanPropertyRowMapper<>(Umpires.class), tournamentId, pageSize, offset);
+        return jdbcTemplate.query("select * from umpires where tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Umpires.class), tournamentId);
     }
 
     @Override
@@ -431,7 +430,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public Teams getTeam(long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty())
             throw new NullPointerException("Team not found.");
@@ -485,20 +484,19 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public List<Players> getAllPlayers(long teamId, long tournamentId, int pageSize, int pageNumber) {
-        int offSet = pageSize * (pageNumber - 1);
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+    public List<Players> getAllPlayers(long teamId, long tournamentId) {
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         List<Players> players = systemInterface.verifyTeamAndTournamentId(teamId, tournamentId);
         if (players.isEmpty())
             throw new NullPointerException("Players not found");
-        return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false' limit ? offset ?",
-                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId, pageSize, offSet);
+        return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false'",
+                new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId);
     }
 
     @Override
     public Players getPlayer(long playerId, long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");
         if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty())
             throw new NullPointerException("Team not found");

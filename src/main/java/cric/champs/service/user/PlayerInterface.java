@@ -14,7 +14,7 @@ public interface PlayerInterface {
 
     SuccessResultModel editPlayer(Players players);
 
-    List<Players> getAllPlayers(long teamId, long tournamentId, int pageSize, int pageNumber);
+    List<Players> getAllPlayers(long teamId, long tournamentId);
 
     Players getPlayer(long playerId, long teamId, long tournamentId);
 }
