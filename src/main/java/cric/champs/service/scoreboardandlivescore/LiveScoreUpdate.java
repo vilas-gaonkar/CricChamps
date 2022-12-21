@@ -353,7 +353,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
+        if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
@@ -380,7 +380,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         jdbcTemplate.update("update players set numberOfTimeHeHasBeenOut = numberOfTimeHeHasBeenOut + 1 ," +
                         "matchesPlayed = matchesPlayed + 1 , totalRuns = totalRuns + ?  where playerId = ? ",
                 batsmanSB.getRuns(), liveScoreModel.getWicketModel().getOutPlayerId());
-        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty())
+        if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty())
             insertNewBatsmanToScoreboard(liveScoreModel, batsmanSB.getScoreBoardId(),
                     liveScoreModel.getWicketModel().getNewBatsmanId(), batsmanSB.getStrikePosition());
     }
