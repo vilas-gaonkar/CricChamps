@@ -18,9 +18,9 @@ public interface LoginInterface {
 
     boolean resetPassword(int otp, String email);
 
-    SuccessResultModel changePassword(String newPassword, String confirmPassword) throws UpdateFailedException;
+    SuccessResultModel changePassword(String newPassword);
 
-    SuccessResultModel resetPassword(String newPassword, String confirmPassword, String email) throws UpdateFailedException;
+    SuccessResultModel resetPassword(String newPassword, String email);
 
     SuccessResultModel changeProfilePhoto(String photoLink) throws UpdateFailedException;
 

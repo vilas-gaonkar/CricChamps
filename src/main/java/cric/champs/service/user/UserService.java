@@ -104,9 +104,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel forgotPassword(String email) throws UsernameNotFoundException, OTPGenerateException {
-        if (!systemInterface.verifyEmail(email))
-            return systemInterface.forgetOtp(email);
-        throw new UsernameNotFoundException("Invalid email");
+        if (systemInterface.verifyEmail(email))
+            throw new UsernameNotFoundException("Invalid email");
+        return systemInterface.forgetOtp(email);
     }
 
     @Override
@@ -115,30 +115,23 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     }
 
     @Override
-    public SuccessResultModel changePassword(String newPassword, String confirmPassword) throws UpdateFailedException {
-        if (newPassword.equals(confirmPassword)) {
-            jdbcTemplate.update("update users set password = ? where userId = ? and isDeleted = 'false'",
-                    passwordEncoder.encode(newPassword), systemInterface.getUserId());
-            return new SuccessResultModel("Your password has been changed successfully");
-        }
-        throw new UpdateFailedException("Please re-check your password");
+    public SuccessResultModel changePassword(String newPassword) {
+        jdbcTemplate.update("update users set password = ? where userId = ? and isDeleted = 'false'",
+                passwordEncoder.encode(newPassword), systemInterface.getUserId());
+        return new SuccessResultModel("Your password has been changed successfully");
     }
 
     @Override
-    public SuccessResultModel resetPassword(String newPassword, String confirmPassword, String email) throws UpdateFailedException {
-        if (newPassword.equals(confirmPassword)) {
-            jdbcTemplate.update("update users set password = ? where email = ? and isDeleted = 'false'",
-                    passwordEncoder.encode(newPassword), email);
-            return new SuccessResultModel("Your password has been reset successfully");
-        }
-        throw new UpdateFailedException("Please re-check your password");
+    public SuccessResultModel resetPassword(String newPassword, String email) {
+        jdbcTemplate.update("update users set password = ? where email = ? and isDeleted = 'false'",
+                passwordEncoder.encode(newPassword), email);
+        return new SuccessResultModel("Your password has been reset successfully");
     }
 
     @Override
     public SuccessResultModel changeProfilePhoto(String profilePhoto) throws UpdateFailedException {
         if (profilePhoto == null)
             throw new UpdateFailedException("Please select a photo");
-
         jdbcTemplate.update("update users set profilePicture = ? where userId = ? and isDeleted = 'false'",
                 profilePhoto, systemInterface.getUserId());
         return new SuccessResultModel("Your profile photo has been changed successfully");
@@ -156,7 +149,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public Users getUserDetails() {
-
         return jdbcTemplate.query("select * from users where userId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Users.class), systemInterface.getUserId()).get(0);
     }
@@ -170,7 +162,6 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         String tournamentCode = systemInterface.generateTournamentCode();
         if (!systemInterface.verifyTournamentCode(tournamentCode).isEmpty())
             registerTournament(tournaments);
-
         jdbcTemplate.update("insert into tournaments values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null,
                 systemInterface.getUserId(), tournaments.getTournamentName(), tournaments.getTournamentType(),
                 tournamentCode, tournaments.getTournamentLogo(), null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -224,11 +215,12 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel setTournamentTime(long tournamentId, LocalTime startTime, LocalTime endTime) throws FixtureGenerationException {
+        if (endTime.isBefore(startTime))
+            throw new FixtureGenerationException("Invalid start and end time");
         List<Tournaments> tournament = systemInterface.verifyTournamentId(tournamentId);
-        if (tournament.isEmpty())
-            throw new NullPointerException("Tournament not found");
-        if (!systemInterface.validateTime(startTime, endTime, tournament.get(0).getNumberOfOvers()))
-            throw new FixtureGenerationException("Insufficient time to generate fixture");
+        if (tournament.isEmpty() ||
+                !systemInterface.validateTime(startTime, endTime, tournament.get(0).getNumberOfOvers()))
+            throw new FixtureGenerationException("Tournament not found or Insufficient time to generate fixture");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? where " +
                 "tournamentId = ? and tournamentStatus = 'UPCOMING'", startTime, endTime, tournamentId);
         return new SuccessResultModel("Time updated successfully");
@@ -260,12 +252,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel registerGrounds(Grounds ground, List<String> groundPhoto) {
-        if (systemInterface.verifyTournamentId(ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("Tournament not found");
-
-        if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("A ground already exists in the given co-ordinates");
-
+        if (systemInterface.verifyTournamentId(ground.getTournamentId()).isEmpty() ||
+                !systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
+            throw new NullPointerException("Tournament not found or ground already added for this co-ordinates");
         jdbcTemplate.update("insert into grounds values(?,?,?,?,?,?,?,?)", null, ground.getTournamentId(),
                 ground.getGroundName(), ground.getCity(), ground.getGroundLocation(), ground.getLatitude(),
                 ground.getLongitude(), "false");
@@ -291,10 +280,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel editGround(Grounds ground, List<String> groundPhoto) {
-        if (systemInterface.verifyGroundId(ground.getGroundId(), ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("Invalid ground");
-        if (!systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
-            throw new NullPointerException("latitude and longitude already added");
+        if (systemInterface.verifyGroundId(ground.getGroundId(), ground.getTournamentId()).isEmpty() ||
+                !systemInterface.verifyLatitudeAndLongitude(ground.getLatitude(), ground.getLongitude(), ground.getTournamentId()).isEmpty())
+            throw new NullPointerException("Invalid ground or latitude and longitude already added");
         jdbcTemplate.update("update grounds set groundName = ? , city = ? , groundLocation = ? , latitude = ? , longitude = ?" +
                         " where groundId = ?", ground.getGroundName(), ground.getCity(), ground.getGroundLocation(),
                 ground.getLatitude(), ground.getLongitude(), ground.getGroundId());
@@ -376,10 +364,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public Umpires getUmpire(long umpireId, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        if (systemInterface.verifyUmpireDetails(tournamentId, umpireId).isEmpty())
-            throw new NullPointerException("Umpire Not Found");
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty() ||
+                systemInterface.verifyUmpireDetails(tournamentId, umpireId).isEmpty())
+            throw new NullPointerException("Tournament not found or Umpire Not Found");
         return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId, umpireId).get(0);
     }
@@ -390,7 +377,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public TeamResultModel registerTeam(Teams teams) throws Exception {
-        if (systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
+        if (systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getTournamentType().
+                equalsIgnoreCase(TournamentTypes.INDIVIDUALMATCH.toString())
                 && systemInterface.verifyTournamentId(teams.getTournamentId()).get(0).getNumberOfTeams() == 2)
             throw new Exception("Individual match should not contain more than two teams");
         jdbcTemplate.update("insert into teams values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", null, teams.getTournamentId(),
@@ -430,10 +418,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public Teams getTeam(long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty())
-            throw new NullPointerException("Team not found.");
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty() ||
+                systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found or Team not found");
         return jdbcTemplate.query("select * from teams where teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Teams.class), teamId, tournamentId).get(0);
     }
@@ -443,8 +430,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
      */
 
     @Override
-    public SuccessResultModel
-    registerPlayer(Players players) throws InvalidFieldException {
+    public SuccessResultModel registerPlayer(Players players) throws InvalidFieldException {
         if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
             throw new NullPointerException("tournament not found");
         if (players.getDesignation() != null && !EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation()))
@@ -485,23 +471,19 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public List<Players> getAllPlayers(long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        List<Players> players = systemInterface.verifyTeamAndTournamentId(teamId, tournamentId);
-        if (players.isEmpty())
-            throw new NullPointerException("Players not found");
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty() ||
+                systemInterface.verifyTeamAndTournamentId(teamId, tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found or Players not found");
         return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId);
     }
 
     @Override
     public Players getPlayer(long playerId, long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        if (systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty())
-            throw new NullPointerException("Team not found");
-        if (systemInterface.verifyPlayerDetails(playerId, teamId, tournamentId).isEmpty())
-            throw new NullPointerException("Player not found");
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty() ||
+                systemInterface.verifyTeamDetails(teamId, tournamentId).isEmpty() ||
+                systemInterface.verifyPlayerDetails(playerId, teamId, tournamentId).isEmpty())
+            throw new NullPointerException("Tournament not found or Team not found or Player not found");
         return jdbcTemplate.query("select * from players where playerId = ? and teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), playerId, teamId, tournamentId).get(0);
     }

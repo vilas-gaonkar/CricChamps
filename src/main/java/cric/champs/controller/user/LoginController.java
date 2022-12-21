@@ -84,11 +84,8 @@ public class LoginController {
     public ResponseEntity<SuccessResultModel> resetPassword(@RequestHeader @Email(message = "enter valid email") String email,
                                                             @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
                                                                     message = "Please provide password at least one uppercase letter,one lowercase letter,one number and "
-                                                                            + "one special character with minimum length 8 maximum length 250") String newPassword,
-                                                            @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
-                                                                    message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
-                                                                            "one special character with minimum length 8 maximum length 250") String confirmPassword) throws UpdateFailedException {
-        return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, confirmPassword, email)));
+                                                                            + "one special character with minimum length 8 maximum length 250") String newPassword) {
+        return ResponseEntity.of(Optional.of(loginInterface.resetPassword(newPassword, email)));
     }
 
     @PatchMapping("/forgot-password")
@@ -135,13 +132,11 @@ public class LoginController {
     }
 
     @PatchMapping("/user/change/password")
-    public ResponseEntity<SuccessResultModel> changePassword(@RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
+    public ResponseEntity<SuccessResultModel> changePassword(@RequestHeader @Pattern(
+            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
             message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
-                    "one special character with minimum length 8 maximum length 250") String newPassword,
-                                                             @RequestHeader @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,250}$",
-                                                                     message = "Please provide password at least one uppercase letter,one lowercase letter,one number and " +
-                                                                             "one special character with minimum length 8 maximum length 250") String confirmPassword) throws UpdateFailedException {
-        return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword, confirmPassword)));
+                    "one special character with minimum length 8 maximum length 250") String newPassword) {
+        return ResponseEntity.of(Optional.of(loginInterface.changePassword(newPassword)));
     }
 
     @DeleteMapping("/user/remove/profile-photo")
