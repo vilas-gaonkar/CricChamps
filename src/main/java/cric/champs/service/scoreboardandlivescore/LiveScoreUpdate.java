@@ -791,6 +791,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreUpdateModel.getTournamentId());
     }
 
+    /**
+     *
+     * update in live score
+     */
     private void liveScoreModification(Tournaments tournaments, Teams teams, LiveScoreUpdateModel liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
         if (lives.isEmpty()) {
@@ -861,6 +865,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 0, 0, liveScoreUpdateModel.getRuns(), wicket, liveScoreUpdateModel.getOver(), liveScoreUpdateModel.getBall() + ball, neededRuns);
     }
 
+    /**
+     *
+     * update  in partnership
+     */
     private void partnershipScoreModification(LiveScoreUpdateModel liveScoreUpdateModel) {
         List<Partnership> partnerships = partnershipDetails(liveScoreUpdateModel);
         List<Partnership> checkPartnership = checkPartnershipDetails(liveScoreUpdateModel);
@@ -930,6 +938,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getTournamentId());
     }
 
+    /**
+     *
+     * update commentary
+     */
     private void commentaryScoreModification(LiveScoreUpdateModel liveScoreUpdateModel) {
         List<Live> lives = liveDetails(liveScoreUpdateModel);
         String comment = getComment(liveScoreUpdateModel);
@@ -966,6 +978,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     }
 
+    /**
+     *
+     * Generate comments
+     */
     private String getComment(LiveScoreUpdateModel liveScoreUpdateModel) {
         Players batsman = getPlayerDetail(liveScoreUpdateModel.getStrikeBatsmanId()).get(0);
         Players bowler = getPlayerDetail(liveScoreUpdateModel.getBowlerId()).get(0);
