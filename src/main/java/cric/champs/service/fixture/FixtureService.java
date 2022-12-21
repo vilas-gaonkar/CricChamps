@@ -531,11 +531,11 @@ public class FixtureService implements FixtureGenerationInterface {
     private int getNumberMatchPerDay(long numberOfHoursPerDayAvailableForPlayingMatch, int numberOfOvers) {
         if (numberOfOvers < 6)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch;
-        else if (numberOfOvers > 6 && numberOfOvers < 16)
+        else if (numberOfOvers < 16)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 2;
-        else if (numberOfOvers > 16 && numberOfOvers < 31)
+        else if (numberOfOvers < 31)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 3;
-        else if (numberOfOvers > 31 && numberOfOvers < 41)
+        else if (numberOfOvers < 41)
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 5;
         else
             return (int) numberOfHoursPerDayAvailableForPlayingMatch / 8;

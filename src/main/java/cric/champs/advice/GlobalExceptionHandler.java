@@ -287,6 +287,14 @@ public class GlobalExceptionHandler {
         return errorMessage;
     }
 
+    @ExceptionHandler(FixtureGenerationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleFixtureGenerationException(FixtureGenerationException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
     @ExceptionHandler(UnexpectedTypeException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleUnexpectedTypeException(UnexpectedTypeException exception) {
