@@ -431,10 +431,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel registerPlayer(Players players) throws InvalidFieldException {
-        if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty())
-            throw new NullPointerException("tournament not found");
-        if (players.getDesignation() != null && !EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation()))
-            throw new InvalidFieldException("Incorrect designation");
+        if (systemInterface.verifyTournamentId(players.getTournamentId()).isEmpty() ||
+                (players.getDesignation() != null && !EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation())))
+            throw new NullPointerException("tournament not found or Incorrect designation");
         if (EnumUtils.isValidEnum(PlayerDesignation.class, players.getDesignation()))
             jdbcTemplate.update("update teams set captainName = ? where teamId = ?", players.getPlayerName(),
                     players.getTeamId());
