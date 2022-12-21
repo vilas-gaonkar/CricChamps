@@ -470,8 +470,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public List<Players> getAllPlayers(long teamId, long tournamentId) {
-        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty() ||
-                systemInterface.verifyTeamAndTournamentId(teamId, tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found or Players not found");
         return jdbcTemplate.query("select * from players where teamId = ? and tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Players.class), teamId, tournamentId);
