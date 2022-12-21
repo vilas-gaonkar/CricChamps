@@ -419,7 +419,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
+        if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
