@@ -101,6 +101,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getMatchStatus().equals(MatchStatus.PAST.toString()))
             throw new LiveScoreUpdationException("Match already completed");
         else if (!getScoreBoard(liveScoreModel).isEmpty() &&
+                getScoreBoard(liveScoreModel).get(0).getMatchStatus() != null &&
                 (getScoreBoard(liveScoreModel).get(0).getMatchStatus().equals(MatchStatus.INNINGCOMPLETED.toString()) ||
                         getScoreBoard(liveScoreModel).get(0).getMatchStatus().equals(MatchStatus.COMPLETED.toString())))
             throw new LiveScoreUpdationException("Inning completed or match completed");
@@ -161,7 +162,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(ScoreBoard.class), tournamentId, matchId, teamId).get(0).getScoreBoardId();
     }
 
-    private void insertNewBatsmanToScoreboard(LiveScoreUpdateModel liveScoreUpdateModel, Long scoreBoardId, Long playerId , String strikePosition) {
+    private void insertNewBatsmanToScoreboard(LiveScoreUpdateModel liveScoreUpdateModel, Long scoreBoardId, Long playerId, String strikePosition) {
         jdbcTemplate.update("insert into batsmanSB values(?,?,?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
                 liveScoreUpdateModel.getBattingTeamId(), playerId, getPlayerDetail(playerId).get(0).getPlayerName(), 0, 0,
                 0, 0, 0, BatsmanStatus.NOTOUT.toString(), strikePosition, null, null);
@@ -377,8 +378,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         jdbcTemplate.update("update players set numberOfTimeHeHasBeenOut = numberOfTimeHeHasBeenOut + 1 ," +
                         "matchesPlayed = matchesPlayed + 1 , totalRuns = totalRuns + ?  where playerId = ? ",
                 batsmanSB.getRuns(), liveScoreModel.getWicketModel().getOutPlayerId());
-        insertNewBatsmanToScoreboard(liveScoreModel, batsmanSB.getScoreBoardId(),
-                liveScoreModel.getWicketModel().getNewBatsmanId(),batsmanSB.getStrikePosition());
+        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty())
+            insertNewBatsmanToScoreboard(liveScoreModel, batsmanSB.getScoreBoardId(),
+                    liveScoreModel.getWicketModel().getNewBatsmanId(), batsmanSB.getStrikePosition());
     }
 
     private int getTotalHundreds(BatsmanSB batsmanSB) {
@@ -614,6 +616,13 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setBall(0);
             }
             return liveScoreModel;
+        } else if (checkForInningCompleteNotInLastBall(liveScoreModel)) {
+            updatePlayerTables(liveScoreModel);
+            if (setTotalRunsInVersusAndCheckForMatchComplete(liveScoreModel))
+                liveScoreModel.setMatchStatus(MatchStatus.COMPLETED.toString());
+            else
+                liveScoreModel.setMatchStatus(MatchStatus.INNINGCOMPLETED.toString());
+            return liveScoreModel;
         } else {
             long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
             long nonStrikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.NONSTRIKE.toString());
@@ -621,6 +630,21 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             liveScoreModel.setNonStrikeBatsmanId(nonStrikeBatsmanSBId);
             liveScoreModel.setBall(liveScoreModel.getBall() + 1);
             return liveScoreModel;
+        }
+    }
+
+    private boolean checkForInningCompleteNotInLastBall(LiveScoreUpdateModel liveScoreModel) {
+        Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);
+        List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ? " +
+                        "and matchStatus = 'INNINGCOMPLETED'", new BeanPropertyRowMapper<>(ScoreBoard.class),
+                liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
+        if (match.getTotalNumberOfWicket() == 0) {
+            updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
+            insertIntoVersus(liveScoreModel);
+            return true;
+        }else {
+            ScoreBoard board = getScoreBoard(liveScoreModel).get(0);
+            return !scoreBoard.isEmpty() && board.getScore() > scoreBoard.get(0).getScore();
         }
     }
 
@@ -650,12 +674,17 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private boolean checkForInningComplete(LiveScoreUpdateModel liveScoreModel) {
         Tournaments tournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0);
         Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);
+        List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ? " +
+                        "and matchStatus = 'INNINGCOMPLETED'", new BeanPropertyRowMapper<>(ScoreBoard.class),
+                liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
         if (match.getTotalNumberOfWicket() == 0 || tournament.getNumberOfOvers() == liveScoreModel.getOver() + 1) {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
             insertIntoVersus(liveScoreModel);
             return true;
+        }else {
+            ScoreBoard board = getScoreBoard(liveScoreModel).get(0);
+            return !scoreBoard.isEmpty() && board.getScore() > scoreBoard.get(0).getScore();
         }
-        return false;
     }
 
     private void updateScoreBoardStatus(LiveScoreUpdateModel liveScoreModel, String matchStatus) {
@@ -668,13 +697,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         ScoreBoard battingScoreBoard = getScoreBoard(liveScoreModel).get(0);
         jdbcTemplate.update("update versus set totalScore = ? , totalOverPlayed = ? , totalballsPlayed = ?," +
                         " matchResult = ? where matchId = ? and teamId = ?", battingScoreBoard.getScore(),
-                battingScoreBoard.getTotalWicketFall(), battingScoreBoard.getOvers() + 1, battingScoreBoard.getBall(),
-                VersusStatus.INNINGCOMPLETE.toString(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
+                battingScoreBoard.getOvers() + 1, battingScoreBoard.getBall(), VersusStatus.INNINGCOMPLETE.toString(),
+                liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
     }
 
     private void updatePlayerTables(LiveScoreUpdateModel liveScoreModel) {
-        long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
-                liveScoreModel.getBowlingTeamId());
+        long scoreBoardId = getScoreBoard(liveScoreModel).get(0).getScoreBoardId();
         List<BowlerSB> bowlerSB = jdbcTemplate.query("select * from bowlingSB where wickets > 4 and scoreBoardId = ?",
                 new BeanPropertyRowMapper<>(BowlerSB.class), scoreBoardId);
         for (BowlerSB bowler : bowlerSB)
@@ -769,6 +797,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and " +
                         "matchId = ? and teamId = ?", new BeanPropertyRowMapper<>(ScoreBoard.class),
                 liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
+        if (scoreBoard.get(0).getMatchStatus() == null)
+            return null;
         return scoreBoard.get(0).getMatchStatus().equals(MatchStatus.INNINGCOMPLETED.toString()) ?
                 scoreBoard.get(0).getScore() > battingTeam.getScore() ? VersusStatus.WIN.toString() :
                         scoreBoard.get(0).getScore() == battingTeam.getScore() ? VersusStatus.DRAW.toString() :
@@ -794,7 +824,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     /**
-     *
      * update in live score
      */
     private void liveScoreModification(Tournaments tournaments, Teams teams, LiveScoreUpdateModel liveScoreUpdateModel) {
@@ -868,7 +897,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     /**
-     *
      * update  in partnership
      */
     private void partnershipScoreModification(LiveScoreUpdateModel liveScoreUpdateModel) {
@@ -941,7 +969,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     /**
-     *
      * update commentary
      */
     private void commentaryScoreModification(LiveScoreUpdateModel liveScoreUpdateModel) {
@@ -981,7 +1008,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     /**
-     *
      * Generate comments
      */
     private String getComment(LiveScoreUpdateModel liveScoreUpdateModel) {
