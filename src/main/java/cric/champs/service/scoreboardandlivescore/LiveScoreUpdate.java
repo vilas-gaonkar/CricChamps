@@ -150,7 +150,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         int bowlingTeamMembers = systemInterface.verifyTeamDetails(liveScoreModel.getBowlingTeamId(),
                 liveScoreModel.getTournamentId()).get(0).getNumberOfPlayers();
         return battingTeamMembers > 11 && bowlingTeamMembers > 11 ? 11 :
-                Math.min(battingTeamMembers, bowlingTeamMembers);
+                Math.min(battingTeamMembers, bowlingTeamMembers) - 1;
     }
 
     //get scoreboard id
@@ -603,7 +603,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                     liveScoreModel.setMatchStatus(MatchStatus.COMPLETED.toString());
                 else
                     liveScoreModel.setMatchStatus(MatchStatus.INNINGCOMPLETED.toString());
-                return liveScoreModel;
             } else {
                 long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
                 long nonStrikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.NONSTRIKE.toString());
@@ -611,8 +610,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setNonStrikeBatsmanId(nonStrikeBatsmanSBId);
                 liveScoreModel.setOver(liveScoreModel.getOver() + 1);
                 liveScoreModel.setBall(0);
-                return liveScoreModel;
             }
+            return liveScoreModel;
         } else {
             long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
             long nonStrikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.NONSTRIKE.toString());
