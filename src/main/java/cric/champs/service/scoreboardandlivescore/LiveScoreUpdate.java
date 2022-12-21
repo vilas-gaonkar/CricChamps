@@ -353,7 +353,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        if (liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
+                liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         }
@@ -417,7 +418,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
-        if (liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+        if (!getPlayerStats(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
+                liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         }
