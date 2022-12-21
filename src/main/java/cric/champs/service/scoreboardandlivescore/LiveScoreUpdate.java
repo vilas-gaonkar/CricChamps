@@ -642,7 +642,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
             insertIntoVersus(liveScoreModel);
             return true;
-        }else {
+        } else {
             ScoreBoard board = getScoreBoard(liveScoreModel).get(0);
             return !scoreBoard.isEmpty() && board.getScore() > scoreBoard.get(0).getScore();
         }
@@ -663,10 +663,22 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setNonStrikeBatsmanId(temp);
             }
             return liveScoreModel;
+        } else if (liveScoreModel.getBall() == 5) {
+            if ((liveScoreModel.getRuns()) % 2 == 0) {
+                long temp = liveScoreModel.getStrikeBatsmanId();
+                liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+                liveScoreModel.setNonStrikeBatsmanId(temp);
+                liveScoreModel.setBall(liveScoreModel.getBall() + 1);
+            } else {
+                liveScoreModel.setBall(0);
+            }
+            liveScoreModel.setOver(liveScoreModel.getOver() + 1);
+            return liveScoreModel;
         } else if ((liveScoreModel.getRuns()) % 2 != 0) {
             long temp = liveScoreModel.getStrikeBatsmanId();
             liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
             liveScoreModel.setNonStrikeBatsmanId(temp);
+            liveScoreModel.setBall(liveScoreModel.getBall() + 1);
         }
         return liveScoreModel;
     }
@@ -681,7 +693,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
             insertIntoVersus(liveScoreModel);
             return true;
-        }else {
+        } else {
             ScoreBoard board = getScoreBoard(liveScoreModel).get(0);
             return !scoreBoard.isEmpty() && board.getScore() > scoreBoard.get(0).getScore();
         }
