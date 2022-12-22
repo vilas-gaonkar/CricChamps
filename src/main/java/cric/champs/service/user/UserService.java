@@ -10,10 +10,7 @@ import cric.champs.resultmodels.TeamResultModel;
 import cric.champs.resultmodels.TournamentResultModel;
 import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
-import cric.champs.service.AccountStatus;
-import cric.champs.service.PlayerDesignation;
-import cric.champs.service.TournamentStatus;
-import cric.champs.service.TournamentTypes;
+import cric.champs.service.*;
 import cric.champs.service.system.SystemInterface;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.apache.commons.lang3.EnumUtils;
@@ -275,6 +272,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         jdbcTemplate.update("update grounds set isDeleted = 'true' where groundId = ?", groundId);
         jdbcTemplate.update("update tournaments set numberOfGrounds = numberOfGrounds - 1 where tournamentId = ?",
                 tournamentId);
+        List<Matches> matches = jdbcTemplate.query("select * from matches where groundId = ? and matchStatus = ?",
+                new BeanPropertyRowMapper<>(Matches.class), groundId, MatchStatus.UPCOMING.toString());
+        if (!matches.isEmpty())
+            jdbcTemplate.update("update matches set matchStatus = 'CANCELLED' where groundId = ?", groundId);
         return new SuccessResultModel("Ground has been deleted");
     }
 
