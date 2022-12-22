@@ -65,4 +65,6 @@ public interface SystemInterface {
     List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId);
 
     Long getScoreBoardId(ScoreBoardModel scoreBoardModel);
+
+    void rejectRequest();
 }
