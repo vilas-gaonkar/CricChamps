@@ -8,5 +8,5 @@ public interface FixtureGenerationInterface {
 
     void roundRobinGenerationForKnockoutLeague(long tournamentId , String tournamentStage);
 
-    boolean roundRobinGenerationForKnockoutNextMatches(Tournaments tournament);
+    void roundRobinGenerationForKnockoutNextMatches(Tournaments tournament);
 }

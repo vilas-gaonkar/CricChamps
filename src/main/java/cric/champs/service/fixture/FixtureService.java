@@ -208,14 +208,14 @@ public class FixtureService implements FixtureGenerationInterface {
      * Fixture for finals knockout
      */
     @Override
-    public boolean roundRobinGenerationForKnockoutNextMatches(Tournaments tournament) {
+    public void roundRobinGenerationForKnockoutNextMatches(Tournaments tournament) {
         long byeTeamId = 0;
         boolean isBye = false;
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? " +
                         "and isDeleted = 'false' order by teamId DESC",
                 new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId(), TeamStatus.WIN.toString());
         jdbcTemplate.update("update tournaments set totalRoundRobinMatches = ?, totalMatchesCompleted = ? where tournamentId = ?",
-                teams.size()/2,0,tournament.getTournamentId());
+                teams.size() / 2, 0, tournament.getTournamentId());
         long[] teamsId = new long[teams.size()];
         for (int index = 0; index < teams.size(); index++)
             teamsId[index] = teams.get(index).getTeamId();
@@ -223,26 +223,21 @@ public class FixtureService implements FixtureGenerationInterface {
             byeTeamId = teamsId[teamsId.length - 1];
             isBye = true;
         }
-        try {
-            List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
-                    new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.UPCOMING.toString());
-            List<Matches> matches1 = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ? order by matchId DESC limit 1",
-                    new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.PAST.toString());
-            long matchId = matches.get(0).getMatchId();
-            int round = matches1.get(0).getRoundNumber() + 1;
-            for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex = teamIdIndex + 2) {
-                insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), matchId);
-                insertIntoVersusOfLeague(teamsId[teamIdIndex + 1], tournament.getTournamentId(), matchId);
-                jdbcTemplate.update("update matches set roundNumber = ? where matchId = ?", round, matchId);
-                matchId++;
-            }
-            if (isBye)
-                jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",
-                        TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
-            return true;
-        } catch (Exception e) {
-            return false;
+        List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ?",
+                new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.UPCOMING.toString());
+        List<Matches> matches1 = jdbcTemplate.query("select * from matches where tournamentId = ? and matchStatus = ? order by matchId DESC limit 1",
+                new BeanPropertyRowMapper<>(Matches.class), tournament.getTournamentId(), MatchStatus.PAST.toString());
+        long matchId = matches.get(0).getMatchId();
+        int round = matches1.get(0).getRoundNumber() + 1;
+        for (int teamIdIndex = 0; teamIdIndex < teamsId.length / 2; teamIdIndex = teamIdIndex + 2) {
+            insertIntoVersusOfLeague(teamsId[teamIdIndex], tournament.getTournamentId(), matchId);
+            insertIntoVersusOfLeague(teamsId[teamIdIndex + 1], tournament.getTournamentId(), matchId);
+            jdbcTemplate.update("update matches set roundNumber = ? where matchId = ?", round, matchId);
+            matchId++;
         }
+        if (isBye)
+            jdbcTemplate.update("update teams set teamStatus = ? where teamId = ?  and tournamentId = ?",
+                    TeamStatus.WIN.toString(), byeTeamId, tournament.getTournamentId());
     }
 
     /**
@@ -255,7 +250,7 @@ public class FixtureService implements FixtureGenerationInterface {
             List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? order by " +
                     "matchNumber DESC limit 3", new BeanPropertyRowMapper<>(Matches.class), tournamentId);
             jdbcTemplate.update("update tournaments set totalRoundRobinMatches = 2 , totalMatchesCompleted  = 0" +
-                    " where tournamentId = ?",tournamentId);
+                    " where tournamentId = ?", tournamentId);
             int matchSize = matches.size() - 1;
             try {
                 for (int teamIdIndex = 0; teamIdIndex < teamsId.length; teamIdIndex = teamIdIndex + 2) {
@@ -268,7 +263,7 @@ public class FixtureService implements FixtureGenerationInterface {
             }
         } else if (tournamentStage.equals(TournamentStage.FINALS.toString())) {
             jdbcTemplate.update("update tournaments set totalRoundRobinMatches = 1 , totalMatchesCompleted  = 0" +
-                    " where tournamentId = ?",tournamentId);
+                    " where tournamentId = ?", tournamentId);
             List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted =" +
                     " 'false' order by points DESC limit 2", new BeanPropertyRowMapper<>(Teams.class), tournamentId);
             Matches match = jdbcTemplate.query("select * from matches where tournamentId = ? order by " +
