@@ -203,8 +203,8 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel setTournamentDate(long tournamentId, LocalDate startDate, LocalDate endDate) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
+        if (systemInterface.verifyTournamentId(tournamentId).isEmpty() || endDate.isBefore(startDate))
+            throw new NullPointerException("Tournament not found or Invalid date");
         jdbcTemplate.update("update tournaments set tournamentStartDate = ? , tournamentEndDate = ? where " +
                 "tournamentId = ? and tournamentStatus = 'UPCOMING'", startDate, endDate, tournamentId);
         return new SuccessResultModel("date updated successfully");
@@ -227,6 +227,9 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public SuccessResultModel setTournamentDateTimes(SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
         if (!systemInterface.verifyTimeDurationGiven(setDateTimeModel))
             throw new FixtureGenerationException("Insufficient time for fixture generation");
+        if (setDateTimeModel.getEndTime().isBefore(setDateTimeModel.getStartTime()) ||
+                setDateTimeModel.getEndDate().isBefore(setDateTimeModel.getStartDate()))
+            throw new FixtureGenerationException("Invalid dor time");
         jdbcTemplate.update("update tournaments set tournamentStartTime = ? , tournamentEndTime = ? , tournamentStartDate = ? , " +
                         "tournamentEndDate = ? where tournamentId = ? and tournamentStatus = 'UPCOMING'", setDateTimeModel.getStartTime(),
                 setDateTimeModel.getEndTime(), setDateTimeModel.getStartDate(), setDateTimeModel.getEndDate(),
