@@ -764,21 +764,25 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private void checkForFinalFixtureGeneration(LiveScoreUpdateModel liveScoreModel) {
         Tournaments tournament = jdbcTemplate.query("select * from tournaments where tournamentId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), liveScoreModel.getTournamentId()).get(0);
-        if (tournament.getTotalRoundRobinMatches() == 1 &&
-                tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
-            if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
-                jdbcTemplate.update(" update tournaments set tournamentStatus = ? where tournamentId = ?",
-                        TournamentStatus.COMPLETED.toString(), liveScoreModel.getTournamentId());
-                return;
-            }
         if (tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
-            if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted())
-                if (tournament.getTotalRoundRobinMatches() != 2)
-                    fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(liveScoreModel.getTournamentId(),
-                            TournamentStage.SEMIFINALS.toString());
-                else
-                    fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(liveScoreModel.getTournamentId(),
-                            TournamentStage.FINALS.toString());
+            generateForLeague(tournament);
+
+    }
+
+    private void generateForLeague(Tournaments tournament) {
+        if (tournament.getTotalRoundRobinMatches() == 1 &&
+                tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
+            jdbcTemplate.update(" update tournaments set tournamentStatus = ? where tournamentId = ?",
+                    TournamentStatus.COMPLETED.toString(), tournament.getTournamentId());
+            return;
+        }
+        if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted())
+            if (tournament.getTotalRoundRobinMatches() != 2)
+                fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(tournament.getTournamentId(),
+                        TournamentStage.SEMIFINALS.toString());
+            else
+                fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(tournament.getTournamentId(),
+                        TournamentStage.FINALS.toString());
     }
 
     private void setALlAfterMatchComplete(LiveScoreUpdateModel liveScoreModel) {
