@@ -260,7 +260,6 @@ public class FixtureService implements FixtureGenerationInterface {
                     matchSize--;
                 }
             } catch (Exception e) {
-                addTOVersus(teamsId[teamsId.length - 1], tournamentId, matches.get(matchSize).getMatchId());
                 addTOVersus(teamsId[teamsId.length - 2], tournamentId, matches.get(matchSize).getMatchId());
             }
         } else if (tournamentStage.equals(TournamentStage.FINALS.toString())) {
