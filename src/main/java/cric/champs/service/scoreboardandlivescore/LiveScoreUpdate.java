@@ -768,11 +768,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         if (tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
             generateForLeague(tournament);
         else if (tournament.getTournamentType().equals(TournamentTypes.KNOCKOUT.toString()))
-            generateForKnockout(tournament, liveScoreModel);
+            generateForKnockout(tournament);
     }
 
-    private void generateForKnockout(Tournaments tournament, LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
-
+    private void generateForKnockout(Tournaments tournament) throws FixtureGenerationException {
         if( tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
             List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? " +
                             "and isDeleted = 'false' order by teamId DESC",
