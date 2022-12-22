@@ -766,7 +766,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(Tournaments.class), liveScoreModel.getTournamentId()).get(0);
         if (tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
             generateForLeague(tournament);
+        else if (tournament.getTournamentType().equals(TournamentTypes.KNOCKOUT.toString()))
+            generateForKnockout(tournament, liveScoreModel);
+    }
 
+    private void generateForKnockout(Tournaments tournament, LiveScoreUpdateModel liveScoreModel) {
     }
 
     private void generateForLeague(Tournaments tournament) {
