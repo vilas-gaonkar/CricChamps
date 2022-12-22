@@ -252,6 +252,8 @@ public class FixtureService implements FixtureGenerationInterface {
             long[] teamsId = getTeamIdForLeagueSemiFinals(tournamentId);
             List<Matches> matches = jdbcTemplate.query("select * from matches where tournamentId = ? order by " +
                     "matchNumber DESC limit 3", new BeanPropertyRowMapper<>(Matches.class), tournamentId);
+            jdbcTemplate.update("update tournaments set totalRoundRobinMatches = 2 , totalMatchesCompleted  = 0" +
+                    " where tournamentId = ?",tournamentId);
             int matchSize = matches.size() - 1;
             try {
                 for (int teamIdIndex = 0; teamIdIndex < teamsId.length; teamIdIndex = teamIdIndex + 2) {
@@ -263,6 +265,8 @@ public class FixtureService implements FixtureGenerationInterface {
                 addTOVersus(teamsId[teamsId.length - 2], tournamentId, matches.get(matchSize).getMatchId());
             }
         } else if (tournamentStage.equals(TournamentStage.FINALS.toString())) {
+            jdbcTemplate.update("update tournaments set totalRoundRobinMatches = 1 , totalMatchesCompleted  = 0" +
+                    " where tournamentId = ?",tournamentId);
             List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and isDeleted =" +
                     " 'false' order by points DESC limit 2", new BeanPropertyRowMapper<>(Teams.class), tournamentId);
             Matches match = jdbcTemplate.query("select * from matches where tournamentId = ? order by " +

@@ -6,6 +6,7 @@ import cric.champs.livescorerequestmodels.LiveScoreUpdateModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.*;
+import cric.champs.service.fixture.FixtureGenerationInterface;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -25,6 +26,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private SystemInterface systemInterface;
 
     private Integer numberOfOversOfTournament;
+
+    @Autowired
+    private FixtureGenerationInterface fixtureGenerationInterface;
 
     @Override
     public LiveScoreUpdateModel updateLiveScore(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
@@ -357,7 +361,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
-        }else
+        } else
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         return true;
     }
@@ -423,7 +427,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
-        }else
+        } else
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         return true;
     }
@@ -752,8 +756,29 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             }
             setALlAfterMatchComplete(liveScoreModel);
             setTeamInfo(liveScoreModel);
+            checkForFinalFixtureGeneration(liveScoreModel);
         }
         return false;
+    }
+
+    private void checkForFinalFixtureGeneration(LiveScoreUpdateModel liveScoreModel) {
+        Tournaments tournament = jdbcTemplate.query("select * from tournaments where tournamentId = ?",
+                new BeanPropertyRowMapper<>(Tournaments.class), liveScoreModel.getTournamentId()).get(0);
+        if (tournament.getTotalRoundRobinMatches() == 1 &&
+                tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
+            if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
+                jdbcTemplate.update(" update tournaments set tournamentStatus = ? where tournamentId = ?",
+                        TournamentStatus.COMPLETED.toString(), liveScoreModel.getTournamentId());
+                return;
+            }
+        if (tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
+            if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted())
+                if (tournament.getTotalRoundRobinMatches() != 2)
+                    fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(liveScoreModel.getTournamentId(),
+                            TournamentStage.SEMIFINALS.toString());
+                else
+                    fixtureGenerationInterface.roundRobinGenerationForKnockoutLeague(liveScoreModel.getTournamentId(),
+                            TournamentStage.FINALS.toString());
     }
 
     private void setALlAfterMatchComplete(LiveScoreUpdateModel liveScoreModel) {
