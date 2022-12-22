@@ -1,5 +1,6 @@
 package cric.champs.controller.Admin;
 
+import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.livescorerequestmodels.LiveScoreUpdateModel;
 import cric.champs.model.LiveScoreModel;
@@ -25,7 +26,7 @@ public class LiveScoreUpdateController {
     private PopUpInterface popUpInterface;
 
     @PostMapping("/update")
-    ResponseEntity<LiveScoreUpdateModel> update(@RequestBody LiveScoreUpdateModel liveScoreUpdateModel) throws LiveScoreUpdationException {
+    ResponseEntity<LiveScoreUpdateModel> update(@RequestBody LiveScoreUpdateModel liveScoreUpdateModel) throws LiveScoreUpdationException, FixtureGenerationException {
         return ResponseEntity.of(Optional.of(liveScoreUpdateInterface.updateLiveScore(liveScoreUpdateModel)));
     }
 

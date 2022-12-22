@@ -214,6 +214,8 @@ public class FixtureService implements FixtureGenerationInterface {
         List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? " +
                         "and isDeleted = 'false' order by teamId DESC",
                 new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId(), TeamStatus.WIN.toString());
+        jdbcTemplate.update("update tournaments set totalRoundRobinMatches = ?, totalMatchesCompleted = ? where tournamentId = ?",
+                teams.size()/2,0,tournament.getTournamentId());
         long[] teamsId = new long[teams.size()];
         for (int index = 0; index < teams.size(); index++)
             teamsId[index] = teams.get(index).getTeamId();

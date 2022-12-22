@@ -1,5 +1,6 @@
 package cric.champs.service.scoreboardandlivescore;
 
+import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.customexceptions.LiveScoreUpdationException;
 import cric.champs.entity.*;
 import cric.champs.livescorerequestmodels.LiveScoreUpdateModel;
@@ -31,7 +32,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private FixtureGenerationInterface fixtureGenerationInterface;
 
     @Override
-    public LiveScoreUpdateModel updateLiveScore(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
+    public LiveScoreUpdateModel updateLiveScore(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException, FixtureGenerationException {
         checkValidationBeforeUpdate(liveScoreModel);
         numberOfOversOfTournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0).getNumberOfOvers();
 
@@ -603,7 +604,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     /**
      * result formation
      */
-    private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) {
+    private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
         if (liveScoreModel.getExtraModel().isExtraStatus() && (
                 liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
@@ -669,7 +670,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(BatsmanSB.class), strikePosition, scoreBoardId).get(0).getPlayerId();
     }
 
-    private LiveScoreUpdateModel resultForExtra(LiveScoreUpdateModel liveScoreModel) {
+    private LiveScoreUpdateModel resultForExtra(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
         if ((liveScoreModel.getRuns() - 1) % 2 != 0) {
             long temp = liveScoreModel.getStrikeBatsmanId();
             liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
@@ -731,7 +732,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         }
     }
 
-    private boolean setTotalRunsInVersusAndCheckForMatchComplete(LiveScoreUpdateModel liveScoreModel) {
+    private boolean setTotalRunsInVersusAndCheckForMatchComplete(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
         ScoreBoard battingScoreBoard = getScoreBoard(liveScoreModel).get(0);
         String matchResult = getMatchResult(liveScoreModel, battingScoreBoard);
         if (matchResult != null) {
@@ -761,7 +762,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         return false;
     }
 
-    private void checkForFinalFixtureGeneration(LiveScoreUpdateModel liveScoreModel) {
+    private void checkForFinalFixtureGeneration(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
         Tournaments tournament = jdbcTemplate.query("select * from tournaments where tournamentId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), liveScoreModel.getTournamentId()).get(0);
         if (tournament.getTournamentType().equals(TournamentTypes.LEAGUE.toString()))
@@ -770,7 +771,21 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             generateForKnockout(tournament, liveScoreModel);
     }
 
-    private void generateForKnockout(Tournaments tournament, LiveScoreUpdateModel liveScoreModel) {
+    private void generateForKnockout(Tournaments tournament, LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
+
+        if( tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
+            List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? " +
+                            "and isDeleted = 'false' order by teamId DESC",
+                    new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId(), TeamStatus.WIN.toString());
+            if(teams.isEmpty())
+                throw new FixtureGenerationException("There are no teams available to play further matches");
+            else if (teams.size()==1) {
+                jdbcTemplate.update(" update tournaments set tournamentStatus = ? where tournamentId = ?",
+                        TournamentStatus.COMPLETED.toString(), tournament.getTournamentId());
+                return;
+            }
+            fixtureGenerationInterface.roundRobinGenerationForKnockoutNextMatches(tournament);
+        }
     }
 
     private void generateForLeague(Tournaments tournament) {
