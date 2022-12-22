@@ -1,6 +1,6 @@
 package cric.champs.controller.user;
 
-import cric.champs.model.LiveScoreModel;
+import cric.champs.requestmodel.LiveScoreModel;
 import cric.champs.resultmodels.LiveScoreResult;
 import cric.champs.service.scoreboardandlivescore.LiveResultInterface;
 import org.springframework.beans.factory.annotation.Autowired;

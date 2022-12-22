@@ -3,8 +3,8 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.entity.*;
 import cric.champs.customexceptions.OTPGenerateException;
-import cric.champs.model.ScoreBoardModel;
-import cric.champs.model.SetDateTimeModel;
+import cric.champs.requestmodel.ScoreBoardModel;
+import cric.champs.requestmodel.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 

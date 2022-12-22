@@ -1,4 +1,4 @@
-package cric.champs.model;
+package cric.champs.requestmodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

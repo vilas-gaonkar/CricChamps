@@ -1,13 +1,11 @@
 package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.Live;
-import cric.champs.model.LiveScoreModel;
+import cric.champs.requestmodel.LiveScoreModel;
 import cric.champs.model.*;
 import cric.champs.resultmodels.LiveScoreResult;
-import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.BatsmanStatus;
 import cric.champs.service.BowlingStatus;
-import cric.champs.service.MatchStatus;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

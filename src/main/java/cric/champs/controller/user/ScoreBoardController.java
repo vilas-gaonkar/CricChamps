@@ -2,9 +2,9 @@ package cric.champs.controller.user;
 
 import cric.champs.entity.ScoreBoard;
 import cric.champs.model.*;
+import cric.champs.requestmodel.ScoreBoardModel;
 import cric.champs.resultmodels.ScoreBoardResult;
 import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
-import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

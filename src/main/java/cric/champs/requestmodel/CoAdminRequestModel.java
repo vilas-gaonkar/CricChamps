@@ -1,4 +1,4 @@
-package cric.champs.model;
+package cric.champs.requestmodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LiveScoreModel {
+public class CoAdminRequestModel {
 
-    private Long tournamentId;
+    private long tournamentUserId;
 
-    private Long matchId;
+    private String coAdminEmail;
 
-    private Long battingTeamId;
+    private long matchId;
 }
