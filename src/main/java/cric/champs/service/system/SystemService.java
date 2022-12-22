@@ -182,8 +182,7 @@ public class SystemService implements SystemInterface {
 
     //verify user tournament accounts
     @Override
-    public List<Tournaments>
-    verifyUserID() {
+    public List<Tournaments> verifyUserID() {
         return jdbcTemplate.query("select * from tournaments where userId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), getUserId());
     }
@@ -260,7 +259,8 @@ public class SystemService implements SystemInterface {
                 new BeanPropertyRowMapper<>(Grounds.class), groundId, tournamentId);
     }
 
-    private void rejectRequest() {
+    @Override
+    public void rejectRequest() {
         if (verifyUserID().isEmpty())
             throw new NullPointerException("Access denied");
     }
