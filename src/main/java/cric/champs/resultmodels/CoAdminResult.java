@@ -17,5 +17,5 @@ public class CoAdminResult {
 
     private String userPhoto;
 
-    private List<Integer> coAdmin;
+    private List<Integer> matchNumber;
 }
