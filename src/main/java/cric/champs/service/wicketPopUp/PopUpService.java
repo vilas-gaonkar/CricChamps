@@ -1,5 +1,6 @@
 package cric.champs.service.wicketPopUp;
 
+import cric.champs.entity.ScoreBoard;
 import cric.champs.resultmodels.PlayersResult;
 import cric.champs.service.OverStatus;
 import cric.champs.service.system.SystemInterface;
@@ -23,19 +24,28 @@ public class PopUpService implements PopUpInterface {
     public List<PlayersResult> remainingBatsman(long tournamentId, long matchId, long teamId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
+        List<ScoreBoard> scoreBoards = getScoreBoard(matchId, teamId);
         return jdbcTemplate.query("select players.playerId, players.playerName from players where not exists " +
-                        "(select batsmanSB.playerId from batsmanSB where players.playerId = batsmanSB.playerId ) and teamId = ?",
-                new BeanPropertyRowMapper<>(PlayersResult.class), teamId);
+                        "(select batsmanSB.playerId from batsmanSB where players.playerId = batsmanSB.playerId " +
+                        "and matchId = ?) and teamId = ?", new BeanPropertyRowMapper<>(PlayersResult.class),
+                matchId, teamId);
+    }
+
+    private List<ScoreBoard> getScoreBoard(long matchId, long teamId) {
+        return jdbcTemplate.query("select * from scoreBoard where teamId = ? and matchId = ?",
+                new BeanPropertyRowMapper<>(ScoreBoard.class), teamId, matchId);
     }
 
     @Override
     public List<PlayersResult> remainingBowlers(long tournamentId, long matchId, long teamId) {
         if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
+        List<ScoreBoard> scoreBoards = getScoreBoard(matchId, teamId);
         return jdbcTemplate.query("select players.playerId, players.playerName from players where not exists " +
                         "(select bowlingSB.playerId from bowlingSB where players.playerId = bowlingSB.playerId and " +
-                        "bowlingSB.bowlerStatus = ?) and teamId = ?", new BeanPropertyRowMapper<>(PlayersResult.class),
-                OverStatus.DONE.toString(), teamId);
+                        "bowlingSB.bowlerStatus = ? and matchId = ?) and teamId = ?",
+                new BeanPropertyRowMapper<>(PlayersResult.class), OverStatus.DONE.toString(),
+                matchId, teamId);
     }
 
     @Override
