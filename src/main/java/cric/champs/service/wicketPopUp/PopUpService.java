@@ -61,8 +61,14 @@ public class PopUpService implements PopUpInterface {
     public List<PlayersResult> currentPlayingBatsman(long tournamentId, long matchId, long teamId) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
-        return jdbcTemplate.query("select batsmanSB.playerId, batsmanSB.playerName from batsmanSB where matchId = ? " +
+        List<PlayersResult> playersResults = jdbcTemplate.query("select batsmanSB.playerId, batsmanSB.playerName from batsmanSB where matchId = ? " +
                         "and teamId = ? and batsmanStatus != ?", new BeanPropertyRowMapper<>(PlayersResult.class), matchId,
                 teamId, BatsmanStatus.OUT.toString());
+
+        if(playersResults.isEmpty()){
+            return jdbcTemplate.query("select playerId, playerName from players where teamId = ?",
+                    new BeanPropertyRowMapper<>(PlayersResult.class), teamId);
+        }
+        return playersResults;
     }
 }
