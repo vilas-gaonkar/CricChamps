@@ -2,6 +2,7 @@ package cric.champs.service.wicketPopUp;
 
 import cric.champs.entity.ScoreBoard;
 import cric.champs.resultmodels.PlayersResult;
+import cric.champs.service.BatsmanStatus;
 import cric.champs.service.OverStatus;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,5 +55,14 @@ public class PopUpService implements PopUpInterface {
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select playerId, playerName from players where teamId = ?",
                 new BeanPropertyRowMapper<>(PlayersResult.class), teamId);
+    }
+
+    @Override
+    public List<PlayersResult> currentPlayingBatsman(long tournamentId, long matchId, long teamId) {
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
+            throw new NullPointerException("Invalid tournament");
+        return jdbcTemplate.query("select batsmanSB.playerId, batsmanSB.playerName from batsmanSB where matchId = ? " +
+                        "and teamId = ? and batsmanStatus != ?", new BeanPropertyRowMapper<>(PlayersResult.class), matchId,
+                teamId, BatsmanStatus.OUT.toString());
     }
 }
