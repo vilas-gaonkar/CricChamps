@@ -2,12 +2,15 @@ package cric.champs.advice;
 
 import cric.champs.customexceptions.*;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.hibernate.id.IdentifierGenerationException;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -51,6 +54,14 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleJwtException(JwtException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", "JWT_TOKEN_EXPIRED");
         return errorMessage;
     }
 
@@ -207,8 +218,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LoginFailedException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public Map<String, String> handleLoginFailedException(LoginFailedException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleBadCredentialsException(BadCredentialsException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -230,9 +249,17 @@ public class GlobalExceptionHandler {
         return errorMessage;
     }
 
+    @ExceptionHandler(UsernameNotFoundExceptions.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleUsernameNotFoundException(UsernameNotFoundExceptions exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleUsernameNotFoundException(UsernameNotFoundException exception) {
+    public Map<String, String> handleUsernameNotFoundExceptions(UsernameNotFoundException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;
@@ -273,6 +300,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotVerifiedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotVerifiedException(NotVerifiedException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(FixtureGenerationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleFixtureGenerationException(FixtureGenerationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
         return errorMessage;

@@ -3,8 +3,8 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.customexceptions.OTPGenerateException;
 import cric.champs.entity.*;
-import cric.champs.model.ScoreBoardModel;
-import cric.champs.model.SetDateTimeModel;
+import cric.champs.requestmodel.ScoreBoardModel;
+import cric.champs.requestmodel.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.MatchStatus;
@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -125,7 +126,8 @@ public class SystemService implements SystemInterface {
         email.setSubject("Cric champs registration OTP");
         email.setText("Enter otp in Cric Champs application to verify the account\n" + otp);
         javaMailSender.send(email);
-        return new SuccessResultModel("OTP has been sent to your email");
+        return new SuccessResultModel("If the mail address entered matches your account," +
+                "you will receive an email with a link to reset your password");
     }
 
     @Override
@@ -181,8 +183,7 @@ public class SystemService implements SystemInterface {
 
     //verify user tournament accounts
     @Override
-    public List<Tournaments>
-    verifyUserID() {
+    public List<Tournaments> verifyUserID() {
         return jdbcTemplate.query("select * from tournaments where userId = ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), getUserId());
     }
@@ -259,7 +260,8 @@ public class SystemService implements SystemInterface {
                 new BeanPropertyRowMapper<>(Grounds.class), groundId, tournamentId);
     }
 
-    private void rejectRequest() {
+    @Override
+    public void rejectRequest() {
         if (verifyUserID().isEmpty())
             throw new NullPointerException("Access denied");
     }
@@ -283,5 +285,25 @@ public class SystemService implements SystemInterface {
                         "matchId = ? and teamId = ?", new BeanPropertyRowMapper<>(ScoreBoard.class),
                 scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(), scoreBoardModel.getTeamId());
         return scoreBoards.isEmpty() ? null : scoreBoards.get(0).getScoreBoardId();
+    }
+
+    @Override
+    public void deleteExpiredTokens() {
+        jdbcTemplate.update("delete from tokenBlocklist where expirationAt <= now()");
+    }
+
+    @Override
+    public boolean verifyTokenValidity(String token) {
+        deleteExpiredTokens();
+        return jdbcTemplate.query("select * from tokenBlocklist where token = ?",
+                new BeanPropertyRowMapper<>(TokenBlocklist.class), token).isEmpty();
+    }
+
+    @Override
+    public String getTokenFromHeader(HttpServletRequest httpServletRequest) {
+        String authorization = httpServletRequest.getHeader("Authorization");
+        if (null != authorization && authorization.startsWith("Bearer "))
+            return authorization.substring(7);
+        throw new NullPointerException("Invalid token");
     }
 }

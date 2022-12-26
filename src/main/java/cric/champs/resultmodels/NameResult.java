@@ -5,16 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TournamentResultModel {
-    private String tournamentName;
+public class NameResult {
 
-    private long tournamentId;
+    private long id;
 
-    private String tournamentCode;
+    private String name;
 
-    private String message;
+    private String photo;
 }

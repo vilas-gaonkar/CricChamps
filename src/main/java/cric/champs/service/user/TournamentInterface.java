@@ -1,7 +1,8 @@
 package cric.champs.service.user;
 
 import cric.champs.customexceptions.FixtureGenerationException;
-import cric.champs.model.SetDateTimeModel;
+import cric.champs.requestmodel.SetDateTimeModel;
+import cric.champs.resultmodels.NameResult;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.TournamentResultModel;
@@ -29,5 +30,7 @@ public interface TournamentInterface {
     SuccessResultModel setTournamentDateTimes(SetDateTimeModel setDateTimeModel) throws FixtureGenerationException;
 
     SuccessResultModel setTournamentOver(long tournamentId, int numberOfOvers);
+
+    List<NameResult> getAllUserTournamentName();
 
 }

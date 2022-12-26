@@ -3,11 +3,12 @@ package cric.champs.service.system;
 import cric.champs.customexceptions.EmailValidationException;
 import cric.champs.entity.*;
 import cric.champs.customexceptions.OTPGenerateException;
-import cric.champs.model.ScoreBoardModel;
-import cric.champs.model.SetDateTimeModel;
+import cric.champs.requestmodel.ScoreBoardModel;
+import cric.champs.requestmodel.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -65,4 +66,12 @@ public interface SystemInterface {
     List<Tournaments> verifyTournamentsIdWithOutUserVerification(Long tournamentId);
 
     Long getScoreBoardId(ScoreBoardModel scoreBoardModel);
+
+    void rejectRequest();
+
+    boolean verifyTokenValidity(String token);
+
+    void deleteExpiredTokens();
+
+    String getTokenFromHeader(HttpServletRequest httpServletRequest);
 }

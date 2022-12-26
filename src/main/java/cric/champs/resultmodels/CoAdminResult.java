@@ -5,16 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TournamentResultModel {
-    private String tournamentName;
+public class CoAdminResult {
 
-    private long tournamentId;
+    private String userName;
 
-    private String tournamentCode;
+    private String userPhoto;
 
-    private String message;
+    private List<Integer> matchNumber;
 }

@@ -1,13 +1,10 @@
 package cric.champs.controller.user;
 
 import cric.champs.entity.Matches;
-import cric.champs.model.LiveScoreModel;
 import cric.champs.model.Versus;
 import cric.champs.resultmodels.MatchResult;
-import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.fixture.MatchInterface;
 import cric.champs.service.scoreboardandlivescore.LiveResultInterface;
-import cric.champs.service.scoreboardandlivescore.ScoreboardInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

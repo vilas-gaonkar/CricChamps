@@ -13,7 +13,7 @@ public interface UmpiresInterface {
 
     SuccessResultModel editUmpire(Umpires umpire);
 
-    List<Umpires> getUmpireDetails(long tournamentId, int pageSize, int pageNumber);
+    List<Umpires> getUmpireDetails(long tournamentId);
 
     Umpires getUmpire(long umpireId, long tournamentId);
 

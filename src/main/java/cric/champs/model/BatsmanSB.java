@@ -18,6 +18,8 @@ public class BatsmanSB {
 
     private long teamId;
 
+    private long matchId;
+
     private long playerId;
 
     private String playerName;

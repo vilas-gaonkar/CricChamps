@@ -2,6 +2,7 @@ package cric.champs.service.scoreboardandlivescore;
 
 import cric.champs.entity.ScoreBoard;
 import cric.champs.model.*;
+import cric.champs.requestmodel.ScoreBoardModel;
 import cric.champs.resultmodels.ScoreBoardResult;
 
 import java.util.List;
