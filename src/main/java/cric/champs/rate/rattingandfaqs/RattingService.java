@@ -43,6 +43,13 @@ public class RattingService implements RatingsInterface, HelpAndFAQsInterface {
         throw new NullPointerException("Please rate between 1 to 5");
     }
 
+    @Override
+    public double getRatting() {
+        List<RatingDetails> ratingDetails = jdbcTemplate.query("select * from ratingDetails",
+                new BeanPropertyRowMapper<>(RatingDetails.class));
+        return ratingDetails.isEmpty() ? 0 : ratingDetails.get(0).getCurrentRatings();
+    }
+
     private void rate(long totalResponse) {
         if (jdbcTemplate.query("select * from ratingDetails", new BeanPropertyRowMapper<>(RatingDetails.class)).isEmpty())
             jdbcTemplate.update("insert into ratingDetails values (?,?)",

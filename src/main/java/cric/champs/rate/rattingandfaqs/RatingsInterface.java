@@ -6,4 +6,5 @@ public interface RatingsInterface {
 
     SuccessResultModel rating(int numberOfStarsRated, String feedback);
 
+    double getRatting();
 }
