@@ -70,11 +70,4 @@ public class GetNameService implements GetNamesInterface {
         return nameResult;
     }
 
-    @Override
-    public List<NameResult> getAllCoAdminName(long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
-            throw new NullPointerException("Tournament not found");
-        return new ArrayList<>();
-    }
-
 }

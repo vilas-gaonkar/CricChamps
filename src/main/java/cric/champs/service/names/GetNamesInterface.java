@@ -14,6 +14,4 @@ public interface GetNamesInterface {
 
     List<NameResult> getAllUmpiresName(long tournamentId);
 
-    List<NameResult> getAllCoAdminName(long tournamentId);
-
 }

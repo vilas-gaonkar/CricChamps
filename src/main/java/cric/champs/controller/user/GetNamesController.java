@@ -39,9 +39,4 @@ public class GetNamesController {
         return ResponseEntity.of(Optional.of(getNamesInterface.getAllUmpiresName(tournamentId)));
     }
 
-    @GetMapping("/coadmins")
-    public ResponseEntity<List<NameResult>> getAllCoAdminNAme(@RequestHeader long tournamentId) {
-        return ResponseEntity.of(Optional.of(getNamesInterface.getAllCoAdminName(tournamentId)));
-    }
-
 }
