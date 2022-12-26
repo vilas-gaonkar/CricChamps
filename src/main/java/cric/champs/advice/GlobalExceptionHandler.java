@@ -2,6 +2,7 @@ package cric.champs.advice;
 
 import cric.champs.customexceptions.*;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.hibernate.id.IdentifierGenerationException;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -53,6 +54,14 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         Map<String, String> errorMessage = new HashMap<>();
         errorMessage.put("Error Message ", exception.getMessage());
+        return errorMessage;
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleJwtException(JwtException exception) {
+        Map<String, String> errorMessage = new HashMap<>();
+        errorMessage.put("Error Message ", "JWT_TOKEN_EXPIRED");
         return errorMessage;
     }
 

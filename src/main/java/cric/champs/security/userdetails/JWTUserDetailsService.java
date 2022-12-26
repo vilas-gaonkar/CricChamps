@@ -3,6 +3,7 @@ package cric.champs.security.userdetails;
 import cric.champs.entity.Users;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.system.SystemInterface;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,4 +28,8 @@ public class JWTUserDetailsService implements UserDetailsService {
         return new User(email, user.get(0).getPassword(), new ArrayList<>());
     }
 
+    public void checkTokenExistInBlocklist(String token) {
+        if(!systemInterface.verifyTokenValidity(token))
+            throw new JwtException("JWT_TOKEN_EXPIRED");
+    }
 }

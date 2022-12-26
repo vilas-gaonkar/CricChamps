@@ -67,4 +67,8 @@ public interface SystemInterface {
     Long getScoreBoardId(ScoreBoardModel scoreBoardModel);
 
     void rejectRequest();
+
+    boolean verifyTokenValidity(String token);
+
+    void deleteExpiredTokens();
 }

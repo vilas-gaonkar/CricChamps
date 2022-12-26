@@ -2,10 +2,7 @@ package cric.champs.security.filter;
 
 import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private JWTUserDetailsService jwtUserDetailsService;
 
     @Override
-    protected void doFilterInternal( HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException, JwtException {
         try {
             String authorization = httpServletRequest.getHeader("Authorization");
 
@@ -42,22 +39,20 @@ public class JwtFilter extends OncePerRequestFilter {
                 token = authorization.substring(7);
                 email = jwtUtility.getUsernameFromToken(token);
             }
+            jwtUserDetailsService.checkTokenExistInBlocklist(token);
 
             if (null != email && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(email);
 
+                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(email);
                 if (jwtUtility.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                             = new UsernamePasswordAuthenticationToken(userDetails,
                             null, userDetails.getAuthorities());
-
                     usernamePasswordAuthenticationToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(httpServletRequest)
                     );
-
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
-
             }
         } catch (ExpiredJwtException exception) {
             String isRefreshToken = httpServletRequest.getHeader("isRefreshToken");
@@ -67,7 +62,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 allowForGenerateRefreshToken(exception, httpServletRequest);
             else
                 httpServletRequest.setAttribute("exception", "JWT_TOKEN_EXPIRED");
-
         } catch (BadCredentialsException exception) {
             httpServletRequest.setAttribute("exception", "BAD_CREDENTIALS");
         } catch (MalformedJwtException exception) {

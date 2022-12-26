@@ -163,14 +163,10 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         LocalDateTime expirationAt = jwtUtility.getExpirationDateFromToken(token).toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime();
         if (expirationAt.isAfter(LocalDateTime.now())) {
-            deleteExpiredTokens();
+            systemInterface.deleteExpiredTokens();
             jdbcTemplate.update("insert into tokenBlocklist values (?,?)", token, expirationAt);
         }
         return new SuccessResultModel("logout successful");
-    }
-
-    private void deleteExpiredTokens() {
-        jdbcTemplate.update("delete from tokenBlocklist where expirationAt <= now()");
     }
 
     /**

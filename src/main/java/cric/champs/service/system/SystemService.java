@@ -285,4 +285,17 @@ public class SystemService implements SystemInterface {
                 scoreBoardModel.getTournamentId(), scoreBoardModel.getMatchId(), scoreBoardModel.getTeamId());
         return scoreBoards.isEmpty() ? null : scoreBoards.get(0).getScoreBoardId();
     }
+
+    @Override
+    public void deleteExpiredTokens() {
+        jdbcTemplate.update("delete from tokenBlocklist where expirationAt <= now()");
+    }
+
+    @Override
+    public boolean verifyTokenValidity(String token) {
+        deleteExpiredTokens();
+        return jdbcTemplate.query("select * from tokenBlocklist where token = ?",
+                new BeanPropertyRowMapper<>(TokenBlocklist.class), token).isEmpty();
+    }
+
 }
