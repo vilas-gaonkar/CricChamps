@@ -1,7 +1,6 @@
 package cric.champs.controller.Admin;
 
 import com.cloudinary.utils.ObjectUtils;
-import cric.champs.customexceptions.InvalidFieldException;
 import cric.champs.entity.Players;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.service.cloud.UploadImageTOCloud;
@@ -28,7 +27,7 @@ public class PlayerController {
 
     @SuppressWarnings("rawtypes")
     @PostMapping("/register")
-    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException, InvalidFieldException {
+    public ResponseEntity<SuccessResultModel> register(@ModelAttribute @Valid Players player, @RequestPart @Nullable MultipartFile playerPhoto) throws IOException {
         Map result = null;
         if (playerPhoto == null)
             player.setProfilePhoto(null);
