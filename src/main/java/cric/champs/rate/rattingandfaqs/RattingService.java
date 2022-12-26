@@ -1,4 +1,4 @@
-package cric.champs.rate.sidepanelservice;
+package cric.champs.rate.rattingandfaqs;
 
 
 import cric.champs.entity.Users;

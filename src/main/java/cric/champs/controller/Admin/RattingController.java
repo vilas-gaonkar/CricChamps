@@ -1,8 +1,8 @@
 package cric.champs.controller.Admin;
 
 import cric.champs.rate.model.HelpAndFAQs;
-import cric.champs.rate.sidepanelservice.HelpAndFAQsInterface;
-import cric.champs.rate.sidepanelservice.RatingsInterface;
+import cric.champs.rate.rattingandfaqs.HelpAndFAQsInterface;
+import cric.champs.rate.rattingandfaqs.RatingsInterface;
 import cric.champs.resultmodels.SuccessResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
