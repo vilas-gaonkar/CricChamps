@@ -40,11 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 token = authorization.substring(7);
                 email = jwtUtility.getUsernameFromToken(token);
             }
-            try {
+
                 jwtUserDetailsService.checkTokenExistInBlocklist(token);
-            } catch (InsufficientTimeException e) {
-                throw new RuntimeException("INVALID_JWT_TOKEN");
-            }
 
             if (null != email && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -69,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 httpServletRequest.setAttribute("exception", "JWT_TOKEN_EXPIRED");
         } catch (BadCredentialsException exception) {
             httpServletRequest.setAttribute("exception", "BAD_CREDENTIALS");
-        } catch (MalformedJwtException exception) {
+        } catch (MalformedJwtException | InsufficientTimeException exception) {
             httpServletRequest.setAttribute("exception", "INVALID_JWT_TOKEN");
         } catch (UnsupportedJwtException exception) {
             httpServletRequest.setAttribute("exception", "Signed JWTs are not supported");
