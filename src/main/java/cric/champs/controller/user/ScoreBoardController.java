@@ -25,9 +25,9 @@ public class ScoreBoardController {
     }
 
     //split apis
-    @PostMapping("/")
-    public ResponseEntity<ScoreBoard> viewScoreBoard(@ModelAttribute ScoreBoardModel scoreBoardModel) {
-        return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoard(scoreBoardModel)));
+    @GetMapping("/")
+    public ResponseEntity<ScoreBoard> viewScoreBoard(@RequestHeader long tournamentId, @RequestHeader long matchId, @RequestHeader long teamId) {
+        return ResponseEntity.of(Optional.of(scoreboardInterface.viewScoreBoard(new ScoreBoardModel(tournamentId, matchId, teamId))));
     }
 
     @PostMapping("/batsman-sb")
