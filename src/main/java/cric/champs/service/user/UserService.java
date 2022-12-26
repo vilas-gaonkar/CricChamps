@@ -27,7 +27,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +150,27 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
     public Users getUserDetails() {
         return jdbcTemplate.query("select * from users where userId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Users.class), systemInterface.getUserId()).get(0);
+    }
+
+    @Override
+    public SuccessResultModel logOut(HttpServletRequest httpServletRequest) {
+        String token;
+        String authorization = httpServletRequest.getHeader("Authorization");
+        if (null != authorization && authorization.startsWith("Bearer "))
+            token = authorization.substring(7);
+        else
+            throw new NullPointerException("Invalid request");
+        LocalDateTime expirationAt = jwtUtility.getExpirationDateFromToken(token).toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime();
+        if (expirationAt.isAfter(LocalDateTime.now())) {
+            deleteExpiredTokens();
+            jdbcTemplate.update("insert into tokenBlocklist values (?,?)", token, expirationAt);
+        }
+        return new SuccessResultModel("logout successful");
+    }
+
+    private void deleteExpiredTokens() {
+        jdbcTemplate.update("delete from tokenBlocklist where expirationAt <= now()");
     }
 
     /**

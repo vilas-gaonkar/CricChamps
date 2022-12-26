@@ -149,4 +149,8 @@ public class LoginController {
         return ResponseEntity.of(Optional.of(loginInterface.getUserDetails()));
     }
 
+    @DeleteMapping("user/sign-out")
+    public ResponseEntity<SuccessResultModel> logout(HttpServletRequest httpServletRequest) {
+        return ResponseEntity.of(Optional.of(loginInterface.logOut(httpServletRequest)));
+    }
 }

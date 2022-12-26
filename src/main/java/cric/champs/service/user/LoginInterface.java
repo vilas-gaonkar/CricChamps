@@ -28,4 +28,6 @@ public interface LoginInterface {
 
     Users getUserDetails();
 
+    SuccessResultModel logOut(HttpServletRequest httpServletRequest);
+
 }
