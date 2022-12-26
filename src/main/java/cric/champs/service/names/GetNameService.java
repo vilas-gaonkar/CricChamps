@@ -43,9 +43,11 @@ public class GetNameService implements GetNamesInterface {
         List<Grounds> grounds = jdbcTemplate.query("select * from grounds where tournamentId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
-        for (Grounds ground : grounds)
-            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName(),
-                    getGroundPics(ground.getGroundId()).get(0).getGroundPhoto()));
+        for (Grounds ground : grounds) {
+            String photo = getGroundPics(ground.getGroundId()).isEmpty() ? null :
+                    getGroundPics(ground.getGroundId()).get(0).getGroundPhoto();
+            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName(), photo));
+        }
         return nameResult;
     }
 
