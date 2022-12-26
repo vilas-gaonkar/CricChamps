@@ -25,18 +25,6 @@ public class GetNameService implements GetNamesInterface {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<NameResult> getAllUserTournamentName() {
-        List<Tournaments> tournaments = systemInterface.verifyUserID();
-        if (tournaments.isEmpty())
-            return new ArrayList<>();
-        List<NameResult> nameResult = new ArrayList<>();
-        for (Tournaments tournament : tournaments)
-            nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName(),
-                    tournament.getTournamentLogo()));
-        return nameResult;
-    }
-
-    @Override
     public List<NameResult> getAllTeamNames(long tournamentId) {
         if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Tournament not found");

@@ -19,11 +19,6 @@ public class GetNamesController {
     @Autowired
     private GetNamesInterface getNamesInterface;
 
-    @GetMapping("/tournaments")
-    public ResponseEntity<List<NameResult>> getAllUserTournamentName() {
-        return ResponseEntity.of(Optional.of(getNamesInterface.getAllUserTournamentName()));
-    }
-
     @GetMapping("/teams")
     public ResponseEntity<List<NameResult>> getAllTeamNames(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(getNamesInterface.getAllTeamNames(tournamentId)));

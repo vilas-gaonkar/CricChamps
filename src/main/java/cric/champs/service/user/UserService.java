@@ -4,10 +4,7 @@ import cric.champs.customexceptions.*;
 import cric.champs.entity.*;
 import cric.champs.requestmodel.SetDateTimeModel;
 import cric.champs.model.GroundPhotos;
-import cric.champs.resultmodels.GroundResult;
-import cric.champs.resultmodels.SuccessResultModel;
-import cric.champs.resultmodels.TeamResultModel;
-import cric.champs.resultmodels.TournamentResultModel;
+import cric.champs.resultmodels.*;
 import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
 import cric.champs.service.*;
@@ -187,6 +184,18 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         int offSet = pageSize * (pageNumber - 1);
         return jdbcTemplate.query("select * from tournaments where userId = ? limit ? offset ?",
                 new BeanPropertyRowMapper<>(Tournaments.class), systemInterface.getUserId(), pageSize, offSet);
+    }
+
+    @Override
+    public List<NameResult> getAllUserTournamentName() {
+        List<Tournaments> tournaments = systemInterface.verifyUserID();
+        if (tournaments.isEmpty())
+            return new ArrayList<>();
+        List<NameResult> nameResult = new ArrayList<>();
+        for (Tournaments tournament : tournaments)
+            nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName(),
+                    tournament.getTournamentLogo()));
+        return nameResult;
     }
 
     @Override

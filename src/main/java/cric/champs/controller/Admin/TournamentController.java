@@ -3,6 +3,7 @@ package cric.champs.controller.Admin;
 import com.cloudinary.utils.ObjectUtils;
 import cric.champs.customexceptions.FixtureGenerationException;
 import cric.champs.requestmodel.SetDateTimeModel;
+import cric.champs.resultmodels.NameResult;
 import cric.champs.resultmodels.SuccessResultModel;
 import cric.champs.entity.Tournaments;
 import cric.champs.resultmodels.TournamentResultModel;
@@ -91,5 +92,10 @@ public class TournamentController {
     @PatchMapping("/set-date-time")
     public ResponseEntity<SuccessResultModel> setTournamentDateTimes(@RequestBody SetDateTimeModel setDateTimeModel) throws FixtureGenerationException {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentDateTimes(setDateTimeModel)));
+    }
+
+    @GetMapping("/tournaments")
+    public ResponseEntity<List<NameResult>> getAllUserTournamentName() {
+        return ResponseEntity.of(Optional.of(tournamentInterface.getAllUserTournamentName()));
     }
 }

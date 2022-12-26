@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface GetNamesInterface {
 
-    List<NameResult> getAllUserTournamentName();
-
     List<NameResult> getAllTeamNames(long tournamentId);
 
     List<NameResult> getAllGroundsName(long tournamentId);
