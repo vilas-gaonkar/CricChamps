@@ -1,4 +1,4 @@
-package cric.champs.setting.model;
+package cric.champs.rate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,12 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Ratings {
+public class HelpAndFAQs {
 
-    private long userId;
+    private int questionId;
 
-    private Integer numberOfStarsRated;
+    private String question;
 
-    private String feedback;
+    private String answer;
+
 }

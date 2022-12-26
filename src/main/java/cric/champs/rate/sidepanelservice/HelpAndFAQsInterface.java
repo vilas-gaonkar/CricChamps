@@ -1,9 +1,11 @@
-package cric.champs.setting.sidepanelservice;
+package cric.champs.rate.sidepanelservice;
 
-import cric.champs.setting.model.HelpAndFAQs;
+import cric.champs.rate.model.HelpAndFAQs;
 
 import java.util.List;
 
 public interface HelpAndFAQsInterface {
+
     List<HelpAndFAQs> helpAndFAQs();
+
 }
