@@ -23,7 +23,7 @@ public class RattingController {
     private HelpAndFAQsInterface helpAndFAQsInterface;
 
     @PostMapping("/")
-    public ResponseEntity<SuccessResultModel> rateApp(@RequestParam @Nullable int numberOfStarRated, @RequestPart @Nullable String feedback) {
+    public ResponseEntity<SuccessResultModel> rateApp(@RequestParam int numberOfStarRated, @RequestPart @Nullable String feedback) {
         return ResponseEntity.of(Optional.of(ratingsInterface.rating(numberOfStarRated, feedback)));
     }
 

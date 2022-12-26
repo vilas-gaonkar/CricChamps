@@ -32,7 +32,7 @@ public class GetNameService implements GetNamesInterface {
                 new BeanPropertyRowMapper<>(Teams.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
         for (Teams team : teams)
-            nameResult.add(new NameResult(team.getTeamId(), team.getTeamName(), team.getTeamLogo()));
+            nameResult.add(new NameResult(team.getTeamId(), team.getTeamName(), team.getCity(), team.getTeamLogo()));
         return nameResult;
     }
 
@@ -46,7 +46,8 @@ public class GetNameService implements GetNamesInterface {
         for (Grounds ground : grounds) {
             String photo = getGroundPics(ground.getGroundId()).isEmpty() ? null :
                     getGroundPics(ground.getGroundId()).get(0).getGroundPhoto();
-            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName(), photo));
+            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName(), ground.getGroundLocation(),
+                    photo));
         }
         return nameResult;
     }
@@ -64,7 +65,8 @@ public class GetNameService implements GetNamesInterface {
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
         for (Umpires umpire : umpires)
-            nameResult.add(new NameResult(umpire.getUmpireId(), umpire.getUmpireName(), umpire.getUmpirePhoto()));
+            nameResult.add(new NameResult(umpire.getUmpireId(), umpire.getUmpireName(), umpire.getCity(),
+                    umpire.getUmpirePhoto()));
         return nameResult;
     }
 

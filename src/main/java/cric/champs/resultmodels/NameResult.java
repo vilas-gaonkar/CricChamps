@@ -15,5 +15,7 @@ public class NameResult {
 
     private String name;
 
+    private String city;
+
     private String photo;
 }
