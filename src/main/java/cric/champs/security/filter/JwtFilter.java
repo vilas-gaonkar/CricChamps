@@ -1,5 +1,6 @@
 package cric.champs.security.filter;
 
+import cric.champs.customexceptions.InsufficientTimeException;
 import cric.champs.security.userdetails.JWTUserDetailsService;
 import cric.champs.security.utility.JWTUtility;
 import io.jsonwebtoken.*;
@@ -39,7 +40,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 token = authorization.substring(7);
                 email = jwtUtility.getUsernameFromToken(token);
             }
-            jwtUserDetailsService.checkTokenExistInBlocklist(token);
+            try {
+                jwtUserDetailsService.checkTokenExistInBlocklist(token);
+            } catch (InsufficientTimeException e) {
+                throw new RuntimeException("INVALID_JWT_TOKEN");
+            }
 
             if (null != email && SecurityContextHolder.getContext().getAuthentication() == null) {
 

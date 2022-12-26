@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -298,4 +299,11 @@ public class SystemService implements SystemInterface {
                 new BeanPropertyRowMapper<>(TokenBlocklist.class), token).isEmpty();
     }
 
+    @Override
+    public String getTokenFromHeader(HttpServletRequest httpServletRequest) {
+        String authorization = httpServletRequest.getHeader("Authorization");
+        if (null != authorization && authorization.startsWith("Bearer "))
+            return authorization.substring(7);
+        throw new NullPointerException("Invalid token");
+    }
 }

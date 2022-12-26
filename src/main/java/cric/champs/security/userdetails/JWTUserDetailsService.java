@@ -1,5 +1,6 @@
 package cric.champs.security.userdetails;
 
+import cric.champs.customexceptions.InsufficientTimeException;
 import cric.champs.entity.Users;
 import cric.champs.service.AccountStatus;
 import cric.champs.service.system.SystemInterface;
@@ -28,8 +29,8 @@ public class JWTUserDetailsService implements UserDetailsService {
         return new User(email, user.get(0).getPassword(), new ArrayList<>());
     }
 
-    public void checkTokenExistInBlocklist(String token) {
+    public void checkTokenExistInBlocklist(String token) throws InsufficientTimeException {
         if(!systemInterface.verifyTokenValidity(token))
-            throw new JwtException("JWT_TOKEN_EXPIRED");
+            throw new InsufficientTimeException("JWT_TOKEN_EXPIRED");
     }
 }

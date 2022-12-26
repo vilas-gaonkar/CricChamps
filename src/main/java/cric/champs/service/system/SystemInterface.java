@@ -8,6 +8,7 @@ import cric.champs.requestmodel.SetDateTimeModel;
 import cric.champs.resultmodels.SuccessResultModel;
 import io.jsonwebtoken.impl.DefaultClaims;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -71,4 +72,6 @@ public interface SystemInterface {
     boolean verifyTokenValidity(String token);
 
     void deleteExpiredTokens();
+
+    String getTokenFromHeader(HttpServletRequest httpServletRequest);
 }

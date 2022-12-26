@@ -154,12 +154,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public SuccessResultModel logOut(HttpServletRequest httpServletRequest) {
-        String token;
-        String authorization = httpServletRequest.getHeader("Authorization");
-        if (null != authorization && authorization.startsWith("Bearer "))
-            token = authorization.substring(7);
-        else
-            throw new NullPointerException("Invalid request");
+        String token = systemInterface.getTokenFromHeader(httpServletRequest);
         LocalDateTime expirationAt = jwtUtility.getExpirationDateFromToken(token).toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDateTime();
         if (expirationAt.isAfter(LocalDateTime.now())) {
