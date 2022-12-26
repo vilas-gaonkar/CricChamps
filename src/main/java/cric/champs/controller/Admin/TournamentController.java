@@ -56,7 +56,7 @@ public class TournamentController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<Tournaments> get(@RequestHeader long tournamentId) {
+    public ResponseEntity<Tournaments> getTournamentDetails(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getTournament(tournamentId)));
     }
 
@@ -79,7 +79,7 @@ public class TournamentController {
         return ResponseEntity.of(Optional.of(tournamentInterface.setTournamentTime(tournamentId, startTime, endTime)));
     }
 
-    @GetMapping("/get")
+    @GetMapping("/show")
     public ResponseEntity<Tournaments> getTournament(@RequestHeader @Size(min = 6, max = 6, message = "Invalid tournament code") String tournamentCode) {
         return ResponseEntity.of(Optional.of(tournamentInterface.getDetailsByTournamentCode(tournamentCode)));
     }

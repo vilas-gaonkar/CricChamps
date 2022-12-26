@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/login","/sign-up", "/forgot-password", "/reset", "/send-otp", "/verify",
                         "/reset-password","/scoreboard/**","/players-stats/**", "/match/**","/live/**","/name/**",
-                        "/team/view**","/player/view**").permitAll()
+                        "/team/view**","/player/view**","/tournament/show").permitAll()
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest()
                 .authenticated()
