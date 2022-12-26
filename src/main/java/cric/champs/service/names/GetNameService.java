@@ -4,6 +4,7 @@ import cric.champs.entity.Grounds;
 import cric.champs.entity.Teams;
 import cric.champs.entity.Tournaments;
 import cric.champs.entity.Umpires;
+import cric.champs.model.GroundPhotos;
 import cric.champs.resultmodels.NameResult;
 import cric.champs.service.system.SystemInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ public class GetNameService implements GetNamesInterface {
             return new ArrayList<>();
         List<NameResult> nameResult = new ArrayList<>();
         for (Tournaments tournament : tournaments)
-            nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName()));
+            nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName(),
+                    tournament.getTournamentLogo()));
         return nameResult;
     }
 
@@ -42,7 +44,7 @@ public class GetNameService implements GetNamesInterface {
                 new BeanPropertyRowMapper<>(Teams.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
         for (Teams team : teams)
-            nameResult.add(new NameResult(team.getTeamId(), team.getTeamName()));
+            nameResult.add(new NameResult(team.getTeamId(), team.getTeamName(), team.getTeamLogo()));
         return nameResult;
     }
 
@@ -54,8 +56,14 @@ public class GetNameService implements GetNamesInterface {
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
         for (Grounds ground : grounds)
-            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName()));
+            nameResult.add(new NameResult(ground.getGroundId(), ground.getGroundName(),
+                    getGroundPics(ground.getGroundId()).get(0).getGroundPhoto()));
         return nameResult;
+    }
+
+    private List<GroundPhotos> getGroundPics(long groundId) {
+        return jdbcTemplate.query("select * from groundPhotos where groundId = ?",
+                new BeanPropertyRowMapper<>(GroundPhotos.class), groundId);
     }
 
     @Override
@@ -66,7 +74,7 @@ public class GetNameService implements GetNamesInterface {
                 new BeanPropertyRowMapper<>(Umpires.class), tournamentId);
         List<NameResult> nameResult = new ArrayList<>();
         for (Umpires umpire : umpires)
-            nameResult.add(new NameResult(umpire.getUmpireId(), umpire.getUmpireName()));
+            nameResult.add(new NameResult(umpire.getUmpireId(), umpire.getUmpireName(), umpire.getUmpirePhoto()));
         return nameResult;
     }
 
