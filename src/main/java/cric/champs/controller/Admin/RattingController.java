@@ -27,7 +27,7 @@ public class RattingController {
         return ResponseEntity.of(Optional.of(ratingsInterface.rating(numberOfStarRated, feedback)));
     }
 
-    @PostMapping("/help-faqs")
+    @GetMapping("/help-faqs")
     public ResponseEntity<List<HelpAndFAQs>> helpAndFAQs() {
         return ResponseEntity.of(Optional.of(helpAndFAQsInterface.helpAndFAQs()));
     }
