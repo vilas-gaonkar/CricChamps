@@ -194,7 +194,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         List<NameResult> nameResult = new ArrayList<>();
         for (Tournaments tournament : tournaments)
             nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName(),
-                    tournament.getTournamentLogo()));
+                    null,tournament.getTournamentLogo()));
         return nameResult;
     }
 
