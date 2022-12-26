@@ -17,6 +17,8 @@ public class BowlerSB {
 
     private long teamId;
 
+    private long matchId;
+
     private long playerId;
 
     private String playerName;

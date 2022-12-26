@@ -48,4 +48,10 @@ public class LiveScoreUpdateController {
         return ResponseEntity.of(Optional.of(popUpInterface.fielders(tournamentId,matchId,teamId)));
     }
 
+    @GetMapping("/currentBatsman")
+    public ResponseEntity<List<PlayersResult>> currentBatsman(@RequestHeader long tournamentId, @RequestHeader long matchId, @RequestHeader long teamId)
+    {
+        return ResponseEntity.of(Optional.of(popUpInterface.currentPlayingBatsman(tournamentId,matchId,teamId)));
+    }
+
 }

@@ -168,8 +168,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void insertNewBatsmanToScoreboard(LiveScoreUpdateModel liveScoreUpdateModel, Long scoreBoardId, Long playerId, String strikePosition) {
-        jdbcTemplate.update("insert into batsmanSB values(?,?,?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
-                liveScoreUpdateModel.getBattingTeamId(), playerId, getPlayerDetail(playerId).get(0).getPlayerName(), 0, 0,
+        jdbcTemplate.update("insert into batsmanSB values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
+                liveScoreUpdateModel.getBattingTeamId(), liveScoreUpdateModel.getMatchId(), playerId, getPlayerDetail(playerId).get(0).getPlayerName(), 0, 0,
                 0, 0, 0, BatsmanStatus.NOTOUT.toString(), strikePosition, null, null);
     }
 
@@ -291,8 +291,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void insertTOBowlerSb(LiveScoreUpdateModel liveScoreModel, long scoreBoardId, int ball) {
-        jdbcTemplate.update("insert into bowlingSB values(?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
-                liveScoreModel.getBowlingTeamId(), liveScoreModel.getBowlerId(),
+        jdbcTemplate.update("insert into bowlingSB values(?,?,?,?,?,?,?,?,?,?,?,?)", scoreBoardId,
+                liveScoreModel.getBowlingTeamId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlerId(),
                 getPlayerDetail(liveScoreModel.getBowlerId()).get(0).getPlayerName(), 0, 0,
                 ball, 0, 0, 0, BowlingStatus.BOWLING.toString());
     }
@@ -772,13 +772,13 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void generateForKnockout(Tournaments tournament) throws FixtureGenerationException {
-        if( tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
+        if (tournament.getTotalRoundRobinMatches() == tournament.getTotalMatchesCompleted()) {
             List<Teams> teams = jdbcTemplate.query("select * from teams where tournamentId = ? and teamStatus = ? " +
                             "and isDeleted = 'false' order by teamId DESC",
                     new BeanPropertyRowMapper<>(Teams.class), tournament.getTournamentId(), TeamStatus.WIN.toString());
-            if(teams.isEmpty())
+            if (teams.isEmpty())
                 throw new FixtureGenerationException("There are no teams available to play further matches");
-            else if (teams.size()==1) {
+            else if (teams.size() == 1) {
                 jdbcTemplate.update(" update tournaments set tournamentStatus = ? where tournamentId = ?",
                         TournamentStatus.COMPLETED.toString(), tournament.getTournamentId());
                 return;

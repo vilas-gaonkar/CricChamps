@@ -23,7 +23,7 @@ public class FixtureController {
     @Autowired
     SystemInterface systemInterface;
 
-    @GetMapping("/generate")
+    @PostMapping("/generate")
     public ResponseEntity<SuccessResultModel> generateFixture(@RequestHeader long tournamentId) throws Exception {
         return ResponseEntity.of(Optional.of(fixtureGenerationInterface.generateFixture(tournamentId)));
     }
