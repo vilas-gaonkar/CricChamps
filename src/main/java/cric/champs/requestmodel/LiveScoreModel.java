@@ -14,6 +14,4 @@ public class LiveScoreModel {
     private Long tournamentId;
 
     private Long matchId;
-
-    private Long battingTeamId;
 }
