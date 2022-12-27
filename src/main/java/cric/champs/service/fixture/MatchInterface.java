@@ -2,6 +2,7 @@ package cric.champs.service.fixture;
 
 import cric.champs.entity.Matches;
 import cric.champs.model.Versus;
+import cric.champs.resultmodels.MatchCellResultModel;
 import cric.champs.resultmodels.MatchResult;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface MatchInterface {
     MatchResult matchInfo(long tournamentId , long matchId);
 
     Matches getMatchInfo(long tournamentId , long matchId);
+
+    List<MatchCellResultModel> info(long tournamentId);
 }

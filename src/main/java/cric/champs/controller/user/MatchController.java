@@ -2,6 +2,7 @@ package cric.champs.controller.user;
 
 import cric.champs.entity.Matches;
 import cric.champs.model.Versus;
+import cric.champs.resultmodels.MatchCellResultModel;
 import cric.champs.resultmodels.MatchResult;
 import cric.champs.service.fixture.MatchInterface;
 import cric.champs.service.scoreboardandlivescore.LiveResultInterface;
@@ -39,6 +40,11 @@ public class MatchController {
     @GetMapping("/view-all")
     public ResponseEntity<List<MatchResult>> viewMatchInfo(@RequestHeader long tournamentId) {
         return ResponseEntity.of(Optional.of(matchInterface.viewMatch(tournamentId)));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<List<MatchCellResultModel>> viewInfo(@RequestHeader long tournamentId) {
+        return ResponseEntity.of(Optional.of(matchInterface.info(tournamentId)));
     }
 
 }
