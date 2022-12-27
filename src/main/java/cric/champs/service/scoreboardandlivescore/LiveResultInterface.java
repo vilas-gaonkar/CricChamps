@@ -13,7 +13,7 @@ public interface LiveResultInterface {
 
     List<Live> viewLiveScore(LiveScoreModel liveScoreModel);
 
-    List<BatsmanSB> viewBatsmanSB(LiveScoreModel liveScoreModel);
+    List<BatsmanSB> viewBatsmanSB(LiveScoreModel liveScoreMo);
 
     BowlerSB viewBowlerSB(LiveScoreModel liveScoreModel);
 

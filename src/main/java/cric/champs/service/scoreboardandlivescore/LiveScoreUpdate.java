@@ -1098,11 +1098,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         } else {
             if (liveScoreUpdateModel.getRuns() > 0 && liveScoreUpdateModel.getRuns() < 4)
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " +
-                        liveScoreUpdateModel.getRuns() + " run(s),\nStraight down the ground.";
+                        liveScoreUpdateModel.getRuns() + " run(s),\n Straight down the ground.";
             else if (liveScoreUpdateModel.getRuns() == 4)
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \nAll the way to the boundary off the bat!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", FOUR runs \n All the way to the boundary off the bat!";
             else if (liveScoreUpdateModel.getRuns() == 6)
-                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \nTHAT'S a HUGE HIT!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", SIX runs \n THAT'S a HUGE HIT!";
             else
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ",  No run. Well bowled.";
         }
