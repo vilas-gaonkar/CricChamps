@@ -71,9 +71,10 @@ public class LiveScoreResultService implements LiveResultInterface {
         List<ScoreBoard> scoreBoard = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId());
         if (scoreBoard.isEmpty())
             return null;
-        return jdbcTemplate.query("select * from bowlingSB where scoreBoardId = ?  and bowlerStatus = ?",
+        List<BowlerSB> bowlerSB = jdbcTemplate.query("select * from bowlingSB where scoreBoardId = ?  and bowlerStatus = ?",
                 new BeanPropertyRowMapper<>(BowlerSB.class), scoreBoard.get(0).getScoreBoardId(),
-                BowlingStatus.BOWLING.toString()).get(0);
+                BowlingStatus.BOWLING.toString());
+        return bowlerSB.isEmpty() ? null : bowlerSB.get(0);
     }
 
     @Override
