@@ -1,6 +1,7 @@
 package cric.champs.resultmodels;
 
 import cric.champs.entity.Live;
+import cric.champs.entity.ScoreBoard;
 import cric.champs.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +27,6 @@ public class LiveScoreResult {
     private FallOfWicketSB fallOfWicketSB;
 
     private List<Commentary> commentary;
+
+    private String matchStatus;
 }

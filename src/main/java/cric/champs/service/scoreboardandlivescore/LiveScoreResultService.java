@@ -4,6 +4,7 @@ import cric.champs.entity.Live;
 import cric.champs.entity.ScoreBoard;
 import cric.champs.requestmodel.LiveScoreModel;
 import cric.champs.model.*;
+import cric.champs.requestmodel.ScoreBoardModel;
 import cric.champs.resultmodels.LiveScoreResult;
 import cric.champs.service.BatsmanStatus;
 import cric.champs.service.BowlingStatus;
@@ -34,7 +35,8 @@ public class LiveScoreResultService implements LiveResultInterface {
         FallOfWicketSB fallOfWicketSB = viewFallOfWickets(liveScoreModel);
         Partnership partnership = viewPartnerShip(liveScoreModel);
         List<Commentary> commentaries = viewCommentary(liveScoreModel);
-        return new LiveScoreResult(lives, batsmanSB, bowlerSB, partnership, fallOfWicketSB, commentaries);
+        ScoreBoard scoreBoard = viewScoreBoard(liveScoreModel);
+        return new LiveScoreResult(lives, batsmanSB, bowlerSB, partnership, fallOfWicketSB, commentaries,scoreBoard.getMatchStatus());
     }
 
     @Override
@@ -106,6 +108,15 @@ public class LiveScoreResultService implements LiveResultInterface {
             throw new NullPointerException("Invalid tournament");
         return jdbcTemplate.query("select * from commentary where matchId = ? and tournamentId = ? order by commentaryId DESC",
                 new BeanPropertyRowMapper<>(Commentary.class), liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
+    }
+
+    @Override
+    public ScoreBoard viewScoreBoard(LiveScoreModel liveScoreModel) {
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(liveScoreModel.getTournamentId()).isEmpty())
+            throw new NullPointerException("Invalid tournament");
+        List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? order by scoreBoardId DESC",
+                new BeanPropertyRowMapper<>(ScoreBoard.class), liveScoreModel.getTournamentId(), liveScoreModel.getMatchId());
+        return scoreBoard.isEmpty() ? null : scoreBoard.get(0);
     }
 
 }
