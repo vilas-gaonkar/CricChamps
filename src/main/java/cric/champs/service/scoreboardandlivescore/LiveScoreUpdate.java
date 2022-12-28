@@ -59,7 +59,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void doInitialConditions(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
-        if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString()) ||
+        if (/*liveScoreModel.getOver() == 0 &&*/ liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString()) ||
                 liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())
             /* && liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0*/) {
             setStatus(liveScoreModel);
