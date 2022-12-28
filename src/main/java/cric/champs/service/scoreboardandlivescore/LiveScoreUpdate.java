@@ -60,7 +60,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
     private void doInitialConditions(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
         if (liveScoreModel.getOver() == 0 && liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString())
-                && liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0) {
+                && (liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0)) {
             setStatus(liveScoreModel);
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
@@ -904,7 +904,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             if (firstInning.isEmpty())
                 insertIntoLive(liveScoreUpdateModel, teams, 0);
             else
-                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns() - liveScoreUpdateModel.getRuns());
+                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns()+1 - liveScoreUpdateModel.getRuns());
         } else
             updatingForExistingLiveScore(liveScoreUpdateModel, tournaments);
     }
