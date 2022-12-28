@@ -904,7 +904,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             if (firstInning.isEmpty())
                 insertIntoLive(liveScoreUpdateModel, teams, 0);
             else
-                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns() - liveScoreUpdateModel.getRuns());
+                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns()+1 - liveScoreUpdateModel.getRuns());
         } else
             updatingForExistingLiveScore(liveScoreUpdateModel, tournaments);
     }
