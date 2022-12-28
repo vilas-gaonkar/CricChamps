@@ -194,7 +194,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
         List<NameResult> nameResult = new ArrayList<>();
         for (Tournaments tournament : tournaments)
             nameResult.add(new NameResult(tournament.getTournamentId(), tournament.getTournamentName(),
-                    null,tournament.getTournamentLogo()));
+                    null, tournament.getTournamentLogo()));
         return nameResult;
     }
 
@@ -340,7 +340,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public GroundResult getGround(long groundId, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament details");
         Grounds ground = jdbcTemplate.query("select * from grounds where tournamentId = ? and groundId = ? and isDeleted = 'false'",
                 new BeanPropertyRowMapper<>(Grounds.class), tournamentId, groundId).get(0);
@@ -391,7 +391,7 @@ public class UserService implements LoginInterface, TournamentInterface, GroundI
 
     @Override
     public Umpires getUmpire(long umpireId, long tournamentId) {
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty() ||
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty() ||
                 systemInterface.verifyUmpireDetails(tournamentId, umpireId).isEmpty())
             throw new NullPointerException("Tournament not found or Umpire Not Found");
         return jdbcTemplate.query("select * from umpires where tournamentId = ? and umpireId = ? and isDeleted = 'false'",

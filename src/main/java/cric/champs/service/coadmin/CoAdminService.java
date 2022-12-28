@@ -29,7 +29,7 @@ public class CoAdminService implements CoAdminInterface {
     @Override
     public List<CoAdminResult> viewCoAdmin(long tournamentId) {
         List<CoAdminResult> coAdminResults = new ArrayList<>();
-        if (systemInterface.verifyTournamentId(tournamentId).isEmpty())
+        if (systemInterface.verifyTournamentsIdWithOutUserVerification(tournamentId).isEmpty())
             throw new NullPointerException("Invalid tournament");
         List<CoAdmin> coAdmins = jdbcTemplate.query("select * from coAdmin where tournamentId = ? group by userId",
                 new BeanPropertyRowMapper<>(CoAdmin.class), tournamentId);

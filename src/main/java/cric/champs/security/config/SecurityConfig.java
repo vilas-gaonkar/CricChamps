@@ -39,7 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/login", "/sign-up", "/forgot-password", "/reset", "/send-otp", "/verify",
                         "/reset-password", "/scoreboard/**", "/players-stats/**", "/match/**", "/live/**", "/name/**",
-                        "/team/view**", "/player/view**", "/tournament/show", "/ratting/view", "/ratting/help-faqs").permitAll()
+                        "/team/view**", "/player/view**", "/tournament/show", "/ratting/view", "/ratting/help-faqs",
+                        "/ground/view", "/umpire/view", "/co-admin/view").permitAll()
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest()
                 .authenticated()
