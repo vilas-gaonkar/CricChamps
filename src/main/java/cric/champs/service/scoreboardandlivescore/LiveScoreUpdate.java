@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LiveScoreUpdate implements LiveScoreUpdateInterface {
@@ -928,7 +929,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         int ball = 1;
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
             wicket = 1;
-        if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() &&
+                (Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.wide.toString()) ||
+                        Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.noBall.toString())))
             ball = 0;
         if (liveScoreUpdateModel.getBall() + 1 == 6 && !liveScoreUpdateModel.getExtraModel().isExtraStatus())
             jdbcTemplate.update("update live set currentRunRate = ?, requiredRunRate = ?, runs = ?, wickets =?, overs = ?," +
@@ -949,7 +952,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         int ball = 1;
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
             wicket = 1;
-        if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() &&
+                (Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.wide.toString()) ||
+                        Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.noBall.toString())))
             ball = 0;
         jdbcTemplate.update("insert into live values(?,?,?,?,?,?,?,?,?,?,?,?)", null, liveScoreUpdateModel.getTournamentId(),
                 liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(), teams.getTeamName(),
@@ -1085,8 +1090,10 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 return "In the air, fielder coming underneath and taken!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
                 return "That's a hit wicket";
-            else
+            else if(liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.STUMPED.toString()))
                 return "Stumped and he's gone!";
+            else
+                return "It's a Wicket";
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
@@ -1117,7 +1124,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreUpdateModel.getExtraModel().isExtraStatus() ? liveScoreUpdateModel.getExtraModel().getExtraType() :
                         String.valueOf(liveScoreUpdateModel.getRuns());
         int ball = 1;
-        if (liveScoreUpdateModel.getExtraModel().isExtraStatus())
+        if (liveScoreUpdateModel.getExtraModel().isExtraStatus() &&
+                (Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.wide.toString()) ||
+                        Objects.equals(liveScoreUpdateModel.getExtraModel().getExtraType(), ExtraRunsType.noBall.toString())))
             ball = 0;
         jdbcTemplate.update("insert into commentary values(?,?,?,?,?,?,?,?,?,?,?)", null, lives.get(0).getLiveId(),
                 liveScoreUpdateModel.getTournamentId(), liveScoreUpdateModel.getMatchId(), liveScoreUpdateModel.getBattingTeamId(),
