@@ -1090,19 +1090,19 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
 
         if (liveScoreUpdateModel.getWicketModel().isWicketStatus())
             if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.BOWLED.toString()))
-                return "Direct Hit! WHAT A WICKET!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "Direct Hit! WHAT A WICKET!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.LBW.toString()))
-                return "An appeal for LBW, and the Umpire says YES!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "An appeal for LBW, and the Umpire says YES!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.RUNOUT.toString()))
-                return "Lovely throw, that's a run-out";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "Lovely throw, that's a run-out";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.CAUGHT.toString()))
-                return "In the air, fielder coming underneath and taken!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "In the air, fielder coming underneath and taken!";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.HITWICKET.toString()))
-                return "That's a hit wicket";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "That's a hit wicket";
             else if (liveScoreUpdateModel.getWicketModel().getOutType().equals(WicketType.STUMPED.toString()))
-                return "Stumped and he's gone!";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "Stumped and he's gone!";
             else
-                return "It's a Wicket";
+                return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ", " + "It's a Wicket";
         else if (liveScoreUpdateModel.getExtraModel().isExtraStatus()) {
             if ((liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                     liveScoreUpdateModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString()))
@@ -1125,7 +1125,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             else
                 return bowler.getPlayerName() + " to " + batsman.getPlayerName() + ",  No run. Well bowled.";
         }
-        return "Oops!... something went wrong ";
+        return "Oops!... something went wrong";
     }
 
     private void insertIntoCommentary(LiveScoreUpdateModel liveScoreUpdateModel, List<Live> lives, String overStatus, int extraRun, String comment) {
