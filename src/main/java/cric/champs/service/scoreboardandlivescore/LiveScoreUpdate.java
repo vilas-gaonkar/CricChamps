@@ -609,7 +609,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         if (liveScoreModel.getExtraModel().isExtraStatus() && (
                 liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                         liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString())))
-            return resultForExtra(liveScoreModel);
+            return resultForExtra(liveScoreModel, scoreBoardId);
             //need to be verified
         else if (liveScoreModel.getBall() == 5) {
             if (checkForInningComplete(liveScoreModel)) {
@@ -626,6 +626,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setOver(liveScoreModel.getOver() + 1);
                 liveScoreModel.setBall(0);
             }
+            liveScoreModel.setOverStatus(null);
             return liveScoreModel;
         } else if (checkForInningCompleteNotInLastBall(liveScoreModel)) {
             updatePlayerTables(liveScoreModel);
@@ -638,6 +639,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
                 liveScoreModel.setNonStrikeBatsmanId(temp);
             }
+            liveScoreModel.setOverStatus(null);
             return liveScoreModel;
         } else {
             long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
@@ -645,6 +647,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             liveScoreModel.setStrikeBatsmanId(strikeBatsmanSBId);
             liveScoreModel.setNonStrikeBatsmanId(nonStrikeBatsmanSBId);
             liveScoreModel.setBall(liveScoreModel.getBall() + 1);
+            liveScoreModel.setOverStatus(null);
             return liveScoreModel;
         }
     }
@@ -670,12 +673,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(BatsmanSB.class), strikePosition, scoreBoardId).get(0).getPlayerId();
     }
 
-    private LiveScoreUpdateModel resultForExtra(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
-        if ((liveScoreModel.getRuns() - 1) % 2 != 0) {
-            long temp = liveScoreModel.getStrikeBatsmanId();
-            liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
-            liveScoreModel.setNonStrikeBatsmanId(temp);
-        }
+    private LiveScoreUpdateModel resultForExtra(LiveScoreUpdateModel liveScoreModel, long scoreBoardId) throws FixtureGenerationException {
         if (checkForInningCompleteNotInLastBall(liveScoreModel)) {
             updatePlayerTables(liveScoreModel);
             if (setTotalRunsInVersusAndCheckForMatchComplete(liveScoreModel))
@@ -683,6 +681,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             else
                 liveScoreModel.setMatchStatus(MatchStatus.INNINGCOMPLETED.toString());
         }
+        long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
+        long nonStrikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.NONSTRIKE.toString());
+        liveScoreModel.setStrikeBatsmanId(strikeBatsmanSBId);
+        liveScoreModel.setNonStrikeBatsmanId(nonStrikeBatsmanSBId);
+        liveScoreModel.setOverStatus(null);
         return liveScoreModel;
     }
 
