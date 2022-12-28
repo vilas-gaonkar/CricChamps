@@ -59,22 +59,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private void doInitialConditions(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
-        if (/*liveScoreModel.getOver() == 0 &&*/ liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString()) ||
-                liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())
-            /* && liveScoreModel.getBall() == 1 || liveScoreModel.getBall() == 0*/) {
+        if (liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString()) ||
+                liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())) {
             setStatus(liveScoreModel);
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
-
-        /*if (liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())) {
-            jdbcTemplate.update("update matches set totalNumberOfWicket = ? where matchId = ? " +
-                            "and tournamentId = ?", getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
-                    liveScoreModel.getTournamentId());
-            updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
-            liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
-        }*/
-
         List<Matches> tournamentMatches = jdbcTemplate.query("select * from matches where matchId = ?",
                 new BeanPropertyRowMapper<>(Matches.class), liveScoreModel.getMatchId());
         if (!tournamentMatches.isEmpty() && tournamentMatches.get(0).getTotalNumberOfWicket() == 0)
@@ -130,12 +120,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                     liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
             jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
                     TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
-            if (liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString())) {
+            /*if (liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString())) {*/
                 insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
                         liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
                 insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
                         liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
-            }
+            /*}*/
             Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                     liveScoreModel.getBattingTeamId());
             insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId(),
@@ -664,11 +654,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private boolean checkForInningCompleteNotInLastBall(LiveScoreUpdateModel liveScoreModel) {
-        Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);
+        /*Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);*/
         List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ? " +
                         "and matchStatus = 'INNINGCOMPLETED'", new BeanPropertyRowMapper<>(ScoreBoard.class),
                 liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
-        if (match.getTotalNumberOfWicket() == 0) {
+        if (systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0).getTotalNumberOfWicket() == 0) {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
             insertIntoVersus(liveScoreModel);
             return true;
@@ -701,8 +691,14 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     }
 
     private boolean checkForInningComplete(LiveScoreUpdateModel liveScoreModel) {
-        Tournaments tournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0);
-        Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);
+        /*Tournaments tournament = systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0);*/
+        if (systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).get(0).getNumberOfOvers() == liveScoreModel.getOver() + 1) {
+            updateScoreBoardStatus(liveScoreModel, MatchStatus.INNINGCOMPLETED.toString());
+            insertIntoVersus(liveScoreModel);
+            return true;
+        }
+        return checkForInningCompleteNotInLastBall(liveScoreModel);
+       /* Matches match = systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).get(0);
         List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and matchId = ? and teamId = ? " +
                         "and matchStatus = 'INNINGCOMPLETED'", new BeanPropertyRowMapper<>(ScoreBoard.class),
                 liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
@@ -713,7 +709,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         } else {
             ScoreBoard board = getScoreBoard(liveScoreModel).get(0);
             return !scoreBoard.isEmpty() && board.getScore() > scoreBoard.get(0).getScore();
-        }
+        }*/
     }
 
     private void updateScoreBoardStatus(LiveScoreUpdateModel liveScoreModel, String matchStatus) {
@@ -868,7 +864,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         List<ScoreBoard> scoreBoard = jdbcTemplate.query("select * from scoreBoard where tournamentId = ? and " +
                         "matchId = ? and teamId = ?", new BeanPropertyRowMapper<>(ScoreBoard.class),
                 liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBowlingTeamId());
-        if (scoreBoard.get(0).getMatchStatus() == null)
+        if (scoreBoard.isEmpty() || scoreBoard.get(0).getMatchStatus() == null)
             return null;
         return scoreBoard.get(0).getMatchStatus().equals(MatchStatus.INNINGCOMPLETED.toString()) ?
                 scoreBoard.get(0).getScore() > battingTeam.getScore() ? VersusStatus.WIN.toString() :
