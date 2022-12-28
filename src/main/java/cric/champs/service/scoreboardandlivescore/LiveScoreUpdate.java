@@ -606,12 +606,13 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
      */
     private LiveScoreUpdateModel result(LiveScoreUpdateModel liveScoreModel) throws FixtureGenerationException {
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(), liveScoreModel.getBattingTeamId());
-        if (liveScoreModel.getExtraModel().isExtraStatus() && (
+        /*if (liveScoreModel.getExtraModel().isExtraStatus() && (
                 liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.wide.toString()) ||
                         liveScoreModel.getExtraModel().getExtraType().equals(ExtraRunsType.noBall.toString())))
             return resultForExtra(liveScoreModel, scoreBoardId);
             //need to be verified
-        else if (liveScoreModel.getBall() == 5) {
+        else*/
+        if (liveScoreModel.getBall() == 5) {
             if (checkForInningComplete(liveScoreModel)) {
                 updatePlayerTables(liveScoreModel);
                 if (setTotalRunsInVersusAndCheckForMatchComplete(liveScoreModel))
