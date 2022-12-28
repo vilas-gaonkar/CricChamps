@@ -366,8 +366,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
         BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
-        if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() &&
-                liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+        if (liveScoreModel.getWicketModel().getNewBatsmanId() != 0) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         } else
@@ -432,8 +431,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
         BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
-        if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() &&
-                liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
+        if (liveScoreModel.getWicketModel().getNewBatsmanId() != 0) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
             setNewBatsmanPosition(null, scoreBoardId, liveScoreModel.getWicketModel().getOutPlayerId());
         } else
@@ -632,10 +630,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 liveScoreModel.setOver(liveScoreModel.getOver() + 1);
                 liveScoreModel.setBall(0);
             }
-            long strikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.STRIKE.toString());
-            long nonStrikeBatsmanSBId = getBatsmanIds(scoreBoardId, StrikePosition.NONSTRIKE.toString());
-            liveScoreModel.setStrikeBatsmanId(strikeBatsmanSBId);
-            liveScoreModel.setNonStrikeBatsmanId(nonStrikeBatsmanSBId);
+            if ((liveScoreModel.getRuns()) % 2 == 0) {
+                long temp = liveScoreModel.getStrikeBatsmanId();
+                liveScoreModel.setStrikeBatsmanId(liveScoreModel.getNonStrikeBatsmanId());
+                liveScoreModel.setNonStrikeBatsmanId(temp);
+            }
             liveScoreModel.setOverStatus(OverStatus.COMPLETED.toString());
             return liveScoreModel;
         } else if (checkForInningCompleteNotInLastBall(liveScoreModel)) {
