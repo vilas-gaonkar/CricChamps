@@ -66,9 +66,9 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
         if (liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())) {
-            jdbcTemplate.update("update matches set matchStatus = ? , totalNumberOfWicket = ? where matchId = ? " +
-                            "and tournamentId = ?", MatchStatus.LIVE.toString(), getTotalWicketsForMatch(liveScoreModel),
-                    liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
+            jdbcTemplate.update("update matches set totalNumberOfWicket = ? where matchId = ? " +
+                            "and tournamentId = ?", getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
+                    liveScoreModel.getTournamentId());
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
