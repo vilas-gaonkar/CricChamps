@@ -350,7 +350,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         }
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
-        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
         doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.NONSTRIKE.toString(),
@@ -358,6 +357,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
         if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
@@ -415,7 +415,6 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         }
         long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                 liveScoreModel.getBattingTeamId());
-        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
         String strikePosition = getStrikePosition(liveScoreModel.getRuns(), liveScoreModel.getBall());
         doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(strikePosition, liveScoreModel.getStrikeBatsmanId(), scoreBoardId);
         if (strikePosition.equals(StrikePosition.STRIKE.toString()))
@@ -424,6 +423,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         else
             doStrikeRotationAndUpdateScoreForLegByeOrByeWicket(StrikePosition.STRIKE.toString(),
                     liveScoreModel.getNonStrikeBatsmanId(), scoreBoardId);
+        BatsmanSB batsmanSB = getBatsmanSB(liveScoreModel);
         if (!getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId()).isEmpty() &&
                 liveScoreModel.getWicketModel().getNewBatsmanId() != null) {
             setNewBatsmanPosition(batsmanSB.getStrikePosition(), scoreBoardId, liveScoreModel.getWicketModel().getNewBatsmanId());
