@@ -65,6 +65,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
+
         if (liveScoreModel.getMatchStatus().equals(MatchStatus.SECONDINNING.toString())) {
             jdbcTemplate.update("update matches set totalNumberOfWicket = ? where matchId = ? " +
                             "and tournamentId = ?", getTotalWicketsForMatch(liveScoreModel), liveScoreModel.getMatchId(),
@@ -72,11 +73,11 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             updateScoreBoardStatus(liveScoreModel, MatchStatus.INPROGRESS.toString());
             liveScoreModel.setMatchStatus(MatchStatus.INPROGRESS.toString());
         }
+
         List<Matches> tournamentMatches = jdbcTemplate.query("select * from matches where matchId = ?",
                 new BeanPropertyRowMapper<>(Matches.class), liveScoreModel.getMatchId());
-        if (!tournamentMatches.isEmpty() && tournamentMatches.get(0).getTotalNumberOfWicket() == 0) {
+        if (!tournamentMatches.isEmpty() && tournamentMatches.get(0).getTotalNumberOfWicket() == 0)
             throw new LiveScoreUpdationException("team does not have wicket to play");
-        }
     }
 
     private void checkValidationBeforeUpdate(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
