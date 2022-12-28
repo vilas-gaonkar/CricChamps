@@ -69,15 +69,15 @@ public class MatchService implements MatchInterface {
             List<Versus> versus = viewMatchDetails(tournamentId, match.getMatchId());
             if (versus.isEmpty())
                 matchCellResultModel.add(new MatchCellResultModel(match.getTournamentId(), match.getMatchId(),
-                        match.getGroundId(), match.getGroundName(), match.getMatchStatus(), match.getMatchDate(),
-                        match.getMatchDay(), match.getMatchStartTime(), match.getMatchEndTime(), null,
-                        null, 0, 0, 0, 0,
-                        null, null, null, 0,
+                        match.getGroundId(), match.getMatchNumber(), match.getGroundName(), match.getMatchStatus(),
+                        match.getMatchDate(), match.getMatchDay(), match.getMatchStartTime(), match.getMatchEndTime(),
+                        null, null, 0, 0, 0,
+                        0, null, null, null, 0,
                         0, 0, 0, null,
                         match.getCancelledReason()));
             else
                 matchCellResultModel.add(new MatchCellResultModel(match.getTournamentId(), match.getMatchId(),
-                        match.getGroundId(), match.getGroundName(), match.getMatchStatus(), match.getMatchDate(),
+                        match.getGroundId(), match.getMatchNumber(), match.getGroundName(), match.getMatchStatus(), match.getMatchDate(),
                         match.getMatchDay(), match.getMatchStartTime(), match.getMatchEndTime(), versus.get(0).getTeamId(),
                         versus.get(0).getTeamName(), versus.get(0).getTotalScore(), versus.get(0).getTotalWickets(),
                         versus.get(0).getTotalOverPlayed(), versus.get(0).getTotalBallsPlayed(),
