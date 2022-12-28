@@ -854,7 +854,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         if (scoreBoard.isEmpty() || scoreBoard.get(0).getMatchStatus() == null)
             return null;
         return scoreBoard.get(0).getMatchStatus().equals(MatchStatus.INNINGCOMPLETED.toString()) ?
-                scoreBoard.get(0).getScore() > battingTeam.getScore() ? VersusStatus.WIN.toString() :
+                scoreBoard.get(0).getScore() < battingTeam.getScore() ? VersusStatus.WIN.toString() ://line changed
                         scoreBoard.get(0).getScore() == battingTeam.getScore() ? VersusStatus.DRAW.toString() :
                                 VersusStatus.LOSS.toString() : null;
     }
