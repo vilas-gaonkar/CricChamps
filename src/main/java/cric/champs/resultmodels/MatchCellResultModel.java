@@ -20,13 +20,15 @@ public class MatchCellResultModel {
 
     private Long groundId;
 
+    private int matchNumber;
+
     private String groundName;
 
     private String matchStatus;
 
     private LocalDate matchDate;
 
-    private String  matchDay;
+    private String matchDay;
 
     private Time matchStartTime;
 
