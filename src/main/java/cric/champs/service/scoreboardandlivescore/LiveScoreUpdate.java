@@ -130,10 +130,12 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                     liveScoreModel.getMatchId(), liveScoreModel.getTournamentId());
             jdbcTemplate.update("update tournaments set tournamentStatus = ? where tournamentId = ?",
                     TournamentStatus.PROGRESS.toString(), liveScoreModel.getTournamentId());
-            insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
-                    liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
-           /* insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
-                    liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());*/
+            if (liveScoreModel.getMatchStatus().equals(MatchStatus.FIRSTINNING.toString())) {
+                insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBattingTeamId(), systemInterface.verifyTeamDetails(
+                        liveScoreModel.getBattingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+                insertIntoScoreBoardOfTeams(liveScoreModel, liveScoreModel.getBowlingTeamId(), systemInterface.verifyTeamDetails(
+                        liveScoreModel.getBowlingTeamId(), liveScoreModel.getTournamentId()).get(0).getTeamName());
+            }
             Long scoreBoardId = getScoreBoardId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId(),
                     liveScoreModel.getBattingTeamId());
             insertNewBatsmanToScoreboard(liveScoreModel, scoreBoardId, liveScoreModel.getStrikeBatsmanId(),
@@ -904,7 +906,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
             if (firstInning.isEmpty())
                 insertIntoLive(liveScoreUpdateModel, teams, 0);
             else
-                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns()+1 - liveScoreUpdateModel.getRuns());
+                insertIntoLive(liveScoreUpdateModel, teams, firstInning.get(0).getRuns() + 1 - liveScoreUpdateModel.getRuns());
         } else
             updatingForExistingLiveScore(liveScoreUpdateModel, tournaments);
     }
