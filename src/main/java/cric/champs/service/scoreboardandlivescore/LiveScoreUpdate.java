@@ -115,7 +115,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId(), liveScoreModel.getBowlingTeamId()).isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         if (liveScoreModel.getWicketModel().isWicketStatus() && (
-                getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() ||
+                /*getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() ||*/
                         Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getWicketModel().getOutPlayerId()) ||
                         Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getStrikeBatsmanId()) ||
                         Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getNonStrikeBatsmanId()) ||
