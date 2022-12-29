@@ -79,7 +79,8 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
     private void checkValidationBeforeUpdate(LiveScoreUpdateModel liveScoreModel) throws LiveScoreUpdationException {
 
         if (systemInterface.verifyTournamentId(liveScoreModel.getTournamentId()).isEmpty() ||
-                systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).isEmpty())
+                systemInterface.verifyMatchId(liveScoreModel.getTournamentId(), liveScoreModel.getMatchId()).isEmpty() ||
+                verifyTeamIdsOfMatch(liveScoreModel))
             throw new LiveScoreUpdationException("Invalid Tournament Updation");
         if (liveScoreModel.getRuns() > 7 || liveScoreModel.getRuns() < 0)
             throw new LiveScoreUpdationException("Invalid runs");
@@ -92,7 +93,7 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
         if (getPlayerDetail(liveScoreModel.getStrikeBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() ||
                 getPlayerDetail(liveScoreModel.getNonStrikeBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() ||
                 getPlayerDetail(liveScoreModel.getBowlerId(), liveScoreModel.getBowlingTeamId()).isEmpty())
-            throw new LiveScoreUpdationException("Invalid player");
+            throw new LiveScoreUpdationException("Invalid player selection");
 
         List<ScoreBoard> scoreBoard = getScoreBoard(liveScoreModel);
         if (liveScoreModel.getMatchStatus() != null &&
@@ -107,18 +108,28 @@ public class LiveScoreUpdate implements LiveScoreUpdateInterface {
                 new BeanPropertyRowMapper<>(Matches.class), liveScoreModel.getTournamentId(),
                 MatchStatus.CANCELLED.toString());
         if (!match.isEmpty())
-            throw new LiveScoreUpdationException("All matches does not have ground so you cannot start tournament");
+            throw new LiveScoreUpdationException("Insufficient grounds, cannot start tournament");
 
         if (liveScoreModel.getWicketModel().isWicketStatus() &&
                 liveScoreModel.getWicketModel().getFielderId() != 0 &&
                 getPlayerDetail(liveScoreModel.getWicketModel().getFielderId(), liveScoreModel.getBowlingTeamId()).isEmpty())
             throw new LiveScoreUpdationException("Invalid player");
         if (liveScoreModel.getWicketModel().isWicketStatus() &&
+                getPlayerDetail(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBattingTeamId()).isEmpty() ||
                 Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getWicketModel().getOutPlayerId()) ||
                 Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getStrikeBatsmanId()) ||
                 Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getNonStrikeBatsmanId()) ||
                 Objects.equals(liveScoreModel.getWicketModel().getNewBatsmanId(), liveScoreModel.getBowlerId()))
             throw new LiveScoreUpdationException("Invalid batsman selected");
+
+    }
+
+    private boolean verifyTeamIdsOfMatch(LiveScoreUpdateModel liveScoreModel) {
+        List<Versus> versus = jdbcTemplate.query("select * from versus where matchId = ? ", new BeanPropertyRowMapper<>(Versus.class),
+                liveScoreModel.getMatchId());
+        return versus.isEmpty() ||
+                (versus.get(0).getTeamId() != liveScoreModel.getBattingTeamId() && versus.get(0).getTeamId() != liveScoreModel.getBowlingTeamId()) ||
+                (versus.get(1).getTeamId() != liveScoreModel.getBattingTeamId() && versus.get(1).getTeamId() != liveScoreModel.getBowlingTeamId());
     }
 
     /**
